@@ -2,7 +2,10 @@
 
 ## Set up 
 * Input your database's setting in database/config.js
-
+* Install moduels
+```
+npm install
+```
 ### Start Server
 ```
 DEBUG=express-locallibrary-tutorial:* npm run devstart
