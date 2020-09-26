@@ -15,8 +15,7 @@
     "morgan": "~1.9.1",
     "sequelize": "^6.3.5",
     "jsonwebtoken": "^8.5.1",
-    "cors" : "^2.8.5"
-    
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
