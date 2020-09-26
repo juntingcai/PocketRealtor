@@ -43,15 +43,16 @@ class user {
     }
 
     // check if user exists
-    User.findUser(email)
+    User.findUserByEmail(email)
       .then((u) => {
         if (!u) {
           // email does not exist
+
           // generate salt
           let salt = crypto.randomBytes(16).toString("hex");
           // hash password with salt
           let hashedPassword = hashPassword(salt, password);
-          
+
           let user = {
             email: email,
             password_salt: salt,
@@ -107,12 +108,16 @@ class user {
       });
     }
 
-    User.findUser(email).then((user) => {
+    User.findUserByEmail(email).then((user) => {
       if (user) {
         let salt = user.password_salt;
         let hashedPassword = hashPassword(salt, password);
         if (hashedPassword === user.password_hashed) {
-          let token = generateAuthToken(user);
+          let token = generateAuthToken({
+            id: user.id,
+            email: user.email,
+            firstname: user.first_name,
+          });
           res.json({
             code: constant.RESPONSE.SUCCESS.code,
             msg: constant.RESPONSE.SUCCESS.msg,
@@ -132,22 +137,45 @@ class user {
       }
     });
   }
+
+  // just for dev
+  testUserToken(req, res, next) {
+    try {
+      const token = req.header("Authorization");
+      const decoded = jwt.verify(token, constant.jwtsecret);
+      const user = User.findUserById(decoded.id);
+      if (!user) {
+        res.json({
+          code: constant.RESPONSE.USER_NOT_EXIST.code,
+          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
+        });
+      }
+
+      res.json({
+        code: constant.RESPONSE.SUCCESS.code,
+        msg: constant.RESPONSE.SUCCESS.msg,
+      });
+
+    } catch (err) {
+      res.json({
+        code: constant.RESPONSE.TOKEN_ERR.code,
+        msg: constant.RESPONSE.TOKEN_ERR.msg,
+      });
+    }
+  }
 }
 
 const generateAuthToken = function (user) {
   let token = jwt.sign({ user: user }, constant.jwtsecret, {
-    expiresIn: "7d", // expire in a week
+    expiresIn: "1d", // expire in a day
   });
-
-  User.appendToken(user.id, token);
-
   return token;
-}
+};
 
 const hashPassword = function (salt, pwd) {
   var hmac = crypto.createHmac("sha256", salt);
   return hmac.update(pwd).digest("hex");
-}
+};
 
 function isEmailLegal(email) {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -162,4 +190,4 @@ function isPasswordLegal(password) {
   return result;
 }
 
-module.exports = new user()
+module.exports = new user();

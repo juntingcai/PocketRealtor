@@ -10,4 +10,7 @@ router.get('/user', function(req, res, next) {
 
 router.post('/register', User.register);
 router.post('/login', User.login)
+
+router.post('/testUserToken', User.testUserToken)
+
 module.exports = router;

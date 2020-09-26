@@ -52,10 +52,10 @@ var User = sequelize.define('user',
       type: Sequelize.STRING,
       allowNull: false,
     },
-    tokens: {
-      type: Sequelize.ARRAY(Sequelize.TEXT),
-      allowNull: true,
-    },
+    // tokens: {
+    //   type: Sequelize.ARRAY(Sequelize.TEXT),
+    //   allowNull: true,
+    // },
   },
   {
     underscored: true,
@@ -73,16 +73,20 @@ class UserDbModel{
     return await User.create(user);
   }
 
-  async findUser(email){
+  async findUserByEmail(email){
     return await User.findOne({ where: { email: email } });
   }
 
-  appendToken(userId, token){
-    User.update(
-      {'tokens': sequelize.fn('array_append', sequelize.col('tokens'), token)},
-      {'where': {'id': userId}}
-     );
+  async findUserById(id){
+    return await User.findOne({ where: { id: id } });
   }
+
+  // appendToken(userId, token){
+  //   User.update(
+  //     {'tokens': sequelize.fn('array_append', sequelize.col('tokens'), token)},
+  //     {'where': {'id': userId}}
+  //    );
+  // }
   
 }
 

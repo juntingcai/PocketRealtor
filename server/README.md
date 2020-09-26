@@ -39,8 +39,11 @@ If user's login inputed correctly, it will return the json with "token".
 ```
 Otherwise, the fail code and message will show as in static/Constant.js
 
-## Token Usage
-After user logged in, every operation, like update profile or change password, must include the token in header.
-The token's duration is 7 days.
+## Token
+To test if your token is valid
+make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
+```
+Post: localhost:3000/testUserToken
+```
 
 
