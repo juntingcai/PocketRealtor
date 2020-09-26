@@ -143,19 +143,20 @@ class user {
     try {
       const token = req.header("Authorization");
       const decoded = jwt.verify(token, constant.jwtsecret);
-      const user = User.findUserById(decoded.id);
-      if (!user) {
-        res.json({
-          code: constant.RESPONSE.USER_NOT_EXIST.code,
-          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
-        });
-      }
-
-      res.json({
-        code: constant.RESPONSE.SUCCESS.code,
-        msg: constant.RESPONSE.SUCCESS.msg,
+      User.findUserById(decoded.user.id).then((user) => {
+        if (user) {
+          res.json({
+            code: constant.RESPONSE.SUCCESS.code,
+            msg: constant.RESPONSE.SUCCESS.msg,
+          });
+          // console.log(user);
+        } else {
+          res.json({
+            code: constant.RESPONSE.USER_NOT_EXIST.code,
+            msg: constant.RESPONSE.USER_NOT_EXIST.msg,
+          });
+        }
       });
-
     } catch (err) {
       res.json({
         code: constant.RESPONSE.TOKEN_ERR.code,
