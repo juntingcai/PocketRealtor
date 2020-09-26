@@ -11,6 +11,7 @@ router.get('/user', function(req, res, next) {
 router.post('/register', User.register);
 router.post('/login', User.login)
 
-router.post('/testUserToken', User.testUserToken)
+router.post('/testUserToken', User.verifyToken ,User.testUserToken)
+router.post('/updatePassword', User.verifyToken, User.updatePassword)
 
 module.exports = router;

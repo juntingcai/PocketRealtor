@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/userModel");
+const { resolveSoa } = require("dns");
 
 class user {
   constructor() {}
@@ -140,29 +141,96 @@ class user {
 
   // just for dev
   testUserToken(req, res, next) {
-    try {
-      const token = req.header("Authorization");
-      const decoded = jwt.verify(token, constant.jwtsecret);
-      User.findUserById(decoded.user.id).then((user) => {
-        if (user) {
+    let reqUser = req.body.user;
+    User.findUserById(reqUser.id).then((user) => {
+      if (user) {
+        res.json({
+          code: constant.RESPONSE.SUCCESS.code,
+          msg: constant.RESPONSE.SUCCESS.msg,
+        });
+        // console.log(user);
+      } else {
+        res.json({
+          code: constant.RESPONSE.USER_NOT_EXIST.code,
+          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
+        });
+      }
+    });
+  }
+
+  updatePassword(req, res, next) {
+    let reqUser = req.body.user;
+    let userId = reqUser.id;
+    let oldPwd = req.body.oldPassword;
+    let newPwd = req.body.newPassword;
+
+    if (!userId || !oldPwd || !newPwd) {
+      res.json({
+        code: constant.RESPONSE.MISS_FIELD.code,
+        msg: constant.RESPONSE.MISS_FIELD.msg,
+      });
+    }
+
+    User.findUserById(userId).then((user) => {
+      // check user exists
+      if (!user) {
+        res.json({
+          code: constant.RESPONSE.USER_NOT_EXIST.code,
+          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
+        });
+        return;
+      }
+      let salt = user.password_salt;
+      // check old password
+      if (user.password_hashed !== hashPassword(salt, oldPwd)) {
+        res.json({
+          code: constant.RESPONSE.WRONG_PWD.code,
+          msg: constant.RESPONSE.WRONG_PWD.msg,
+        });
+        return;
+      }
+      // check new password
+      if (!isPasswordLegal(newPwd)) {
+        res.json({
+          code: constant.RESPONSE.WRONG_FMT.code,
+          msg: constant.RESPONSE.WRONG_FMT.msg,
+        });
+        return;
+      }
+      // hash new password
+      let newHashedPwd = hashPassword(salt, newPwd);
+      User.updatePassword(user.id, newHashedPwd)
+        .then(() => {
+          // success
           res.json({
             code: constant.RESPONSE.SUCCESS.code,
             msg: constant.RESPONSE.SUCCESS.msg,
           });
-          // console.log(user);
-        } else {
+        })
+        .catch((err) => {
+          // database error
           res.json({
-            code: constant.RESPONSE.USER_NOT_EXIST.code,
-            msg: constant.RESPONSE.USER_NOT_EXIST.msg,
+            code: constant.RESPONSE.DATABASE_ERROR.code,
+            msg: constant.RESPONSE.DATABASE_ERROR.msg,
+            err: err,
           });
-        }
-      });
-    } catch (err) {
-      res.json({
-        code: constant.RESPONSE.TOKEN_ERR.code,
-        msg: constant.RESPONSE.TOKEN_ERR.msg,
-      });
-    }
+        });
+    });
+  }
+
+  verifyToken(req, res, next) {
+    const token = req.header("Authorization");
+    jwt.verify(token, constant.jwtsecret, function (err, decoded) {
+      if (err) {
+        res.json({
+          code: constant.RESPONSE.TOKEN_ERR.code,
+          msg: constant.RESPONSE.TOKEN_ERR.msg,
+        });
+      } else {
+        req.body.user = decoded.user;
+        next();
+      }
+    });
   }
 }
 
