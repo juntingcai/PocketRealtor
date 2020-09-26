@@ -23,7 +23,4 @@ sequelize
     console.log("Unable to connect to the database:", err);
   });
 
-module.exports = {sequelize};
-
-exports.sequelize = sequelize;
-exports.Sequelize = Sequelize;
+module.exports = sequelize;
