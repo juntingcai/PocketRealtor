@@ -1,5 +1,6 @@
 const { sequelize, Sequelize } = require("../database/dbConnection");
 const constant = require("../static/Constant");
+const resTemplate = require("../utils/Response");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
@@ -21,25 +22,15 @@ class user {
       firstname.length == 0 ||
       lastname.length == 0
     ) {
-      res.json({
-        code: constant.RESPONSE.NO_DATA.code,
-        msg: constant.RESPONSE.NO_DATA.msg,
-        //data: err,
-      });
+      resTemplate.success(res);
     }
 
     if (!isEmailLegal(email)) {
-      res.json({
-        code: constant.RESPONSE.NO_DATA.code,
-        msg: constant.RESPONSE.NO_DATA.msg,
-      });
+      resTemplate.wrongFormat(res);
     }
 
     if (!isPasswordLegal(password)) {
-      res.json({
-        code: constant.RESPONSE.NO_DATA.code,
-        msg: constant.RESPONSE.NO_DATA.msg,
-      });
+      resTemplate.wrongFormat(password);
     }
 
     // check if user exists
@@ -63,32 +54,18 @@ class user {
 
           // register user
           User.createUser(user)
-            .then((result) => {
-              res.json({
-                code: constant.RESPONSE.SUCCESS.code,
-                msg: constant.RESPONSE.SUCCESS.msg,
-              });
+            .then(() => {
+              resTemplate.success(res);
             })
             .catch((err) => {
-              res.json({
-                code: constant.RESPONSE.NO_DATA.code,
-                msg: constant.RESPONSE.NO_DATA.msg,
-              });
+              resTemplate.noDataFound(res);
             });
         } else {
-          res.json({
-            // email exists
-            code: constant.RESPONSE.EMAIL_EXIST.code,
-            msg: constant.RESPONSE.EMAIL_EXIST.msg,
-          });
+          resTemplate.emailExist(res);
         }
       })
       .catch((err) => {
-        res.json({
-          // email exists
-          code: constant.RESPONSE.FAILD.code,
-          msg: constant.RESPONSE.FAILD.msg,
-        });
+        resTemplate.fail(res);
       });
   }
 
@@ -102,10 +79,7 @@ class user {
       email.length == 0 ||
       password.length == 0
     ) {
-      res.json({
-        code: constant.RESPONSE.MISS_FIELD.code,
-        msg: constant.RESPONSE.MISS_FIELD.msg,
-      });
+      resTemplate.missFileds(res);
     }
 
     User.findUserByEmail(email).then((user) => {
@@ -118,22 +92,12 @@ class user {
             email: user.email,
             firstname: user.first_name,
           });
-          res.json({
-            code: constant.RESPONSE.SUCCESS.code,
-            msg: constant.RESPONSE.SUCCESS.msg,
-            token: token,
-          });
+          resTemplate.success_login(res, token);
         } else {
-          res.json({
-            code: constant.RESPONSE.USER_NOT_EXIST.code,
-            msg: constant.RESPONSE.USER_NOT_EXIST.msg,
-          });
+          resTemplate.userNotExist(res);
         }
       } else {
-        res.json({
-          code: constant.RESPONSE.USER_NOT_EXIST.code,
-          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
-        });
+        resTemplate.userNotExist(res);
       }
     });
   }
@@ -143,16 +107,9 @@ class user {
     let reqUser = req.body.user;
     User.findUserById(reqUser.id).then((user) => {
       if (user) {
-        res.json({
-          code: constant.RESPONSE.SUCCESS.code,
-          msg: constant.RESPONSE.SUCCESS.msg,
-        });
-        // console.log(user);
+        resTemplate.success(res);
       } else {
-        res.json({
-          code: constant.RESPONSE.USER_NOT_EXIST.code,
-          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
-        });
+        resTemplate.USER_NOT_EXIST(res);
       }
     });
   }
@@ -164,56 +121,110 @@ class user {
     let newPwd = req.body.newPassword;
 
     if (!userId || !oldPwd || !newPwd) {
-      res.json({
-        code: constant.RESPONSE.MISS_FIELD.code,
-        msg: constant.RESPONSE.MISS_FIELD.msg,
-      });
+      resTemplate.missFileds(res);
+      return;
     }
 
     User.findUserById(userId).then((user) => {
       // check user exists
       if (!user) {
-        res.json({
-          code: constant.RESPONSE.USER_NOT_EXIST.code,
-          msg: constant.RESPONSE.USER_NOT_EXIST.msg,
-        });
+        resTemplate.userNotExist(res);
         return;
       }
       let salt = user.password_salt;
       // check old password
       if (user.password_hashed !== hashPassword(salt, oldPwd)) {
-        res.json({
-          code: constant.RESPONSE.WRONG_PWD.code,
-          msg: constant.RESPONSE.WRONG_PWD.msg,
-        });
+        resTemplate.wrongPassword(res);
         return;
       }
       // check new password
       if (!isPasswordLegal(newPwd)) {
-        res.json({
-          code: constant.RESPONSE.WRONG_FMT.code,
-          msg: constant.RESPONSE.WRONG_FMT.msg,
-        });
+        resTemplate.wrongFormat(res);
         return;
       }
       // hash new password
       let newHashedPwd = hashPassword(salt, newPwd);
       User.updatePassword(user.id, newHashedPwd)
         .then(() => {
-          // success
-          res.json({
-            code: constant.RESPONSE.SUCCESS.code,
-            msg: constant.RESPONSE.SUCCESS.msg,
-          });
+          resTemplate.success(res);
         })
         .catch((err) => {
-          // database error
-          res.json({
-            code: constant.RESPONSE.DATABASE_ERROR.code,
-            msg: constant.RESPONSE.DATABASE_ERROR.msg,
-            err: err,
-          });
+          resTemplate.fail(res);
         });
+    });
+  }
+
+  updateProfile(req, res, next) {
+    let reqUserId = req.body.user.id;
+
+    let firstname = req.body.firstname;
+    let lastname = req.body.lastname;
+    let birthday = req.body.birthday;
+    let nickname = req.body.nickname;
+    let intro = req.body.intro;
+
+    if (!reqUserId) {
+      resTemplate.tokenError(res);
+    }
+
+    let profile = {};
+    if (firstname) {
+      profile.firstname = firstname;
+    }
+
+    if (lastname) {
+      profile.lastname = lastname;
+    }
+
+    if (birthday) {
+      profile.birthday = birthday;
+    }
+
+    if (nickname) {
+      profile.nickname = nickname;
+    }
+
+    if (intro) {
+      profile.intro = intro;
+    }
+
+    User.updateProfile(reqUserId, profile)
+      .then(() => {
+        resTemplate.success(res);
+      })
+      .catch((err) => {
+        console.log(err);
+        resTemplate.fail(res);
+      });
+  }
+
+  getUserProfile(req, res, next) {
+    let userId = req.params.userId;
+
+    if (!userId) {
+      res.json({
+        success: false,
+        message: "Please specify userId",
+      });
+    }
+
+    User.findUserById(userId).then((user) => {
+      if (user) {
+        let resUser = {
+          email: user.email,
+          firstname: user.first_name,
+          lastname: user.last_name,
+          nickname: user.nickname,
+          birthday: user.birthday,
+          intro: user.intro,
+        };
+        res.json({ success: true, data: resUser });
+      } else {
+        res.json({
+          success: false,
+          message: "Cannot find the user",
+        });
+      }
     });
   }
 
@@ -221,10 +232,7 @@ class user {
     const token = req.header("Authorization");
     jwt.verify(token, constant.jwtsecret, function (err, decoded) {
       if (err) {
-        res.json({
-          code: constant.RESPONSE.TOKEN_ERR.code,
-          msg: constant.RESPONSE.TOKEN_ERR.msg,
-        });
+        resTemplate.tokenError(res);
       } else {
         req.body.user = decoded.user;
         next();

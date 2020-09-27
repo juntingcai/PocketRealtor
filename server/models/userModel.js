@@ -1,8 +1,7 @@
-const {User, Role} = require("./models")
+const { User, Role } = require("./models");
 
 class UserModel {
   async createUser(user) {
-    user.role_id = 0;
     return await User.create(user);
   }
 
@@ -21,6 +20,33 @@ class UserModel {
         where: { id: id },
       }
     );
+  }
+
+  async updateProfile(id, profile) {
+    let user = {};
+    let firstname = profile.firstname;
+    let lastname = profile.lastname;
+    let birthday = profile.birthday;
+    let nickname = profile.nickname;
+    let intro = profile.intro;
+
+    if (firstname) {
+      user.first_name = firstname;
+    }
+    if (lastname) {
+      user.last_name = lastname;
+    }
+    if (birthday) {
+      user.birthday = birthday;
+    }
+    if (nickname) {
+      user.nickname = nickname;
+    }
+    if (intro) {
+      user.intro = intro;
+    }
+
+    return await User.update(user, { where: { id: id } });
   }
 }
 

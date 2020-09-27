@@ -14,7 +14,7 @@ DEBUG=express-locallibrary-tutorial:* npm run devstart
 ## User Register
 
 ```
-Post: localhost:3000/register
+Post: localhost:3000/user/register
 {
     "email": "youremail@gmail.com",
     "password": "EE123456ee",
@@ -26,7 +26,7 @@ No matter success or fail, the server will return a json in {code: code, msg: me
 
 ## User Login
 ```
-Post: localhost:3000/login
+Post: localhost:3000/user/login
 {
     "email": "bnb1083@gmail.com",
     "password": "EE123456ee"
@@ -49,13 +49,54 @@ make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
 Post: localhost:3000/testUserToken
 ```
 
-## Change password
+## Change password (Token needed)
 To update user's passoword, please include the user's token in Header
 "Authorization":"USER'S TOKEN", and make a post request:
 ```
-Post: localhost:3000/updatePassword
+Post: localhost:3000/user/updatePassword
 {
     "oldPassword": "Ee123456789",
     "newPassword": "Ee123456100"
 }
 ```
+
+## Update password (Token needed)
+To update user's profole, please include the user's token in Header
+"Authorization":"USER'S TOKEN", and make a put request:
+```
+Put: localhost:3000/user/updateProfile
+{
+    "firstname": "Jerry",
+    "lastname": "Chen",
+    "nickname": "JC",
+    "intro" : "Hi I am Jerry"
+}
+```
+
+## Get someone's profile
+To get someone's profile, please make a get request and provide the user's id
+```
+GET: localhost:3000/user/:userId
+```
+If the user exists, a json will be returned like: 
+```
+{
+    "success": true,
+    "data": {
+        "email": "member2@gmail.com",
+        "firstname": "Jerry",
+        "lastname": "Chen",
+        "nickname": "JC",
+        "birthday": null,
+        "intro": "Hi I am Jerry"
+    }
+}
+```
+If the user does not exist, a json will be returned like:
+```
+{
+    "success": false,
+    "message": "Cannot find the user"
+}
+```
+
