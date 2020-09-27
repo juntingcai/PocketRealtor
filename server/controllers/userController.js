@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/userModel");
-const { resolveSoa } = require("dns");
 
 class user {
   constructor() {}

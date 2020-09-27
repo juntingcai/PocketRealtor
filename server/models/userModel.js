@@ -1,49 +1,8 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = require("../database/dbConnection");
+const {User, Role} = require("./models")
 
-const User = sequelize.define(
-  "user",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-    first_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    last_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password_salt: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password_hashed: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    underscored: true,
-    timestamps: false,
-    //freezeTableName: false
-  }
-);
-
-// User.sync({ force: true });
-
-sequelize.sync();
-
-class UserDbModel {
+class UserModel {
   async createUser(user) {
+    user.role_id = 0;
     return await User.create(user);
   }
 
@@ -65,4 +24,4 @@ class UserDbModel {
   }
 }
 
-module.exports = new UserDbModel();
+module.exports = new UserModel();
