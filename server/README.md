@@ -49,4 +49,13 @@ make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
 Post: localhost:3000/testUserToken
 ```
 
-
+## Change password
+To update user's passoword, please include the user's token in Header
+"Authorization":"USER'S TOKEN", and make a post request:
+```
+Post: localhost:3000/updatePassword
+{
+    "oldPassword": "Ee123456789",
+    "newPassword": "Ee123456100"
+}
+```
