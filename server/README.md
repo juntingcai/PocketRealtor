@@ -46,6 +46,7 @@ Otherwise, the fail code and reason will show as in static/Constant.js
 ## Token
 * To test if your token is valid, make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
 * If the token is valid, it will return the user's info in Json.
+* If you'd like to see the token's value(user's id), check out https://jwt.io, and enter the token you got.
 ```
 Post: localhost:3000/testUserToken
 ```
