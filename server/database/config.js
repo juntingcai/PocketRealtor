@@ -1,7 +1,7 @@
 module.exports = {
-  db: "jerrydb",
-  user: "jerrychen",
-  password: "jerry1234",
+  db: "jerrydb", // jerrydb
+  user: "jerrychen", // jerrychen
+  password: "jerry1234", // jerry1234
   host: "localhost",
   port: 5432,
   dialect: "postgres",

@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/dbConnection");
+const config = require('../config');
 
 let tableDefaultSetting = {
   underscored: true,
@@ -105,7 +106,7 @@ const RolePermission = sequelize.define(
 Permission.belongsToMany(Role, { through: RolePermission , foreignKey: "permission_id"});
 Role.belongsToMany(Permission, { through: RolePermission , foreignKey: "role_id"});
 
-sequelize.sync({force: false}).then(()=>{
+sequelize.sync({force: config.resetTables}).then(()=>{
   Role.bulkCreate([
     { id: 1, name: "Renter" },
     { id: 2, name: "Host" },
