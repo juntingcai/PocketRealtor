@@ -30,7 +30,7 @@ class user {
     }
 
     if (!isPasswordLegal(password)) {
-      resTemplate.wrongFormat(password);
+      resTemplate.wrongFormat(res);
     }
 
     // check if user exists
@@ -90,7 +90,7 @@ class user {
           let token = generateAuthToken({
             id: user.id,
             email: user.email,
-            firstname: user.first_name,
+            hash: hashedPassword,
           });
           resTemplate.success_login(res, token);
         } else {
@@ -104,14 +104,15 @@ class user {
 
   // just for dev
   testUserToken(req, res, next) {
-    let reqUser = req.body.user;
-    User.findUserById(reqUser.id).then((user) => {
-      if (user) {
-        resTemplate.success(res);
-      } else {
-        resTemplate.USER_NOT_EXIST(res);
-      }
-    });
+    // let reqUser = req.body.user;
+    // User.findUserById(reqUser.id).then((user) => {
+    //   if (user) {
+    //     resTemplate.success(res);
+    //   } else {
+    //     resTemplate.userNotExist(res);
+    //   }
+    // });
+    res.json(req.body.user);
   }
 
   updatePassword(req, res, next) {
@@ -234,8 +235,42 @@ class user {
       if (err) {
         resTemplate.tokenError(res);
       } else {
-        req.body.user = decoded.user;
-        next();
+        // check user info
+        let decodedUser = decoded.user;
+        if (!decodedUser) {
+          resTemplate.tokenError(res);
+        }
+
+        let userId = decodedUser.id;
+        let email = decodedUser.email;
+        let pwdHash = decodedUser.hash;
+
+        if (!userId || !email || !pwdHash) {
+          console.log("Token Fields Missed")
+          resTemplate.tokenError(res);
+        }
+
+        User.findUserById(userId)
+          .then((user) => {
+            if (
+              !user ||
+              userId !== user.id ||
+              user.email !== email ||
+              user.password_hashed !== pwdHash
+              
+            ) {
+              console.log("Cannot find user info")
+              resTemplate.tokenError(res);
+            } else{
+              console.log("token passed")
+              req.body.user = user;
+              next();
+            }
+          })
+          .catch((err) => {
+            console.log("Error happened" + err);
+            resTemplate.tokenError(res);
+          });
       }
     });
   }

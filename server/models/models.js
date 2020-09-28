@@ -105,7 +105,7 @@ const RolePermission = sequelize.define(
 Permission.belongsToMany(Role, { through: RolePermission , foreignKey: "permission_id"});
 Role.belongsToMany(Permission, { through: RolePermission , foreignKey: "role_id"});
 
-sequelize.sync({force: true}).then(()=>{
+sequelize.sync({force: false}).then(()=>{
   Role.bulkCreate([
     { id: 1, name: "Renter" },
     { id: 2, name: "Host" },
