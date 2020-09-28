@@ -44,9 +44,8 @@ If user's login inputed correctly, it will return the json with "token".
 Otherwise, the fail code and reason will show as in static/Constant.js
 
 ## Token
-To test if your token is valid
-make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
-If the token is valid, it will return the user's info in Json.
+* To test if your token is valid, make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
+* If the token is valid, it will return the user's info in Json.
 ```
 Post: localhost:3000/testUserToken
 ```
@@ -62,7 +61,7 @@ Post: localhost:3000/user/updatePassword
 }
 ```
 
-## Update password (Token needed)
+## Update profile (Token needed)
 To update user's profole, please include the user's token in Header
 "Authorization":"USER'S TOKEN", and make a put request:
 ```
