@@ -1,8 +1,14 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/dbConnection");
 
+let tableDefaultSetting = {
+  underscored: true,
+  timestamps: false,
+  freezeTableName: true,
+};
+
 const User = sequelize.define(
-  "user_account",
+  "users",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -48,43 +54,71 @@ const User = sequelize.define(
       allowNull: true,
     },
   },
-  {
-    underscored: true,
-    timestamps: false,
-    freezeTableName: true
-  }
+  tableDefaultSetting
 );
 
-sequelize.sync();
+const Role = sequelize.define(
+  "roles",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  tableDefaultSetting
+);
+
+const UserRole = sequelize.define(
+  "user_roles", 
+  {},
+  tableDefaultSetting
+);
+
+User.belongsToMany(Role, { through: UserRole , foreignKey: "user_id"});
+Role.belongsToMany(User, { through: UserRole , foreignKey: "role_id"});
+
+const Permission = sequelize.define(
+  "permissions",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  tableDefaultSetting
+);
+
+const RolePermission = sequelize.define(
+  "role_permissions",
+  {},
+  tableDefaultSetting
+);
+
+Permission.belongsToMany(Role, { through: RolePermission , foreignKey: "permission_id"});
+Role.belongsToMany(Permission, { through: RolePermission , foreignKey: "role_id"});
+
+sequelize.sync({force: true}).then(()=>{
+  Role.bulkCreate([
+    { id: 1, name: "Renter" },
+    { id: 2, name: "Host" },
+    { id: 3, name: "Agent" },
+  ]);
+  
+  Permission.bulkCreate([
+    { id: 1, name: "Create a listing" },
+    { id: 2, name: "Message a host" },
+    { id: 3, name: "Message a renter" },
+  ]);
+})
 
 
-// TBD:
-// Role.hasOne(User);
-// User.belongsTo(Role, {foreignKey: 'role_id', defaultValue: 0})
-// const Role = sequelize.define(
-//   "role",
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//     },
-//     role_name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//   },
-//   {
-//     underscored: true,
-//     timestamps: false,
-//   }
-// );
-// Role.bulkCreate([
-//   { id: 0, role_name: "undecided" },
-//   { id: 1, role_name: "reanter" },
-//   { id: 2, role_name: "host" },
-//   { id: 3, role_name: "renter&host" },
-//   { id: 4, role_name: "agent" },
-// ])
 
-
-module.exports = {User}
+module.exports = { User };
