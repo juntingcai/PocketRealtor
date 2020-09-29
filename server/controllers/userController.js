@@ -92,8 +92,11 @@ class user {
             email: user.email,
             hash: hashedPassword,
           });
-          let resSuccess = resTemplate.SUCCESS;
-          resSuccess.token = token;
+          let resSuccess = {
+            code: resTemplate.SUCCESS.code, 
+            msg: resTemplate.SUCCESS.msg ,
+            token : token
+          };
           res.json(resSuccess);
         } else {
           res.json(resTemplate.USER_NOT_EXIST);
@@ -209,9 +212,13 @@ class user {
           birthday: user.birthday,
           intro: user.intro,
         };
-        let reqSuccess = resTemplate.SUCCESS;
-        reqSuccess.data = resUser;
-        res.json(reqSuccess);
+        let resSuccess = {
+          code: resTemplate.SUCCESS.code, 
+          msg: resTemplate.SUCCESS.msg ,
+          data: resUser
+        };
+        res.json(resSuccess);
+
       } else {
         res.json(resTemplate.USER_NOT_EXIST);
       }
