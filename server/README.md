@@ -23,7 +23,7 @@ Post: localhost:3000/user/register
 }
 ```
 * Password has to be between 6 to 20 characters and contain at least one numeric digit, one uppercase and one lowercase letter
-* No matter success or fail, the server will return a json in {code: code, msg: message} where code and message are in static/Constant.js
+* No matter success or fail, the server will return a json in {code: code, msg: message} where code and message are in static/ResponseTemplate.js
 
 ## User Login
 ```
@@ -41,7 +41,7 @@ If user's login inputed correctly, it will return the json with "token".
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJlbWFpbCI6ImJuYjEwODNAZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6IkplcnJ5IiwibGFzdF9uYW1lIjoiQ2hlbiIsInBhc3N3b3JkX3NhbHQiOiJjYzMyN2QwMDBmNWIxN2JmYWNmMTFlYjRhN2RhMTQ0NCIsInBhc3N3b3JkX2hhc2hlZCI6ImY2OTYzYzFmZTQxNmFkZWY0YTI0MDY1NzEyYmYzYWY4YjU2M2Y5Zjk0MTQ4ODQ4NjJmNDI5ZWRlMWJlZWNiODAiLCJ0b2tlbnMiOm51bGx9LCJpYXQiOjE2MDEwODM1MDUsImV4cCI6MTYwMTY4ODMwNX0.hdKH5wdAnJTTyrd7nzgQX7G0IMr3o8n2Uk94GyGXqm8"
 }
 ```
-Otherwise, the fail code and reason will show as in static/Constant.js
+Otherwise, the fail code and reason will show as in static/ResponseTemplate.js
 
 ## Token
 * To test if your token is valid, make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"

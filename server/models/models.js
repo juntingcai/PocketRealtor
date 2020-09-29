@@ -1,6 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/dbConnection");
-const config = require('../config');
+const config = require("../config");
+const permissionType = require("../static/PermissionType");
+const roleType = require("../static/RoleType");
 
 let tableDefaultSetting = {
   underscored: true,
@@ -73,14 +75,10 @@ const Role = sequelize.define(
   tableDefaultSetting
 );
 
-const UserRole = sequelize.define(
-  "user_roles", 
-  {},
-  tableDefaultSetting
-);
+const UserRole = sequelize.define("user_roles", {}, tableDefaultSetting);
 
-User.belongsToMany(Role, { through: UserRole , foreignKey: "user_id"});
-Role.belongsToMany(User, { through: UserRole , foreignKey: "role_id"});
+User.belongsToMany(Role, { through: UserRole, foreignKey: "user_id" });
+Role.belongsToMany(User, { through: UserRole, foreignKey: "role_id" });
 
 const Permission = sequelize.define(
   "permissions",
@@ -103,23 +101,26 @@ const RolePermission = sequelize.define(
   tableDefaultSetting
 );
 
-Permission.belongsToMany(Role, { through: RolePermission , foreignKey: "permission_id"});
-Role.belongsToMany(Permission, { through: RolePermission , foreignKey: "role_id"});
+Permission.belongsToMany(Role, {
+  through: RolePermission,
+  foreignKey: "permission_id",
+});
+Role.belongsToMany(Permission, {
+  through: RolePermission,
+  foreignKey: "role_id",
+});
 
-sequelize.sync({force: config.resetTables}).then(()=>{
+sequelize.sync({ force: config.resetTables }).then(() => {
   Role.bulkCreate([
-    { id: 1, name: "Renter" },
-    { id: 2, name: "Host" },
-    { id: 3, name: "Agent" },
-  ]);
-  
+    roleType.RENTER, 
+    roleType.HOST, 
+    roleType.AGENT]);
+
   Permission.bulkCreate([
-    { id: 1, name: "Create a listing" },
-    { id: 2, name: "Message a host" },
-    { id: 3, name: "Message a renter" },
+    permissionType.CREATE_LISTING,
+    permissionType.MESSAGE_HOST,
+    permissionType.MESSAGE_RENTER,
   ]);
-})
+});
 
-
-
-module.exports = { User };
+module.exports = { User, UserRole };

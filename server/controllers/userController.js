@@ -1,8 +1,8 @@
-const { sequelize, Sequelize } = require("../database/dbConnection");
 const constant = require("../static/Constant");
-const resTemplate = require("../utils/Response");
+const resTemplate = require("../static/ResponseTemplate");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const regex = require("../static/Regex");
 
 const User = require("../models/userModel");
 
@@ -22,15 +22,15 @@ class user {
       firstname.length == 0 ||
       lastname.length == 0
     ) {
-      resTemplate.success(res);
+      res.json(resTemplate.SUCCESS);
     }
 
     if (!isEmailLegal(email)) {
-      resTemplate.wrongFormat(res);
+      res.json(resTemplate.INVALID_EMAIL);
     }
 
     if (!isPasswordLegal(password)) {
-      resTemplate.wrongFormat(res);
+      res.json(resTemplate.INVALID_PASSWORD);
     }
 
     // check if user exists
@@ -55,17 +55,17 @@ class user {
           // register user
           User.createUser(user)
             .then(() => {
-              resTemplate.success(res);
+              res.json(resTemplate.SUCCESS);
             })
             .catch((err) => {
-              resTemplate.noDataFound(res);
+              responseFail(res, err);
             });
         } else {
-          resTemplate.emailExist(res);
+          res.json(resTemplate.EMAIL_EXIST);
         }
       })
       .catch((err) => {
-        resTemplate.fail(res);
+        responseFail(res, err);
       });
   }
 
@@ -79,7 +79,7 @@ class user {
       email.length == 0 ||
       password.length == 0
     ) {
-      resTemplate.missFileds(res);
+      res.json(resTemplate.MISS_FIELD);
     }
 
     User.findUserByEmail(email).then((user) => {
@@ -92,26 +92,20 @@ class user {
             email: user.email,
             hash: hashedPassword,
           });
-          resTemplate.success_login(res, token);
+          let resSuccess = resTemplate.SUCCESS;
+          resSuccess.token = token;
+          res.json(resSuccess);
         } else {
-          resTemplate.userNotExist(res);
+          res.json(resTemplate.USER_NOT_EXIST);
         }
       } else {
-        resTemplate.userNotExist(res);
+        res.json(resTemplate.USER_NOT_EXIST);
       }
     });
   }
 
   // just for dev
   testUserToken(req, res, next) {
-    // let reqUser = req.body.user;
-    // User.findUserById(reqUser.id).then((user) => {
-    //   if (user) {
-    //     resTemplate.success(res);
-    //   } else {
-    //     resTemplate.userNotExist(res);
-    //   }
-    // });
     res.json(req.body.user);
   }
 
@@ -122,35 +116,35 @@ class user {
     let newPwd = req.body.newPassword;
 
     if (!userId || !oldPwd || !newPwd) {
-      resTemplate.missFileds(res);
+      res.json(resTemplate.MISS_FIELD);
       return;
     }
 
     User.findUserById(userId).then((user) => {
       // check user exists
       if (!user) {
-        resTemplate.userNotExist(res);
+        res.json(resTemplate.USER_NOT_EXIST);
         return;
       }
       let salt = user.password_salt;
       // check old password
       if (user.password_hashed !== hashPassword(salt, oldPwd)) {
-        resTemplate.wrongPassword(res);
+        res.json(resTemplate.INCORRECT_PASSWORD);
         return;
       }
       // check new password
       if (!isPasswordLegal(newPwd)) {
-        resTemplate.wrongFormat(res);
+        res.json(resTemplate.INVALID_PASSWORD);
         return;
       }
       // hash new password
       let newHashedPwd = hashPassword(salt, newPwd);
       User.updatePassword(user.id, newHashedPwd)
         .then(() => {
-          resTemplate.success(res);
+          res.json(resTemplate.SUCCESS);
         })
         .catch((err) => {
-          resTemplate.fail(res);
+          responseFail(res, err);
         });
     });
   }
@@ -165,7 +159,7 @@ class user {
     let intro = req.body.intro;
 
     if (!reqUserId) {
-      resTemplate.tokenError(res);
+      res.json(resTemplate.TOKEN_ERR);
     }
 
     let profile = {};
@@ -191,11 +185,10 @@ class user {
 
     User.updateProfile(reqUserId, profile)
       .then(() => {
-        resTemplate.success(res);
+        res.json(resTemplate.SUCCESS);
       })
       .catch((err) => {
-        console.log(err);
-        resTemplate.fail(res);
+        responseFail(res, err);
       });
   }
 
@@ -203,10 +196,7 @@ class user {
     let userId = req.params.userId;
 
     if (!userId) {
-      res.json({
-        success: false,
-        message: "Please specify userId",
-      });
+      res.json(resTemplate.MISS_FIELD);
     }
 
     User.findUserById(userId).then((user) => {
@@ -219,12 +209,11 @@ class user {
           birthday: user.birthday,
           intro: user.intro,
         };
-        res.json({ success: true, data: resUser });
+        let reqSuccess = resTemplate.SUCCESS;
+        reqSuccess.data = resUser;
+        res.json(reqSuccess);
       } else {
-        res.json({
-          success: false,
-          message: "Cannot find the user",
-        });
+        res.json(resTemplate.USER_NOT_EXIST);
       }
     });
   }
@@ -233,12 +222,12 @@ class user {
     const token = req.header("Authorization");
     jwt.verify(token, constant.jwtsecret, function (err, decoded) {
       if (err) {
-        resTemplate.tokenError(res);
+        res.json(resTemplate.TOKEN_ERR);
       } else {
         // check user info
         let decodedUser = decoded.user;
         if (!decodedUser) {
-          resTemplate.tokenError(res);
+          res.json(resTemplate.TOKEN_ERR);
         }
 
         let userId = decodedUser.id;
@@ -246,8 +235,8 @@ class user {
         let pwdHash = decodedUser.hash;
 
         if (!userId || !email || !pwdHash) {
-          console.log("Token Fields Missed")
-          resTemplate.tokenError(res);
+          console.log("Token Fields Missed");
+          res.json(resTemplate.TOKEN_ERR);
         }
 
         User.findUserById(userId)
@@ -257,19 +246,17 @@ class user {
               userId !== user.id ||
               user.email !== email ||
               user.password_hashed !== pwdHash
-              
             ) {
-              console.log("Cannot find user info")
-              resTemplate.tokenError(res);
-            } else{
-              console.log("token passed")
+              console.log("Cannot find user info");
+              res.json(resTemplate.TOKEN_ERR);
+            } else {
+              console.log("token passed");
               req.body.user = user;
               next();
             }
           })
           .catch((err) => {
-            console.log("Error happened" + err);
-            resTemplate.tokenError(res);
+            responseFail(res, err);
           });
       }
     });
@@ -289,16 +276,25 @@ const hashPassword = function (salt, pwd) {
 };
 
 function isEmailLegal(email) {
-  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re = regex.EMAIL;
   const result = re.test(email);
   return result;
 }
 
 function isPasswordLegal(password) {
   // const re =  /^[A-Za-z]\w{7,14}$/; // between 7 to 16 characters and contain only characters, numeric digits, underscore and first character must be a letter
-  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // between 6 to 20 characters and contain at least one numeric digit, one uppercase and one lowercase letter
+  const re = regex.PASSWORD1;
   const result = re.test(password);
   return result;
+}
+
+/**
+ * This function is for debug purpose
+ */
+function responseFail(res, err) {
+  let fail = resTemplate.FAIL;
+  fail.msg += err;
+  res.json(fail);
 }
 
 module.exports = new user();
