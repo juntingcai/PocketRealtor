@@ -82,8 +82,8 @@ Put: localhost:3000/user/updateProfile
 
 ## Update user's role (Token needed)
 
-PUT: localhost:3000/user/updateRole
 ```
+PUT: localhost:3000/user/updateRole
 {
     "isAgent" : false,
     "isRenter" : true,
@@ -107,8 +107,8 @@ However, if 3 roles are all true, the server will ignore the agent.
 And if all roles are false or undefined, no data will be updated, but the server is still going to return SUCCESS.  
 
 ## Update user's avatar (Token needed)
-PUT: localhost:3000/user/updateAvatar
 ```
+PUT: localhost:3000/user/updateAvatar
 {
     "avatar" : AVATAR
 }
