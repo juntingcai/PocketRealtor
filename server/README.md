@@ -116,6 +116,7 @@ PUT: localhost:3000/user/updateAvatar
 where AVATAR will be stored in database as Blob.  
 See example response in "Get someone's profile" 
 
+
 ## Get someone's profile
 To get someone's profile, please make a GET request and provide the user's id
 ```
@@ -159,3 +160,34 @@ If the user does not exist, a json will be returned like:
 }
 ```
 
+## GET User's role
+To get a user's role, please make a GET request and provide the user's id
+```
+GET: localhost:3000/user/role/:userId
+```
+Response will be a json array  
+One role
+```
+[
+    {
+        "user_id": 1,
+        "role_id": 1,
+        "role_name": "Renter"
+    }
+]
+```
+Two roles
+```
+[
+    {
+        "user_id": 1,
+        "role_id": 2,
+        "role_name": "Host"
+    },
+    {
+        "user_id": 1,
+        "role_id": 1,
+        "role_name": "Renter"
+    }
+]
+```

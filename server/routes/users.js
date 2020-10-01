@@ -9,6 +9,7 @@ router.get('/user', function(req, res, next) {
 });
 
 router.get('/user/:userId/', User.getUserProfile)
+router.get('/user/role/:userId/', User.getUserRole)
 
 router.post('/user/register', User.register);
 router.post('/user/login', User.login)

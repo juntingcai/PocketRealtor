@@ -1,5 +1,5 @@
 const RoleType = require("../static/RoleType");
-const { UserRole, User } = require("./models");
+const { UserRole, Role } = require("./models");
 
 class UserRoleModel {
   async updateUserRole(userId, roleType) {
@@ -36,6 +36,13 @@ class UserRoleModel {
         });
       }
     });
+  }
+
+  async getUserRole(userId){
+    return UserRole.findAll({
+      raw: true,
+      where : {user_id : userId}
+    })
   }
 }
 

@@ -123,4 +123,4 @@ sequelize.sync({ force: config.resetTables }).then(() => {
   ]);
 });
 
-module.exports = { User, UserRole };
+module.exports = { User, UserRole, Role };

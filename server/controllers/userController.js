@@ -6,6 +6,8 @@ const regex = require("../static/Regex");
 
 const User = require("../models/userModel");
 const UserRole = require("../models/roleModel");
+const RoleType = require("../static/RoleType");
+const { Role } = require("../models/models");
 
 class user {
   constructor() {}
@@ -241,7 +243,7 @@ class user {
           nickname: user.nickname,
           birthday: user.birthday,
           intro: user.intro,
-          avatar: user.avatar
+          avatar: user.avatar,
         };
         let resSuccess = {
           code: resTemplate.SUCCESS.code,
@@ -253,6 +255,45 @@ class user {
         res.json(resTemplate.USER_NOT_EXIST);
       }
     });
+  }
+
+  getUserRole(req, res, next) {
+    let userId = req.params.userId;
+    if (!userId) {
+      res.json(resTemplate.MISS_FIELD);
+    }
+
+    UserRole.getUserRole(userId)
+      .then((roles) => {
+        if (!roles) {
+          res.json(resTemplate.NO_DATA);
+          return;
+        }
+        var resRoles = [];
+        for (var i = 0; i < roles.length; i++) {
+          let role = roles[i];
+          let roleId = role.role_id;
+          switch (roleId) {
+            case RoleType.RENTER.id:
+              role.role_name = RoleType.RENTER.name;
+              break;
+            case RoleType.HOST.id:
+              role.role_name = RoleType.HOST.name;
+              break;
+            case RoleType.AGENT.id:
+              role.role_name = RoleType.AGENT.name;
+              break;
+
+            default:
+              break;
+          }
+          resRoles.push(role);
+        }
+        res.json(resRoles)
+      })
+      .catch((err) => {
+        responseFail(res, err);
+      });
   }
 
   updateAvatar(req, res, next) {
