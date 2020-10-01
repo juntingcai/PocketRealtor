@@ -2,7 +2,7 @@
 
 ## Set up 
 * Input your database's setting in database/config.js
-* Install moduels
+* Install moduels (package PR may need to bed installed manaually)
 ```
 npm install
 ```
@@ -10,6 +10,10 @@ npm install
 ```
 DEBUG=express-locallibrary-tutorial:* npm run devstart
 ```
+
+## Server Response
+* No matter requests success or fail, the server will return a json in {code: code, msg: message} (sometimes with token) where code and message are in static/ResponseTemplate.js
+* Note: Currently response code and message are not stable, so please do not rely on it.
 
 ## User Register
 
@@ -23,7 +27,7 @@ Post: localhost:3000/user/register
 }
 ```
 * Password has to be between 6 to 20 characters and contain at least one numeric digit, one uppercase and one lowercase letter
-* No matter success or fail, the server will return a json in {code: code, msg: message} where code and message are in static/ResponseTemplate.js
+* If registered successfully, the server will return the token (see "User Login" response).
 
 ## User Login
 ```
@@ -70,10 +74,47 @@ Put: localhost:3000/user/updateProfile
 {
     "firstname": "Jerry",
     "lastname": "Chen",
+    "birthday" "2001-01-01",
     "nickname": "JC",
     "intro" : "Hi I am Jerry"
 }
 ```
+
+## Update user's role (Token needed)
+
+PUT: localhost:3000/user/updateRole
+```
+{
+    "isAgent" : false,
+    "isRenter" : true,
+    "isHost" : false
+}
+```
+You do not need to give every role field. It's still working if you input: 
+```
+{
+    "isRenter" : true,
+}
+```
+Also, renter and host and be true simultaneously.  
+```
+{
+    "isRenter" : true,
+    "isHost" : true
+}
+```
+However, if 3 roles are all true, the server will ignore the agent.  
+And if all roles are false or undefined, no data will be updated, but the server is still going to return SUCCESS.  
+
+## Update user's avatar (Token needed)
+PUT: localhost:3000/user/updateAvatar
+```
+{
+    "avatar" : AVATAR
+}
+```
+where AVATAR will be stored in database as Blob.  
+See example response in "Get someone's profile" 
 
 ## Get someone's profile
 To get someone's profile, please make a GET request and provide the user's id
@@ -89,8 +130,24 @@ If the user exists, a json will be returned like:
         "firstname": "Jerry",
         "lastname": "Chen",
         "nickname": "JC",
-        "birthday": null,
-        "intro": "Hi I am Jerry"
+        "birthday": 2001-01-01,
+        "intro": "Hi I am Jerry",
+        "avatar": {
+            "type": "Buffer",
+            "data": [
+                100,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                48
+            ]
+        }
     }
 }
 ```
