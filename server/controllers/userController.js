@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const regex = require("../static/Regex");
 
 const User = require("../models/userModel");
+const UserRole = require("../models/roleModel");
 
 class user {
   constructor() {}
@@ -22,7 +23,7 @@ class user {
       firstname.length == 0 ||
       lastname.length == 0
     ) {
-      res.json(resTemplate.SUCCESS);
+      res.json(resTemplate.MISS_FIELD);
     }
 
     if (!isEmailLegal(email)) {
@@ -54,8 +55,18 @@ class user {
 
           // register user
           User.createUser(user)
-            .then(() => {
-              res.json(resTemplate.SUCCESS);
+            .then((user) => {
+              let token = generateAuthToken({
+                id: user.id,
+                email: user.email,
+                hash: hashedPassword,
+              });
+              let resSuccess = {
+                code: resTemplate.SUCCESS.code,
+                msg: resTemplate.SUCCESS.msg,
+                token: token,
+              };
+              res.json(resSuccess);
             })
             .catch((err) => {
               responseFail(res, err);
@@ -93,9 +104,9 @@ class user {
             hash: hashedPassword,
           });
           let resSuccess = {
-            code: resTemplate.SUCCESS.code, 
-            msg: resTemplate.SUCCESS.msg ,
-            token : token
+            code: resTemplate.SUCCESS.code,
+            msg: resTemplate.SUCCESS.msg,
+            token: token,
           };
           res.json(resSuccess);
         } else {
@@ -110,6 +121,25 @@ class user {
   // just for dev
   testUserToken(req, res, next) {
     res.json(req.body.user);
+  }
+
+  updateRole(req, res, next) {
+    let reqUser = req.body.user;
+    let userId = reqUser.id;
+
+    let roleType = {
+      isHost: req.body.isHost,
+      isRenter: req.body.isRenter,
+      isAgent: req.body.isAgent,
+    };
+
+    UserRole.updateUserRole(userId, roleType)
+      .then(() => {
+        res.json(resTemplate.SUCCESS);
+      })
+      .catch((err) => {
+        responseFail(res, err);
+      });
   }
 
   updatePassword(req, res, next) {
@@ -211,18 +241,28 @@ class user {
           nickname: user.nickname,
           birthday: user.birthday,
           intro: user.intro,
+          avatar: user.avatar
         };
         let resSuccess = {
-          code: resTemplate.SUCCESS.code, 
-          msg: resTemplate.SUCCESS.msg ,
-          data: resUser
+          code: resTemplate.SUCCESS.code,
+          msg: resTemplate.SUCCESS.msg,
+          data: resUser,
         };
         res.json(resSuccess);
-
       } else {
         res.json(resTemplate.USER_NOT_EXIST);
       }
     });
+  }
+
+  updateAvatar(req, res, next) {
+    let userId = req.body.user.id;
+    let avatar = req.body.avatar;
+    User.updateAvatar(userId, avatar)
+      .then(() => res.json(resTemplate.SUCCESS))
+      .catch((err) => {
+        responseFail(res, err);
+      });
   }
 
   verifyToken(req, res, next) {

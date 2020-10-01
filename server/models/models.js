@@ -45,7 +45,7 @@ const User = sequelize.define(
       allowNull: true,
     },
     birthday: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
     avatar: {

@@ -37,6 +37,7 @@ class UserModel {
       user.last_name = lastname;
     }
     if (birthday) {
+      // let bd = new Date(birthday);
       user.birthday = birthday;
     }
     if (nickname) {
@@ -47,6 +48,15 @@ class UserModel {
     }
 
     return await User.update(user, { where: { id: id } });
+  }
+
+  async updateAvatar(userId, avatar) {
+    return await User.update(
+      { avatar: avatar },
+      {
+        where: { id: userId },
+      }
+    );
   }
 }
 
