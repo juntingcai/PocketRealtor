@@ -1,5 +1,8 @@
 # Server usage
 
+## Update 
+10/7: Add create/delete and search for listings  
+
 ## Set up 
 * Input your database's setting in database/config.js
 * Install moduels (package PR may need to bed installed manaually)
@@ -190,4 +193,62 @@ Two roles
         "role_name": "Renter"
     }
 ]
+```
+
+## Create a house listing(Host user token needed)
+Before a user creating a listing, the user must be a Host. 
+(See [Update user's role](https://github.com/sfdevshop/PocketRealtorApp/tree/master/server#update-users-role-token-needed))
+```
+POST: localhost:3000/listing/create
+{
+    "property": {
+        "title": "My Amazing house",
+        "introduction": "This is the best house in the world",
+        "address": "9999 Coolest Street",
+        "city": "San Francisco",
+        "state": "CA",
+        "zip_code": 94999,
+        "latitude": 37.776339,
+        "longitude": -122.450672,
+        "price": 9999.99,
+        "rooms": 9
+    }
+}
+```
+
+## Delete a house listing(Owner token needed)
+**Note: The user calling this api must be the owner of the house.**  
+```
+DELETE localhost:3000/listing/delete/:listingid
+```
+
+
+## Search for listings
+This is a GET api which supports searching listings.  
+Parameters can be (all of them are optional): 
+* state (2 chars)
+* city
+* zipcode (5-digit integer)
+* minprice
+* maxprice
+
+Here are some examples:  
+```
+GET localhost:3000/listings  // find all listings
+```
+
+```
+GET localhost:3000/listings?state=CA  // find all listings in CA
+```
+
+```
+GET localhost:3000/listings?state=CA&city=San Francisco  // find listings in San Francisco
+```
+
+```
+GET localhost:3000/listings?zipcode=94118  // find listings having zip code 94118
+```
+
+```
+GET localhost:3000/listings?minprice=1000&maxprice=20000  // find listings which's price is the range of 1,000 to 20,000
 ```
