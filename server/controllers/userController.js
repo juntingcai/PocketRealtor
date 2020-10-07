@@ -9,7 +9,7 @@ const UserRole = require("../models/roleModel");
 const RoleType = require("../static/RoleType");
 const { Role } = require("../models/models");
 
-class user {
+class UserController {
   constructor() {}
 
   register(req, res, next) {
@@ -26,14 +26,17 @@ class user {
       lastname.length == 0
     ) {
       res.json(resTemplate.MISS_FIELD);
+      return;
     }
 
     if (!isEmailLegal(email)) {
       res.json(resTemplate.INVALID_EMAIL);
+      return;
     }
 
     if (!isPasswordLegal(password)) {
       res.json(resTemplate.INVALID_PASSWORD);
+      return;
     }
 
     // check if user exists
@@ -69,6 +72,7 @@ class user {
                 token: token,
               };
               res.json(resSuccess);
+              return;
             })
             .catch((err) => {
               responseFail(res, err);
@@ -349,6 +353,15 @@ class user {
       }
     });
   }
+
+  helloUser(req, res){
+
+    User.query().then((users)=>{
+        res.json(users);
+    })
+
+  }
+
 }
 
 const generateAuthToken = function (user) {
@@ -385,4 +398,4 @@ function responseFail(res, err) {
   res.json(fail);
 }
 
-module.exports = new user();
+module.exports = new UserController();

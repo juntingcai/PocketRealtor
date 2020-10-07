@@ -58,6 +58,11 @@ class UserModel {
       }
     );
   }
+
+  async query(){
+    return User.findAll({ where: { nickname: null } });
+  }
+
 }
 
 module.exports = new UserModel();

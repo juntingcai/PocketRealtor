@@ -20,6 +20,9 @@ const ResponseTempate = {
   // token fails
   TOKEN_MISS: { code: 60001, msg: "Token is not found, please login again" },
   TOKEN_ERR: { code: 60002, msg: "Invalid token" },
+
+  // Role fail
+  PERMISSION_DENY: {code: 41000, msg: "You are not allowed to do this"}
   
 };
 

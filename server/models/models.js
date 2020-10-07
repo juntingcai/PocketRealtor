@@ -110,17 +110,75 @@ Role.belongsToMany(Permission, {
   foreignKey: "role_id",
 });
 
-sequelize.sync({ force: config.resetTables }).then(() => {
-  Role.bulkCreate([
-    roleType.RENTER, 
-    roleType.HOST, 
-    roleType.AGENT]);
+const Listing = sequelize.define(
+  "listings",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    introduction: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    state: {
+      type: DataTypes.STRING(2),
+      allowNull: true,
+    },
+    zip_code: {
+      type: DataTypes.INTEGER(5),
+      allowNull: true,
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(9, 6),
+      allowNull: true,
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(9, 6),
+      allowNull: true,
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    rooms: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    image_links: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+  },
+  tableDefaultSetting
+);
 
-  Permission.bulkCreate([
-    permissionType.CREATE_LISTING,
-    permissionType.MESSAGE_HOST,
-    permissionType.MESSAGE_RENTER,
-  ]);
+User.hasMany(Listing, { foreignKey: "owner_id" });
+Listing.belongsTo(User, { foreignKey: "owner_id" });
+
+sequelize.sync({ force: config.resetTables }).then(() => {
+  if (config.resetTables) {
+    Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
+
+    Permission.bulkCreate([
+      permissionType.CREATE_LISTING,
+      permissionType.MESSAGE_HOST,
+      permissionType.MESSAGE_RENTER,
+    ]);
+  }
 });
 
-module.exports = { User, UserRole, Role };
+module.exports = { User, UserRole, Role, Listing };
