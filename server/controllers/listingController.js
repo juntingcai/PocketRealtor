@@ -5,23 +5,6 @@ const UserRole = require("../models/roleModel");
 const RoleType = require("../static/RoleType");
 const ListingModel = require("../models/listingModel");
 
-// {
-//    id : 1 ,
-//    title : "My Elegant house",
-//    introduction : "A good house",
-//    address : "2312 Cool Stree.",
-//    city : "San Francisco",
-//    state : "CA",
-//    zip_code : 94118,
-//    rent_price: 3000,
-//    sale_price: 3000000000,
-//    latitude : 23.232456,
-//    longitude : 123.123456,
-//    price : 1331234,
-//    rooms : 5,
-//    image_links : null,
-// }
-
 class ListingController {
   findRentListings(req, res, next) {
     let state = req.query.state;
@@ -56,10 +39,21 @@ class ListingController {
             continue;
           }
         }
-        
+
         searchResult.push(listing);
       }
       res.json(searchResult);
+    });
+  }
+
+  getListingById(req, res, next) {
+    let listingId = req.params.id;
+    ListingModel.findListingById(listingId).then((listing) => {
+      if (listing) {
+        res.json(listing);
+      } else {
+        res.json(resTemplate.NO_DATA);
+      }
     });
   }
 
@@ -71,8 +65,71 @@ class ListingController {
     });
   }
 
-  copyFromListing(req, res, next){
-    // TODO
+  copyFromListing(req, res, next) {
+    let user = req.body.user;
+    let listingId = req.params.id;
+    ListingModel.findListingById(listingId).then((listing) => {
+      if (!listing) {
+        res.json(resTemplate.NO_DATA);
+        return;
+      }
+
+      let replicatedListing = {
+        title: listing.get("title"),
+        description: listing.get("description"),
+        address: listing.get("address"),
+        city: listing.get("city"),
+        state: listing.get("state"),
+        latitude: listing.get("latitude"),
+        longitude: listing.get("longitude"),
+        rooms: listing.get("rooms"),
+        zip_code: listing.get("zip_code"),
+        rent_price: listing.get("rent_price"),
+        sale_price: listing.get("sale_price"),
+        bath_rooms: listing.get("bath_rooms"),
+        area: listing.get("area"),
+        age: listing.get("age"),
+        owner_id: user.id,
+      };
+      console.log(replicatedListing);
+
+      ListingModel.createListing(replicatedListing).then((newListing) => {
+        if (newListing) {
+          res.json(newListing);
+        } else {
+          res.json(resTemplate.FAIL);
+        }
+      });
+    });
+  }
+
+  updateListing(req, res, next) {
+    let userId = req.body.user.id;
+    let properties = req.body.property;
+    let listingId = req.body.id;
+    if (!listingId || !properties) {
+      res.json(resTemplate.MISS_FIELD);
+      return;
+    }
+    ListingModel.findListingById(listingId).then((listing) => {
+      if (listing) {
+        if (listing.owner_id != userId) {
+          res.json(resTemplate.PERMISSION_DENY);
+        } else {
+          ListingModel.deleteListing(listingId).then(() => {
+            properties.id = listingId;
+            properties.owner_id = listing.owner_id;
+            ListingModel.createListing(properties).then((newListing) => {
+              res.json(newListing);
+            });
+          });
+        }
+      } else {
+        res.json(resTemplate.NO_DATA);
+      }
+    });
+
+    ListingModel.findListingById;
   }
 
   deleteListing(req, res, next) {
@@ -91,8 +148,6 @@ class ListingController {
         res.json(resTemplate.NO_DATA);
       }
     });
-
-    ListingModel.findListingById;
   }
 
   verifyHostRole(req, res, next) {
