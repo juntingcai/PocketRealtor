@@ -3,12 +3,16 @@
 ## Update
 
 ### 10/7
+
 1. Add create/delete and search for listings
-### 10/15 :
+
+### 10/15
+
 1.  Add More properties in listing (type, rent_price, sale_price, bath_rooms, area, age)
 2.  change listing property name : introduction -> description
 3.  Add tenants preference functions (add, update, search, get)
-4.  User's profile updated: add gender and occupation 
+4.  User's profile updated: add gender and occupation
+5.  Add get/copy/update listing functionality
 
 ## Set up
 
@@ -266,6 +270,39 @@ POST: localhost:3000/listing/create
 }
 ```
 
+## Duplicate a house listing(Owner token needed)
+
+**The duplicated owner will be the one who calls this api(by given token)**
+
+```
+PUT: localhost:3000/listing/duplicate/:listingId
+```
+
+## Update a house listing(Owner token needed)
+
+```
+PUT: localhost:3000/listing/update
+{   "id": 3004,
+    "property": {
+        "title": "My house",
+        "description": "This is a good house",
+        "address": "2312 Cool Stree.",
+        "city": "San Jose",
+        "state": "CA",
+        "latitude": 37.776339,
+        "longitude": -122.450672,
+        "rooms": 5,
+        "zip_code" : 94117,
+        "type" : "Apartment",
+        "rent_price": 2500,
+        "sale_price" : 999999,
+        "bath_rooms" : 2,
+        "area" : 55000.12,
+        "age" : 30
+    }
+}
+```
+
 ## Delete a house listing(Owner token needed)
 
 **Note: The user calling this api must be the owner of the house.**
@@ -305,6 +342,12 @@ GET localhost:3000/listings?zipcode=94118  // find listings having zip code 9411
 
 ```
 GET localhost:3000/listings?minprice=1000&maxprice=20000  // find listings which's price is the range of 1,000 to 20,000
+```
+
+## GET A LISTING
+
+```
+GET localhost:3000/listing/:id
 ```
 
 ## Add Tenant's living location preference (Tenant token needed)
@@ -359,24 +402,32 @@ POST: localhost:3000/tenant/preference/update
 ```
 
 ## Search tenants
+
 Users can find other tenants who are interested in certain city,
 A request could be :
 **(NOTE: Must give both city and state)**
+
 ```
 GET: localhost:3000/tenants?city=San Francisco&state=CA
 ```
+
 If one of city or state is missing, it will find all tanants.  
-Also you can find all users(with tenant's role) by: 
+Also you can find all users(with tenant's role) by:
+
 ```
 GET: localhost:3000/tenants
 ```
 
 ## Get a tenant's preference
+
 You can find a tenant preference on both city and zips
+
 ```
 GET: localhost:3000/tenant/preference/:userId
 ```
-A json would be return like(sorted): 
+
+A json would be return like(sorted):
+
 ```
 {
     "userId": "2",
