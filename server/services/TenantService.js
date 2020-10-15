@@ -5,9 +5,9 @@ const {
   User,
   UserRole,
 } = require("../models/models");
-const { Op } = require("Sequelize");
+const { Op } = require("sequelize");
 const RoleType = require("../static/RoleType");
-const { user } = require("../database/config");
+
 
 let zipCodeMap = new Map();
 let cityZipMap = new Map();
