@@ -279,7 +279,7 @@ PUT: localhost:3000/listing/duplicate/:listingId
 ```
 
 ## Update a house listing(Owner token needed)
-
+Must provide all fileds (even though some may not be changes)
 ```
 PUT: localhost:3000/listing/update
 {   "id": 3004,
