@@ -10,6 +10,12 @@ let tableDefaultSetting = {
   freezeTableName: true,
 };
 
+let tableSettingWithTimestamps = {
+  underscored: true,
+  timestamps: true,
+  freezeTableName: true,
+};
+
 const User = sequelize.define(
   "users",
   {
@@ -56,9 +62,58 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    gender: {
+      type: DataTypes.STRING, // F or M
+      allowNull: true,
+    },
+    occupation: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   tableDefaultSetting
 );
+
+const UsZipCode = sequelize.define(
+  "us_zip_codes",
+  {
+    zip: {
+      type: DataTypes.STRING(5),
+      primaryKey: true,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    state: {
+      type: DataTypes.STRING(2),
+      allowNull: false,
+    },
+    county: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 6),
+      allowNull: true,
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(10, 6),
+      allowNull: true,
+    },
+  },
+  tableDefaultSetting
+);
+
+const TenantZipPreference = sequelize.define(
+  "tenant_preferences",
+  {},
+  tableDefaultSetting
+);
+
+User.belongsToMany(UsZipCode, { through: TenantZipPreference, foreignKey: "user_id" });
+UsZipCode.belongsToMany(User, { through: TenantZipPreference, foreignKey: "zip_code" });
+
 
 const Role = sequelize.define(
   "roles",
@@ -122,7 +177,15 @@ const Listing = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    introduction: {
+    type: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
@@ -143,18 +206,30 @@ const Listing = sequelize.define(
       allowNull: true,
     },
     latitude: {
-      type: DataTypes.DECIMAL(9, 6),
+      type: DataTypes.DECIMAL(10, 6),
       allowNull: true,
     },
     longitude: {
-      type: DataTypes.DECIMAL(9, 6),
+      type: DataTypes.DECIMAL(10, 6),
       allowNull: true,
     },
-    price: {
+    sale_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    rent_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    area: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
     rooms: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    bath_rooms: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -181,4 +256,4 @@ sequelize.sync({ force: config.resetTables }).then(() => {
   }
 });
 
-module.exports = { User, UserRole, Role, Listing };
+module.exports = { User, UserRole, Role, Listing, TenantZipPreference, UsZipCode};

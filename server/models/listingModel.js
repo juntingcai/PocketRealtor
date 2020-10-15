@@ -24,7 +24,7 @@ class ListingModel {
   }
 
   async updateListing(listing) {
-    // TODO
+    // TODO:
   }
 
   async deleteListing(listingId) {

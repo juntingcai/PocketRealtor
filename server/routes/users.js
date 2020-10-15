@@ -19,6 +19,4 @@ router.put('/user/updateProfile', User.verifyToken, User.updateProfile)
 router.put('/user/updateRole', User.verifyToken, User.updateRole)
 router.put('/user/updateAvatar', User.verifyToken, User.updateAvatar)
 
-router.get('/hello', User.helloUser);
-
 module.exports = router;

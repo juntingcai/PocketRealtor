@@ -13,6 +13,8 @@ const ListingModel = require("../models/listingModel");
 //    city : "San Francisco",
 //    state : "CA",
 //    zip_code : 94118,
+//    rent_price: 3000,
+//    sale_price: 3000000000,
 //    latitude : 23.232456,
 //    longitude : 123.123456,
 //    price : 1331234,
@@ -21,7 +23,7 @@ const ListingModel = require("../models/listingModel");
 // }
 
 class ListingController {
-  findListings(req, res, next) {
+  findRentListings(req, res, next) {
     let state = req.query.state;
     let city = req.query.city;
     let zipCode = req.query.zipcode;
@@ -44,8 +46,8 @@ class ListingController {
           continue;
         }
 
-        if (listing.price) {
-          let price = parseFloat(listing.price);
+        if (listing.rent_price) {
+          let price = parseFloat(listing.rent_price);
           if (minPrice && price < minPrice) {
             continue;
           }
@@ -54,7 +56,7 @@ class ListingController {
             continue;
           }
         }
-
+        
         searchResult.push(listing);
       }
       res.json(searchResult);

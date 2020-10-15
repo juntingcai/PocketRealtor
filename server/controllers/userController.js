@@ -197,6 +197,9 @@ class UserController {
     let nickname = req.body.nickname;
     let intro = req.body.intro;
 
+    let gender = req.body.gender;
+    let occupation = req.body.occupation;
+
     if (!reqUserId) {
       res.json(resTemplate.TOKEN_ERR);
     }
@@ -220,6 +223,14 @@ class UserController {
 
     if (intro) {
       profile.intro = intro;
+    }
+
+    if(gender){
+      profile.gender = gender;
+    }
+
+    if(occupation){
+      profile.occupation = occupation;
     }
 
     User.updateProfile(reqUserId, profile)
@@ -246,6 +257,8 @@ class UserController {
           lastname: user.last_name,
           nickname: user.nickname,
           birthday: user.birthday,
+          gender: user.gender,
+          occupation: user.occupation,
           intro: user.intro,
           avatar: user.avatar,
         };
@@ -352,14 +365,6 @@ class UserController {
           });
       }
     });
-  }
-
-  helloUser(req, res){
-
-    User.query().then((users)=>{
-        res.json(users);
-    })
-
   }
 
 }
