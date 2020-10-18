@@ -9,7 +9,7 @@ const UserRole = require("../models/roleModel");
 const RoleType = require("../static/RoleType");
 const { Role } = require("../models/models");
 
-class user {
+class UserController {
   constructor() {}
 
   register(req, res, next) {
@@ -26,14 +26,17 @@ class user {
       lastname.length == 0
     ) {
       res.json(resTemplate.MISS_FIELD);
+      return;
     }
 
     if (!isEmailLegal(email)) {
       res.json(resTemplate.INVALID_EMAIL);
+      return;
     }
 
     if (!isPasswordLegal(password)) {
       res.json(resTemplate.INVALID_PASSWORD);
+      return;
     }
 
     // check if user exists
@@ -69,6 +72,7 @@ class user {
                 token: token,
               };
               res.json(resSuccess);
+              return;
             })
             .catch((err) => {
               responseFail(res, err);
@@ -193,6 +197,9 @@ class user {
     let nickname = req.body.nickname;
     let intro = req.body.intro;
 
+    let gender = req.body.gender;
+    let occupation = req.body.occupation;
+
     if (!reqUserId) {
       res.json(resTemplate.TOKEN_ERR);
     }
@@ -216,6 +223,14 @@ class user {
 
     if (intro) {
       profile.intro = intro;
+    }
+
+    if(gender){
+      profile.gender = gender;
+    }
+
+    if(occupation){
+      profile.occupation = occupation;
     }
 
     User.updateProfile(reqUserId, profile)
@@ -242,6 +257,8 @@ class user {
           lastname: user.last_name,
           nickname: user.nickname,
           birthday: user.birthday,
+          gender: user.gender,
+          occupation: user.occupation,
           intro: user.intro,
           avatar: user.avatar,
         };
@@ -349,6 +366,7 @@ class user {
       }
     });
   }
+
 }
 
 const generateAuthToken = function (user) {
@@ -385,4 +403,4 @@ function responseFail(res, err) {
   res.json(fail);
 }
 
-module.exports = new user();
+module.exports = new UserController();
