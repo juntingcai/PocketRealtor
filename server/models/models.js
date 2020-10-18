@@ -244,7 +244,7 @@ const Listing = sequelize.define(
 User.hasMany(Listing, { foreignKey: "owner_id" });
 Listing.belongsTo(User, { foreignKey: "owner_id" });
 
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ force: config.resetTables }).then(() => {
   if (config.resetTables) {
     Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
 

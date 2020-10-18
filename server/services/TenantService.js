@@ -8,7 +8,6 @@ const {
 const { Op } = require("sequelize");
 const RoleType = require("../static/RoleType");
 
-
 let zipCodeMap = new Map();
 let cityZipMap = new Map();
 class TenantService {

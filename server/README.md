@@ -14,10 +14,14 @@
 4.  User's profile updated: add gender and occupation
 5.  Add get/copy/update listing functionality
 
+### 10/18
+1. Change conditions in searching listings
+
 ## Set up
 
 - Input your database's setting in database/config.js
-- Install moduels (package PR may need to bed installed manaually)
+- Install moduels (package PR may need to be installed manaually)
+- Set up the listening port and tables reset in config.js 
 
 ```
 npm install
@@ -264,7 +268,6 @@ PUT: localhost:3000/listing/duplicate/:listingId
 ```
 
 ## Update a house listing(Owner token needed)
-Must provide all fileds (even though some may not be changes)
 ```
 PUT: localhost:3000/listing/update
 {   "id": 3004,
@@ -296,37 +299,26 @@ PUT: localhost:3000/listing/update
 DELETE localhost:3000/listing/delete/:listingid
 ```
 
-## Search for listings
+## Search for listings (10/18 changed)
 
-This is a GET api which supports searching listings.  
-Parameters can be (all of them are optional):
+Given a center from coordinate and radius(mile), this api will provides the house listings in the range.  
 
-- state (2 chars)
-- city
-- zipcode (5-digit integer)
-- minprice
-- maxprice
+Required parameters
+- lat // latitude
+- lng // longitude
+- radius // in miles
+- type // 1 = rent, 2 = sale
+
+Optional parameters
+- minPrice // rent/sale price >= minPrice
+- maxPrice // rent/sale price <= maxPrice
+- bedrooms // least bedroom number
+- bathrooms // least bathrooms number
 
 Here are some examples:
-
 ```
-GET localhost:3000/listings  // find all listings
-```
-
-```
-GET localhost:3000/listings?state=CA  // find all listings in CA
-```
-
-```
-GET localhost:3000/listings?state=CA&city=San Francisco  // find listings in San Francisco
-```
-
-```
-GET localhost:3000/listings?zipcode=94118  // find listings having zip code 94118
-```
-
-```
-GET localhost:3000/listings?minprice=1000&maxprice=20000  // find listings which's price is the range of 1,000 to 20,000
+localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=3&type=1
+localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=100&type=1&minPrice=202&maxPrice=5000&bedrooms=1&bathrooms=1
 ```
 
 ## GET A LISTING
