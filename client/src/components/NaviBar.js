@@ -8,6 +8,7 @@ import { connect } from "react-redux";
 import { toLogin, toRegister } from '../actions/dialog';
 import { logout } from '../actions/auth';
 import PropTypes from "prop-types";
+import { withRouter } from 'react-router-dom';
 
 
 const NaviBar = (props) => {
@@ -27,7 +28,7 @@ const NaviBar = (props) => {
             props.toLogin()
         }
         console.log(e.target.id)
-        props.history.push('/list');
+        props.history.push(e.target.id);
     };
     const goto = () => {
 
@@ -111,4 +112,4 @@ const mapStateToProps = (state) => ({
 });
 
 
-export default connect(mapStateToProps, { toLogin, toRegister, logout })(NaviBar);
+export default withRouter(connect(mapStateToProps, { toLogin, toRegister, logout })(NaviBar));
