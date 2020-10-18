@@ -13,7 +13,9 @@ router.get('/user/role/:userId/', User.getUserRole)
 
 router.post('/user/register', User.register);
 router.post('/user/login', User.login)
+
 router.post('/user/verifyuser', User.verifyToken ,User.testUserToken)
+
 router.post('/user/updatePassword', User.verifyToken, User.updatePassword)
 router.put('/user/updateProfile', User.verifyToken, User.updateProfile)
 router.put('/user/updateRole', User.verifyToken, User.updateRole)
