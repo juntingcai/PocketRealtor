@@ -1,0 +1,97 @@
+.navi-wrap{
+    height: 5.6rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 5rem;
+    box-sizing: border-box;
+}
+.navi-wrap .logo{
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1634d8;
+    text-decoration: none;
+}
+.navi-wrap .button-group{
+    display: flex;
+    align-items: center;
+}
+.navi-wrap .menu-button-wrap{
+    box-sizing: content-box;
+    padding: 0.3rem 0.7rem;
+    height: 2.5rem;
+    border-radius: 1.65rem;
+    border: solid 1px #bdbdbd;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+
+}
+.navi-wrap .menu-button-wrap:hover{
+    cursor: pointer;
+    box-shadow: 0 3px 4px 0 #0005;
+}
+#menu-button-popover .MuiPopover-paper{
+    margin-top: 0.7rem;
+    height: auto;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.pull-menu{
+    padding: 1rem 0;
+    width: 16rem;
+    display: flex;
+    flex-direction: column;
+    
+}
+.pull-menu .link-group{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    
+}
+.pull-menu .link-group-divider{
+    border-top: solid 1px #0002;
+
+}
+.pull-menu .link-group div{
+    display: flex;
+    align-items: center;
+    padding: 0.2rem 1.2rem;
+    font-size: 0.9rem;
+    width: 100%;
+    height: 3rem;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    letter-spacing: 0.3px;
+}
+.pull-menu .auth-link-group div, .signin{
+    font-weight: bold;
+}
+.pull-menu .signout{
+    border-top: solid 1px #0002;
+}
+.pull-menu .link-group div:hover{
+    background: #bdbdbd8e;
+    
+    
+}
+
+.navi-wrap .button-group .link{
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #1634d8;
+    text-decoration: none;
+    margin-right: 1.5rem;
+    height: 2rem;
+}
+.navi-wrap .button-group .link:hover{
+    border-bottom: solid 2px  #1634d8;
+}

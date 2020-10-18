@@ -1,0 +1,58 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.body-wrap{
+  height: calc(100% - 5.6rem);
+}
+.MuiButton-root{
+  text-transform: none !important;
+}
+#root .theme-color{
+  color:#1634d8;
+  border-color: #1634d8;
+}
+#root .theme-color-2{
+  color:#d91654;
+  border-color: #d91654;
+}
+#root .theme-color-bg{
+  background: #1634d8;
+  color: #fff;
+}

@@ -1,0 +1,97 @@
+.property-wrap{
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.search-bar-wrap{
+    display: flex;
+    justify-content: flex-start;
+    height: 4rem;
+    width: 100%;
+    padding: 0.8rem;
+    box-sizing: border-box;
+    border: solid 1px #0005;
+    
+}
+.search-bar-wrap button{
+    width: 7rem;
+    margin-left: 0.5rem;
+    height: 100%;
+}
+
+
+.content-wrap{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: calc(100% - 4rem);
+
+}
+.map-wrap{
+    flex: 1
+
+}
+.list-wrap{
+    z-index: 100;
+    max-width: 60%;
+    width: 55rem;
+   
+    box-shadow: -5px 2px 5px #0002, -10px 2px 8px #0001;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow: scroll;
+}
+.list-wrap>.title{
+    margin: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+}
+#search-input-in-property-list{
+    position: relative;
+    width:20rem;
+    
+}
+#search-input-in-property-list .input-box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    height: 100%;
+}
+#search-input-in-property-list .input-box input{
+    outline: none;
+    border-style: none;
+    margin-left: 1rem;
+    flex: 1;
+    height: 100%;
+}
+#search-input-in-property-list .search-box{
+    width: 100%;
+    border: solid 1px  #1634d8;
+    border-radius: 0.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    overflow: hidden;
+    
+
+}
+#search-input-in-property-list .suggestion-item, #search-input-in-property-list .suggestion-item--active{
+    
+    border-collapse: collapse;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 2rem;
+    line-height: 3rem;
+    font-size: 1rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
