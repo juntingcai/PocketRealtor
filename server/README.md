@@ -78,7 +78,7 @@ Otherwise, the fail code and reason will show as in static/ResponseTemplate.js
 - If you'd like to see the token's value(user's id), check out https://jwt.io, and enter the token you got.
 
 ```
-Post: localhost:3000/testUserToken
+Post: localhost:3000/verifyuser
 ```
 
 ## Change password (Token needed)
@@ -144,11 +144,11 @@ However, if 3 roles are all true, the server will ignore the agent.
 And if all roles are false or undefined, no data will be updated, but the server is still going to return SUCCESS.
 
 ## Update user's avatar (Token needed)
-
+Update user's avatar by giving a image link
 ```
 PUT: localhost:3000/user/updateAvatar
 {
-    "avatar" : AVATAR
+    "avatar" : "https://i.imgur.com/0avxl7q.jpg"
 }
 ```
 
@@ -175,22 +175,7 @@ If the user exists, a json will be returned like:
         "nickname": "JC",
         "birthday": 2001-01-01,
         "intro": "Hi I am Jerry",
-        "avatar": {
-            "type": "Buffer",
-            "data": [
-                100,
-                49,
-                50,
-                51,
-                52,
-                53,
-                54,
-                55,
-                56,
-                57,
-                48
-            ]
-        }
+        "avatar": "https://i.imgur.com/0avxl7q.jpg"
     }
 }
 ```

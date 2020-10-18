@@ -55,7 +55,7 @@ const User = sequelize.define(
       allowNull: true,
     },
     avatar: {
-      type: DataTypes.BLOB,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     intro: {
@@ -63,7 +63,7 @@ const User = sequelize.define(
       allowNull: true,
     },
     gender: {
-      type: DataTypes.STRING, // F or M
+      type: DataTypes.INTEGER, // 1 = Male, 2 = Female
       allowNull: true,
     },
     occupation: {
@@ -244,7 +244,7 @@ const Listing = sequelize.define(
 User.hasMany(Listing, { foreignKey: "owner_id" });
 Listing.belongsTo(User, { foreignKey: "owner_id" });
 
-sequelize.sync({ force: config.resetTables }).then(() => {
+sequelize.sync({ force: true }).then(() => {
   if (config.resetTables) {
     Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
 
