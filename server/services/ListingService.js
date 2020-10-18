@@ -1,5 +1,5 @@
 const { User, Listing } = require("../models/models");
-const { Op } = require("Sequelize");
+const { Op } = require("sequelize");
 const resTemplate = require("../static/ResponseTemplate");
 
 class ListingService {
