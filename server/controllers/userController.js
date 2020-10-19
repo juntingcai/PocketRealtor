@@ -1,13 +1,8 @@
 const constant = require("../static/Constant");
 const resTemplate = require("../static/ResponseTemplate");
-const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const regex = require("../static/Regex");
-
-const User = require("../models/userModel");
-const UserRole = require("../models/roleModel");
-const RoleType = require("../static/RoleType");
-const { Role } = require("../models/models");
+const UserService = require("../services/UserService");
 
 class UserController {
   constructor() {}
@@ -17,14 +12,7 @@ class UserController {
     var password = req.body.password;
     let firstname = req.body.firstname;
     let lastname = req.body.lastname;
-    if (
-      email === undefined ||
-      password === undefined ||
-      firstname === undefined ||
-      lastname === undefined ||
-      firstname.length == 0 ||
-      lastname.length == 0
-    ) {
+    if (!email || !password || !firstname || !lastname) {
       res.json(resTemplate.MISS_FIELD);
       return;
     }
@@ -39,89 +27,26 @@ class UserController {
       return;
     }
 
-    // check if user exists
-    User.findUserByEmail(email)
-      .then((u) => {
-        if (!u) {
-          // email does not exist
+    let user = {
+      email: email,
+      password: password,
+      firstname: firstname,
+      lastname: lastname,
+    };
 
-          // generate salt
-          let salt = crypto.randomBytes(16).toString("hex");
-          // hash password with salt
-          let hashedPassword = hashPassword(salt, password);
-
-          let user = {
-            email: email,
-            password_salt: salt,
-            password_hashed: hashedPassword,
-            first_name: firstname,
-            last_name: lastname,
-          };
-
-          // register user
-          User.createUser(user)
-            .then((user) => {
-              let token = generateAuthToken({
-                id: user.id,
-                email: user.email,
-                hash: hashedPassword,
-              });
-              let resSuccess = {
-                code: resTemplate.SUCCESS.code,
-                msg: resTemplate.SUCCESS.msg,
-                token: token,
-              };
-              res.json(resSuccess);
-              return;
-            })
-            .catch((err) => {
-              responseFail(res, err);
-            });
-        } else {
-          res.json(resTemplate.EMAIL_EXIST);
-        }
-      })
-      .catch((err) => {
-        responseFail(res, err);
-      });
+    UserService.register(user, res);
   }
 
   login(req, res, next) {
     let email = req.body.email;
-    var password = req.body.password;
+    let password = req.body.password;
 
-    if (
-      email === undefined ||
-      password === undefined ||
-      email.length == 0 ||
-      password.length == 0
-    ) {
+    if (!email || !password) {
       res.json(resTemplate.MISS_FIELD);
+      return;
     }
 
-    User.findUserByEmail(email).then((user) => {
-      if (user) {
-        let salt = user.password_salt;
-        let hashedPassword = hashPassword(salt, password);
-        if (hashedPassword === user.password_hashed) {
-          let token = generateAuthToken({
-            id: user.id,
-            email: user.email,
-            hash: hashedPassword,
-          });
-          let resSuccess = {
-            code: resTemplate.SUCCESS.code,
-            msg: resTemplate.SUCCESS.msg,
-            token: token,
-          };
-          res.json(resSuccess);
-        } else {
-          res.json(resTemplate.USER_NOT_EXIST);
-        }
-      } else {
-        res.json(resTemplate.USER_NOT_EXIST);
-      }
-    });
+    UserService.login(email, password, res);
   }
 
   // just for dev
@@ -131,7 +56,11 @@ class UserController {
 
   updateRole(req, res, next) {
     let reqUser = req.body.user;
-    let userId = reqUser.id;
+
+    if (!reqUser || !reqUser.id) {
+      res.status(403).send("Lose user id in jwt");
+      return;
+    }
 
     let roleType = {
       isHost: req.body.isHost,
@@ -139,13 +68,11 @@ class UserController {
       isAgent: req.body.isAgent,
     };
 
-    UserRole.updateUserRole(userId, roleType)
-      .then(() => {
-        res.json(resTemplate.SUCCESS);
-      })
-      .catch((err) => {
-        responseFail(res, err);
-      });
+    if (!roleType.isHost && !roleType.isRenter && !roleType.isAgent) {
+      res.json(resTemplate.MISS_FIELD);
+      return;
+    }
+    UserService.updateRole(reqUser.id, roleType, res);
   }
 
   updatePassword(req, res, next) {
@@ -154,38 +81,16 @@ class UserController {
     let oldPwd = req.body.oldPassword;
     let newPwd = req.body.newPassword;
 
+    if (!reqUser) {
+      res.status(400).send("Missing token");
+      return;
+    }
+
     if (!userId || !oldPwd || !newPwd) {
       res.json(resTemplate.MISS_FIELD);
       return;
     }
-
-    User.findUserById(userId).then((user) => {
-      // check user exists
-      if (!user) {
-        res.json(resTemplate.USER_NOT_EXIST);
-        return;
-      }
-      let salt = user.password_salt;
-      // check old password
-      if (user.password_hashed !== hashPassword(salt, oldPwd)) {
-        res.json(resTemplate.INCORRECT_PASSWORD);
-        return;
-      }
-      // check new password
-      if (!isPasswordLegal(newPwd)) {
-        res.json(resTemplate.INVALID_PASSWORD);
-        return;
-      }
-      // hash new password
-      let newHashedPwd = hashPassword(salt, newPwd);
-      User.updatePassword(user.id, newHashedPwd)
-        .then(() => {
-          res.json(resTemplate.SUCCESS);
-        })
-        .catch((err) => {
-          responseFail(res, err);
-        });
-    });
+    UserService.updatePassword(userId, oldPwd, newPwd, res);
   }
 
   updateProfile(req, res, next) {
@@ -196,12 +101,12 @@ class UserController {
     let birthday = req.body.birthday;
     let nickname = req.body.nickname;
     let intro = req.body.intro;
-
     let gender = req.body.gender;
     let occupation = req.body.occupation;
 
     if (!reqUserId) {
-      res.json(resTemplate.TOKEN_ERR);
+      res.status(400).send("Lose user id in jwt");
+      return;
     }
 
     let profile = {};
@@ -225,102 +130,68 @@ class UserController {
       profile.intro = intro;
     }
 
-    if(gender){
+    if (gender) {
       profile.gender = gender;
     }
 
-    if(occupation){
+    if (occupation) {
       profile.occupation = occupation;
     }
 
-    User.updateProfile(reqUserId, profile)
-      .then(() => {
-        res.json(resTemplate.SUCCESS);
-      })
-      .catch((err) => {
-        responseFail(res, err);
-      });
+    UserService.updateProfile(reqUserId, profile, res);
   }
 
   getUserProfile(req, res, next) {
-    let userId = req.params.userId;
-
+    let userId = parseInt(req.params.userId);
+    if (isNaN(userId)) {
+      res.status(400).send("UserId is missing");
+      return;
+    }
+  
     if (!userId) {
       res.json(resTemplate.MISS_FIELD);
+      return;
     }
 
-    User.findUserById(userId).then((user) => {
-      if (user) {
-        let resUser = {
-          email: user.email,
-          firstname: user.first_name,
-          lastname: user.last_name,
-          nickname: user.nickname,
-          birthday: user.birthday,
-          gender: user.gender,
-          occupation: user.occupation,
-          intro: user.intro,
-          avatar: user.avatar,
-        };
-        let resSuccess = {
-          code: resTemplate.SUCCESS.code,
-          msg: resTemplate.SUCCESS.msg,
-          data: resUser,
-        };
-        res.json(resSuccess);
-      } else {
+    UserService.getUserById(userId).then((user) => {
+      if (!user) {
         res.json(resTemplate.USER_NOT_EXIST);
+        return;
       }
+      res.json({ data: user });
     });
   }
 
   getUserRole(req, res, next) {
     let userId = req.params.userId;
+
     if (!userId) {
       res.json(resTemplate.MISS_FIELD);
     }
 
-    UserRole.getUserRole(userId)
-      .then((roles) => {
-        if (!roles) {
-          res.json(resTemplate.NO_DATA);
-          return;
-        }
-        var resRoles = [];
-        for (var i = 0; i < roles.length; i++) {
-          let role = roles[i];
-          let roleId = role.role_id;
-          switch (roleId) {
-            case RoleType.RENTER.id:
-              role.role_name = RoleType.RENTER.name;
-              break;
-            case RoleType.HOST.id:
-              role.role_name = RoleType.HOST.name;
-              break;
-            case RoleType.AGENT.id:
-              role.role_name = RoleType.AGENT.name;
-              break;
-
-            default:
-              break;
-          }
-          resRoles.push(role);
-        }
-        res.json(resRoles)
+    UserService.getUserRoles(userId)
+      .then((result) => {
+        res.json(result);
       })
       .catch((err) => {
-        responseFail(res, err);
+        console.log(err);
+        res.status(500).send(err);
       });
   }
 
   updateAvatar(req, res, next) {
     let userId = req.body.user.id;
     let avatar = req.body.avatar;
-    User.updateAvatar(userId, avatar)
-      .then(() => res.json(resTemplate.SUCCESS))
-      .catch((err) => {
-        responseFail(res, err);
-      });
+    if (!userId) {
+      res.status(403).send("Lose user id in jwt");
+    }
+    UserService.updateUserAvatar(userId, avatar).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).send("Fail to update avatar");
+      }
+    });
   }
 
   verifyToken(req, res, next) {
@@ -328,11 +199,13 @@ class UserController {
     jwt.verify(token, constant.jwtsecret, function (err, decoded) {
       if (err) {
         res.json(resTemplate.TOKEN_ERR);
+        return;
       } else {
         // check user info
         let decodedUser = decoded.user;
         if (!decodedUser) {
           res.json(resTemplate.TOKEN_ERR);
+          return;
         }
 
         let userId = decodedUser.id;
@@ -342,44 +215,26 @@ class UserController {
         if (!userId || !email || !pwdHash) {
           console.log("Token Fields Missed");
           res.json(resTemplate.TOKEN_ERR);
+          return;
         }
 
-        User.findUserById(userId)
+        UserService.isUserValid(userId, email, pwdHash)
           .then((user) => {
-            if (
-              !user ||
-              userId !== user.id ||
-              user.email !== email ||
-              user.password_hashed !== pwdHash
-            ) {
-              console.log("Cannot find user info");
+            if (!user) {
               res.json(resTemplate.TOKEN_ERR);
-            } else {
-              console.log("token passed");
-              req.body.user = user;
-              next();
+              return;
             }
+            req.body.user = user;
+            next();
           })
           .catch((err) => {
-            responseFail(res, err);
+            console.log(err);
+            res.status(500).catch("Fail to examine the jwt token");
           });
       }
     });
   }
-
 }
-
-const generateAuthToken = function (user) {
-  let token = jwt.sign({ user: user }, constant.jwtsecret, {
-    expiresIn: "1d", // expire in a day
-  });
-  return token;
-};
-
-const hashPassword = function (salt, pwd) {
-  var hmac = crypto.createHmac("sha256", salt);
-  return hmac.update(pwd).digest("hex");
-};
 
 function isEmailLegal(email) {
   const re = regex.EMAIL;
@@ -394,13 +249,17 @@ function isPasswordLegal(password) {
   return result;
 }
 
-/**
- * This function is for debug purpose
- */
-function responseFail(res, err) {
-  let fail = resTemplate.FAIL;
-  fail.msg += err;
-  res.json(fail);
+function isEmailLegal(email) {
+  const re = regex.EMAIL;
+  const result = re.test(email);
+  return result;
+}
+
+function isPasswordLegal(password) {
+  // const re =  /^[A-Za-z]\w{7,14}$/; // between 7 to 16 characters and contain only characters, numeric digits, underscore and first character must be a letter
+  const re = regex.PASSWORD1;
+  const result = re.test(password);
+  return result;
 }
 
 module.exports = new UserController();

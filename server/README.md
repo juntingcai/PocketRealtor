@@ -102,16 +102,15 @@ Post: localhost:3000/user/updatePassword
 
 To update user's profole, please include the user's token in Header
 "Authorization":"USER'S TOKEN", and make a put request:
-
 ```
 Put: localhost:3000/user/updateProfile
 {
     "firstname": "Jerry",
     "lastname": "Chen",
-    "birthday" "2001-01-01",
+    "birthday" : "2001-01-01",
     "nickname": "JC",
-    "intro" : "Hi I am Jerry"
-    "gender": "JC",
+    "intro" : "Hi I am Jerry",
+    "gender": "1",
     "occupation" : "Hi I am Jerry"
 }
 ```
@@ -171,13 +170,14 @@ If the user exists, a json will be returned like:
 
 ```
 {
-    "success": true,
     "data": {
-        "email": "member2@gmail.com",
+        "email": "youremail1@gmail.com",
         "firstname": "Jerry",
         "lastname": "Chen",
         "nickname": "JC",
-        "birthday": 2001-01-01,
+        "birthday": "2001-01-01",
+        "gender": 1,
+        "occupation": "Hi I am Jerry",
         "intro": "Hi I am Jerry",
         "avatar": "https://i.imgur.com/0avxl7q.jpg"
     }

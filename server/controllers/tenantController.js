@@ -1,8 +1,8 @@
 const resTemplate = require("../static/ResponseTemplate");
-
-const UserRole = require("../models/roleModel");
 const RoleType = require("../static/RoleType");
 const TenantService = require("../services/TenantService");
+const UserService = require("../services/UserService");
+
 class TenantController {
   addTenantZipPreference(req, res) {
     // put a zip code
@@ -39,7 +39,7 @@ class TenantController {
   }
 
   addCityPreference(req, res) {
-    let user = req.body.user
+    let user = req.body.user;
     let city = req.body.city;
     let state = req.body.state;
     if (city && state) {
@@ -68,18 +68,11 @@ class TenantController {
   verifyTenantRole(req, res, next) {
     let user = req.body.user;
     let userId = user.id;
-
-    UserRole.getUserRole(userId).then((roles) => {
-      var isUserTenant = false;
-      for (var i = 0; i < roles.length; i++) {
-        let role = roles[i];
-        console.log(role);
-        if (role.role_id === RoleType.RENTER.id) {
-          isUserTenant = true;
-          break;
-        }
-      }
-      if (isUserTenant) {
+    if (!user) {
+      res.status(403);
+    }
+    UserService.checkUserRole(userId, RoleType.RENTER.id).then((result) => {
+      if (result) {
         next();
       } else {
         res.json(resTemplate.PERMISSION_DENY);

@@ -1,8 +1,6 @@
 const resTemplate = require("../static/ResponseTemplate");
-
-const UserRole = require("../models/roleModel");
 const RoleType = require("../static/RoleType");
-
+const UserService = require("../services/UserService");
 const ListingService = require("../services/ListingService");
 
 class ListingController {
@@ -97,18 +95,11 @@ class ListingController {
   verifyHostRole(req, res, next) {
     let user = req.body.user;
     let userId = user.id;
-
-    UserRole.getUserRole(userId).then((roles) => {
-      var isUserHost = false;
-      for (var i = 0; i < roles.length; i++) {
-        let role = roles[i];
-        console.log(role);
-        if (role.role_id === RoleType.HOST.id) {
-          isUserHost = true;
-          break;
-        }
-      }
-      if (isUserHost) {
+    if (!user) {
+      res.status(403);
+    }
+    UserService.checkUserRole(userId, RoleType.HOST.id).then((result) => {
+      if (result) {
         next();
       } else {
         res.json(resTemplate.PERMISSION_DENY);
