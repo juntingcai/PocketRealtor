@@ -168,7 +168,7 @@ class ListingService {
   }
 }
 
-function getRange(latitude, longitude, radiusMile) {
+function getRangeInMile(latitude, longitude, radiusMile) {
   let degree = (24901 * 1609) / 360.0;
   let dpmLat = 1 / degree;
   let radiusLat = dpmLat * radiusMile;
@@ -188,16 +188,34 @@ function getRange(latitude, longitude, radiusMile) {
   };
 }
 
+function getRangeInKm(latitude, longitude, radiusInKm) {
+  let kmInLongitudeDegree = 111.320 * Math.cos( latitude / 180.0 * Math.PI)
+
+  let deltaLat = radiusInKm / 111.1;
+  let deltaLong = radiusInKm / kmInLongitudeDegree;
+
+  let minLat = latitude - deltaLat;  
+  let maxLat = latitude + deltaLat;
+  let minLng = longitude - deltaLong; 
+  let maxLng = longitude + deltaLong;
+  return {
+    minLat: minLat,
+    maxLat: maxLat,
+    minLng: minLng,
+    maxLng: maxLng,
+  };
+}
+
 function getFindListingQueryOptions(conditions, isRenting) {
   let latitude = conditions.latitude;
   let longitude = conditions.longitude;
-  let radiusMile = conditions.radiusMile;
+  let radius = conditions.radius;
 
-  if (!latitude || !longitude || !radiusMile) {
+  if (!latitude || !longitude || !radius) {
     res.json(resTemplate.MISS_FIELD);
     return;
   }
-  let range = getRange(latitude, longitude, radiusMile);
+  let range = getRangeInKm(latitude, longitude, radius);
 
   let queryOptions = {
     latitude: { [Op.and]: [{ [Op.gte]: range.minLat }, { [Op.lte]: range.maxLat }]},

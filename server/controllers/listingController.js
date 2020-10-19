@@ -18,13 +18,13 @@ class ListingController {
     }
     let latitude = parseFloat(req.query.lat);
     let longitude = parseFloat(req.query.lng);
-    let radiusMile = parseFloat(req.query.radius);
+    let radius = parseFloat(req.query.radius);
     let type = parseInt(req.query.type);
 
     let condition = {
       latitude: latitude,
       longitude: longitude,
-      radiusMile: radiusMile,
+      radius: radius,
     };
     if (req.query.minPrice) {
       condition.minPrice = req.query.minPrice;
