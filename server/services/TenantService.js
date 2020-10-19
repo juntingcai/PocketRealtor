@@ -153,6 +153,7 @@ class TenantService {
         let result = [];
         for (var i = 0; i < fitUsers.length; i++) {
           let fittingUser = userMap.get(fitUsers[i].get("user_id"));
+          
           let resUser = {
             id: fittingUser.get("id"),
             firstname: fittingUser.get("first_name"),
@@ -160,6 +161,7 @@ class TenantService {
             email: fittingUser.get("email"),
             gender: fittingUser.get("gender"),
             occupation: fittingUser.get("occupation"),
+            avatar:fittingUser.get("avatar"),
           };
           result.push(resUser);
         }
@@ -193,6 +195,7 @@ class TenantService {
               email: user.get("email"),
               gender: user.get("gender"),
               occupation: user.get("occupation"),
+              avatar:user.get("avatar"),
             };
             result.push(resUser);
           }
