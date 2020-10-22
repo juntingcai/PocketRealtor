@@ -5,7 +5,7 @@ const resTemplate = require("../static/ResponseTemplate");
 class ListingService {
   findRentListings(conditions, res) {
     let queryOptions = getFindListingQueryOptions(conditions, true);
-    
+
     Listing.findAll({ raw: true, where: queryOptions }).then((listings) => {
       res.json(listings);
     });
@@ -18,13 +18,9 @@ class ListingService {
     });
   }
 
-  getListingById(listingId, res) {
-    Listing.findByPk(listingId).then((listing) => {
-      if (listing) {
-        res.json(listing);
-      } else {
-        res.json(resTemplate.NO_DATA);
-      }
+  async getListingById(listingId) {
+    return await Listing.findByPk(listingId).then((listing) => {
+      return listing;
     });
   }
 
@@ -189,14 +185,14 @@ function getRangeInMile(latitude, longitude, radiusMile) {
 }
 
 function getRangeInKm(latitude, longitude, radiusInKm) {
-  let kmInLongitudeDegree = 111.320 * Math.cos( latitude / 180.0 * Math.PI)
+  let kmInLongitudeDegree = 111.32 * Math.cos((latitude / 180.0) * Math.PI);
 
   let deltaLat = radiusInKm / 111.1;
   let deltaLong = radiusInKm / kmInLongitudeDegree;
 
-  let minLat = latitude - deltaLat;  
+  let minLat = latitude - deltaLat;
   let maxLat = latitude + deltaLat;
-  let minLng = longitude - deltaLong; 
+  let minLng = longitude - deltaLong;
   let maxLng = longitude + deltaLong;
   return {
     minLat: minLat,
@@ -218,8 +214,12 @@ function getFindListingQueryOptions(conditions, isRenting) {
   let range = getRangeInKm(latitude, longitude, radius);
 
   let queryOptions = {
-    latitude: { [Op.and]: [{ [Op.gte]: range.minLat }, { [Op.lte]: range.maxLat }]},
-    longitude: { [Op.and]: [{ [Op.gte]: range.minLng }, { [Op.lte]: range.maxLng }]}
+    latitude: {
+      [Op.and]: [{ [Op.gte]: range.minLat }, { [Op.lte]: range.maxLat }],
+    },
+    longitude: {
+      [Op.and]: [{ [Op.gte]: range.minLng }, { [Op.lte]: range.maxLng }],
+    },
   };
 
   let minPrice = 0;

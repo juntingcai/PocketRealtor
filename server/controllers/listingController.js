@@ -2,6 +2,7 @@ const resTemplate = require("../static/ResponseTemplate");
 const RoleType = require("../static/RoleType");
 const UserService = require("../services/UserService");
 const ListingService = require("../services/ListingService");
+const HistoryService = require("../services/HistoryService");
 
 class ListingController {
   findListings(req, res, next) {
@@ -48,7 +49,16 @@ class ListingController {
   getListingById(req, res, next) {
     let listingId = req.params.id;
     if (listingId) {
-      ListingService.getListingById(listingId, res);
+      ListingService.getListingById(listingId).then((listing) => {
+        if (listing) {
+          res.json(listing);
+          if (req.body.user) {
+            HistoryService.viewListing(req.body.user.id, listingId);
+          }
+        } else {
+          res.status(404).json(resTemplate.NO_DATA);
+        }
+      });
     }
   }
 

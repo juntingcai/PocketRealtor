@@ -65,6 +65,62 @@ class TenantController {
     }
   }
 
+  addListingToFavorite(req, res) {
+    let user = req.body.user;
+    let listingId = req.params.listingId;
+
+    if (!user || !listingId) {
+      res.json(resTemplate.MISS_FIELD);
+      return;
+    }
+
+    TenantService.addToFavorite(user.id, listingId).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).send("Fail to add to favorite");
+      }
+    });
+  }
+
+  deleteOneFavoriteListing(req, res) {
+    let user = req.body.user;
+    let listingId = req.params.listingId;
+
+    if (!user || !listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+
+    TenantService.deleteFavorite(user.id, listingId).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).send("Fail to delete the favorite");
+      }
+    });
+  }
+
+  getFavoriteListings(req, res) {
+    var userId = req.params.userId;
+    if (!userId) {
+      userId = req.body.user.id;
+    }
+
+    if (!userId) {
+      res.status(403).json(resTemplate.MISS_FIELD);
+    }
+
+    TenantService.getUserFavoriteListings(userId).then((favorites) => {
+      console.log(favorites);
+      if (favorites) {
+        res.json(favorites);
+      } else {
+        res.json([]);
+      }
+    });
+  }
+
   verifyTenantRole(req, res, next) {
     let user = req.body.user;
     let userId = user.id;

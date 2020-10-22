@@ -3,6 +3,7 @@ const resTemplate = require("../static/ResponseTemplate");
 const jwt = require("jsonwebtoken");
 const regex = require("../static/Regex");
 const UserService = require("../services/UserService");
+const HistoryService = require("../services/HistoryService");
 
 class UserController {
   constructor() {}
@@ -147,18 +148,29 @@ class UserController {
       res.status(400).send("UserId is missing");
       return;
     }
-  
+
     if (!userId) {
       res.json(resTemplate.MISS_FIELD);
       return;
     }
 
-    UserService.getUserById(userId).then((user) => {
+    UserService.getUserById(userId).then(async (user) => {
       if (!user) {
         res.json(resTemplate.USER_NOT_EXIST);
         return;
       }
-      res.json({ data: user });
+      let responseBody = { data: user };
+      if (req.body.user) {
+        if (req.body.user.id == userId) {
+          responseBody.history = {
+            tenants: await HistoryService.getViewedTenants(userId),
+            listings: await HistoryService.getViewedListings(userId),
+          };
+        } else {
+          HistoryService.viewTenant(req.body.user.id, userId);
+        }
+      }
+      res.json(responseBody);
     });
   }
 
@@ -231,6 +243,55 @@ class UserController {
             console.log(err);
             res.status(500).catch("Fail to examine the jwt token");
           });
+      }
+    });
+  }
+
+  interpretToken(req, res, next) {
+    const token = req.header("Authorization");
+    if (!token) {
+      next();
+    }
+    jwt.verify(token, constant.jwtsecret, function (err, decoded) {
+      if (err) {
+        next();
+      } else {
+        let decodedUser = decoded.user;
+        if (!decodedUser) {
+          next();
+        }
+        req.body.user = decodedUser;
+        next();
+      }
+    });
+  }
+
+  cleanTenantHistory(req, res) {
+    let user = req.body.user;
+    if (!user) {
+      res.status(403).json(resTemplate.PERMISSION_DENY);
+      return;
+    }
+    HistoryService.cleanViewedTenant(user.id).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).send("Fail to delete history");
+      }
+    });
+  }
+
+  cleanListingHistory(req, res) {
+    let user = req.body.user;
+    if (!user) {
+      res.status(403).json(resTemplate.PERMISSION_DENY);
+      return;
+    }
+    HistoryService.cleanViewdListings(user.id).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).send("Fail to delete history");
       }
     });
   }
