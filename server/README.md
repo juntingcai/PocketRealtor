@@ -17,6 +17,12 @@
 ### 10/18
 1. Change conditions in searching listings
 
+### 10/22
+1. Users are able to see their history of exploring tenants and listings
+2. Tenants are able to like a listing, and delete it
+3. Modify some structures
+
+
 ## Set up
 
 - Input your database's setting in database/config.js
@@ -36,3 +42,6 @@ DEBUG=express-locallibrary-tutorial:* npm run devstart
 ## Server Response
 - No matter requests success or fail, the server will return a json in {code: code, msg: message} (sometimes with token) where code and message are in static/ResponseTemplate.js
 - Note: Currently response code and message are not stable, so please do not rely on it.
+
+## API
+See [documant/Readme.md](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document).

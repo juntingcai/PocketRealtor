@@ -1,11 +1,5 @@
-## Update 
-10/22 Create History functionality
-
-When viewing a listing or an user with token, the server will record it.   
-
-The history will be along with the user's profile call(but other people cannot see it)   
-
-For example, when calling GET:localhost:3000/user/60008, where 60008 is user itself, the return will become the following: 
+## Get History 
+When calling GET:localhost:3000/user/60008, where 60008 is user itself, the return will become the following: 
 ```
 {
     "data": {
@@ -80,7 +74,7 @@ For example, when calling GET:localhost:3000/user/60008, where 60008 is user its
 
 
 ## Delete History
-By calling the following API with token, the history can be removed.   
+By calling the following API with token, the related history can be removed.   
 ```
 DELETE localhost:3000/history/tenant
 DELETE localhost:3000/history/listing
