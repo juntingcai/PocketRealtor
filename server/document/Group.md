@@ -56,7 +56,7 @@ GET localhost:3000/tenant/group/:id
 ```
 
 If the user(token) calling this api is the owner or member of the group, it will return some detail.
-
+The filed "notes" represents the messages that members wrote.  See [Note](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#notes-discusstion-board)
 ```
 {
     "id": 8,
@@ -149,7 +149,10 @@ POST localhost:3000/tenant/group/invite/
 }
 ```
 
-### Get invitations (TODO)
+### Get invitations 
+** Not completed yet **
+
+This api is going to look up the invitations of a group owner made.  
 
 ### Accept / Reject a invitation
 
@@ -259,7 +262,6 @@ PUT localhost:3000/tenant/group/notes/put/:groupId
    "message" : "Hello Guys!"
 }
 ```
-The messages only can be seen by group the owner and members.  
-
-The messages will be displayed in GET-GROUP
+* Messages only can be seen by group the owner and members.  
+* Messages will be displayed in [GET-GROUP](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-group-owner-and-member-side)
 
