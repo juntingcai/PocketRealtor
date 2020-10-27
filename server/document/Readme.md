@@ -31,5 +31,24 @@
 ### Tenant Viewed History
 * [Get History](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/History.md#get-history)
 * [Delete history](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Tenant.md#view-favorite-list-token-needed)
-* []()
-* []()
+
+### Tenant Group
+* [Create Group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#create-group)
+* [Update Group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#update-group)
+* [Delete Group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#delete-group)
+* [Get group (Owner and Member side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-group-owner-and-member-side)
+* [Get group (Guest side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-group-guest-side)
+
+* [Invite a tenant](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#invite-a-tenant)
+* [Get invitations (TODO) ]()
+* [Accept / Reject a invitation](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#accept--reject-a-invitation)
+
+* [Apply for a group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#apply-for-a-group)
+* [Get applications(Group Owner Side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-applicationsgroup-owner-side)
+* [Get applications(Applicant Side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-applicationsapplicant-side)
+* [Withdraw an application](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#withdraw-an-application)
+* [Accept/ Reject applications (Owner side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#accept-reject-applications-owner-side)
+
+* [Notes (Discusstion Board)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#notes-discusstion-board)
+
+
