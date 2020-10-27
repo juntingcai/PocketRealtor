@@ -17,7 +17,7 @@ const ResponseTempate = {
   INVALID_ZIP_CODE: { code: 40010, msg: "The zip code is invalid" },
   INVALID_INPUT : {code: 40010, msg: "The input body is invalid"},
   // database fails
-  FAIL: { code: 50001, msg: "Request Fail: " },
+  FAIL: { code: 50001, msg: "Request Fail" },
   DATABASE_ERROR: { code: 50002, msg: "Some issues happends in database" },
 
   // token fails
