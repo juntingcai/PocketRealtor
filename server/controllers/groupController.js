@@ -115,11 +115,9 @@ class GroupController {
       await TenantGroupService.verifyGroupMember(user.id, groupId).then(
         async (isGroupMember) => {
           if (isGroupMember) {
-            await TenantGroupService.getGroupDetail(user.id, groupId).then(
-              (result) => {
-                group = result;
-              }
-            );
+            await TenantGroupService.getGroupDetail(groupId).then((result) => {
+              group = result;
+            });
           } else {
             await TenantGroupService.getGroupDescription(groupId).then(
               (result) => {
@@ -140,6 +138,22 @@ class GroupController {
     } else {
       res.status(404).json(resTemplate.NO_DATA);
     }
+  }
+
+  // to get groups that an user is in
+  getUserGroups(req, res) {
+    let user = req.body.user;
+    if (!user) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    TenantGroupService.getUserGroupList(user.id).then((result) => {
+      if (result) {
+        res.json(result);
+      } else {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+      }
+    });
   }
 
   // Members
@@ -321,7 +335,11 @@ class GroupController {
         res.status(403).json(resTemplate.PERMISSION_DENY);
         return;
       }
-      TenantGroupService.getWaitingTenant(groupId).then((result) => {
+      TenantGroupService.getWaitingTenants(groupId).then((result) => {
+        if (!result) {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+          return;
+        }
         res.json(result);
       });
     });
@@ -334,8 +352,12 @@ class GroupController {
       return;
     }
 
-    TenantGroupService.getApplyingGroup(user.id)
+    TenantGroupService.getUserApllyingGroups(user.id)
       .then((result) => {
+        if (result == undefined) {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+          return;
+        }
         res.json(result);
       })
       .catch((err) => {
@@ -397,6 +419,41 @@ class GroupController {
         }
       );
     });
+  }
+
+  getGroupInvitees(req, res) {
+    let owner = req.body.user;
+    if (!owner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let groupId = req.params.groupId;
+    if (!groupId || isNaN(parseInt(groupId))) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+
+    TenantGroupService.verifyGroupOnwer(owner.id, groupId).then((approved) => {
+      if (!approved) {
+        res.status(403).json(resTemplate.PERMISSION_DENY);
+        return;
+      }
+
+      TenantGroupService.getInvitation(groupId).then((result) => {
+        if (result == undefined) {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+          return;
+        }
+        res.json(result);
+      });
+    });
+  }
+
+  test(req, res) {
+    TenantGroupService.verifyGroupMember(600, 8).then(result =>{
+      res.json(result);
+
+    })
   }
 }
 

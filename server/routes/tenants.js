@@ -128,6 +128,13 @@ router.get(
   TenantGroup.getApplyingGroups
 );
 
+router.get(
+  "/tenant/group/invite/:groupId",
+  User.verifyToken,
+  Tenant.verifyTenantRole,
+  TenantGroup.getGroupInvitees
+);
+
 router.delete(
   "/tenant/group/applied/cancel/:groupId",
   User.verifyToken,
@@ -142,6 +149,15 @@ router.put(
   TenantGroup.putMessage
 );
 
-router.get("/test", Tenant.test);
+router.get(
+  "/tenant/groups",
+  User.verifyToken,
+  Tenant.verifyTenantRole,
+  TenantGroup.getUserGroups
+);
+
+
+
+router.get("/test", TenantGroup.test);
 
 module.exports = router;

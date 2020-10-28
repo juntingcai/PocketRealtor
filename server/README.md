@@ -22,6 +22,8 @@
 2. Tenants are able to like a listing, and delete it
 3. Modify some structures
 
+### 10/28
+1. Implemented grouping functionalities. [See Here](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document#tenant-group)
 
 ## Set up
 

@@ -2,7 +2,7 @@ const { User, TenantGroups, GroupMembers } = require("../models/models");
 const { Op, Sequelize } = require("sequelize");
 
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
-const groupMembers = require("../models/groupMembers");
+
 class TenantGroupService {
   // owner
   // create a group
@@ -20,6 +20,11 @@ class TenantGroupService {
     return TenantGroups.create(newGroup)
       .then((group) => {
         if (group) {
+          GroupMembers.create({
+            group_id: group.id,
+            user_id: ownerId,
+            state: GroupMemberState.OWNER.id,
+          });
           return group.id;
         } else {
           return undefined;
@@ -97,10 +102,10 @@ class TenantGroupService {
         await GroupMembers.count({
           where: {
             group_id: group.id,
-            state: GroupMemberState.APPROVED.id,
+            state: [GroupMemberState.APPROVED.id, GroupMemberState.OWNER.id],
           },
         }).then((cnt) => {
-          groupInfo.size = cnt + 1; // owner does not be counted, so add 1 here
+          groupInfo.size = cnt;
         });
 
         await User.findByPk(ownerId).then((user) => {
@@ -121,39 +126,33 @@ class TenantGroupService {
   }
 
   //getWaitingTenant
-  getWaitingTenant(groupId) {
+  getWaitingTenants(groupId) {
     return GroupMembers.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.col("user.id"), "id"],
+        [Sequelize.col("user.first_name"), "firstname"],
+        [Sequelize.col("user.last_name"), "lsstname"],
+        [Sequelize.col("user.avatar"), "avatar"],
+        [Sequelize.col("updated_at"), "applyAt"],
+      ],
       where: {
         group_id: groupId,
         state: GroupMemberState.WAITING.id,
       },
+      include: {
+        model: User,
+        attributes: [],
+      },
       order: [["updated_at", "ASC"]],
-    }).then((waitingUsers) => {
-      console.log(waitingUsers);
-      var waitingUsersId = [];
-      for (var i = 0; i < waitingUsers.length; i++) {
-        let waitingUser = waitingUsers[i];
-        waitingUsersId.push(waitingUser.user_id);
-      }
-
-      return User.findAll({
-        raw: true,
-        attributes: [
-          "id",
-          ["first_name", "firstname"],
-          ["last_name", "lastname"],
-          "avatar",
-        ],
-        where: { id: waitingUsersId },
+    })
+      .then((waitingUsers) => {
+        return waitingUsers;
       })
-        .then((users) => {
-          return users;
-        })
-        .catch((err) => {
-          console.log(err);
-          return undefined;
-        });
-    });
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
   }
 
   // verify applications
@@ -201,6 +200,37 @@ class TenantGroupService {
     });
   }
 
+  // get invitation
+
+  getInvitation(groupId) {
+    return GroupMembers.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.col("user.id"), "id"],
+        [Sequelize.col("user.first_name"), "firstname"],
+        [Sequelize.col("user.last_name"), "lastname"],
+        [Sequelize.col("user.avatar"), "avatar"],
+        [Sequelize.col("updated_at"), "invitedAt"],
+      ],
+      where: {
+        group_id: groupId,
+        state: GroupMemberState.INVITED.id,
+      },
+      include: {
+        model: User,
+        attributes: [],
+      },
+      order: [["updated_at", "ASC"]],
+    })
+      .then((invitees) => {
+        return invitees;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
   // members
   // apply a group
   applyGroup(userId, groupId) {
@@ -231,33 +261,33 @@ class TenantGroupService {
   }
 
   // get the groups that the user has applied
-  getApplyingGroup(userId) {
+  getUserApllyingGroups(userId) {
     return GroupMembers.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.col("tenant_group.id"), "id"],
+        [Sequelize.col("tenant_group.name"), "name"],
+        [Sequelize.col("tenant_group.description"), "description"],
+        [Sequelize.col("created_at"), "applyAt"],
+      ],
       where: {
         user_id: userId,
         state: GroupMemberState.WAITING.id,
       },
-    }).then(async (waitingList) => {
-      var waitingGroupIds = [];
-      for (var i = 0; i < waitingList.length; i++) {
-        waitingGroupIds.push(waitingList[i].group_id);
-      }
-      var result = [];
-      await TenantGroups.findAll({
-        where: {
-          id: waitingGroupIds,
-        },
-      }).then((groups) => {
-        for (var i = 0; i < groups.length; i++) {
-          let group = groups[i];
-          result.push({
-            groupId: group.id,
-            name: group.name,
-          });
-        }
+      include: {
+        model: TenantGroups,
+        attributes: [],
+      },
+      order: [["created_at", "ASC"]],
+    })
+      .then((groups) => {
+        console.log(groups);
+        return groups;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
       });
-      return result;
-    });
   }
 
   cancelApplication(userId, groupId) {
@@ -282,57 +312,79 @@ class TenantGroupService {
       });
   }
 
-  getGroupDetail(userId, groupId) {
-    return TenantGroups.findByPk(groupId).then(async (group) => {
+  getGroupDetail(groupId) {
+    return TenantGroups.findByPk(groupId, {
+      include: {
+        model: User,
+        attributes: ["id", "first_name", "last_name", "avatar"],
+      },
+    }).then(async (group) => {
+      if (!group) {
+        return undefined;
+      }
       let result = {};
-      result.id = group.id;
+      result.id = groupId;
       result.name = group.name;
       result.description = group.description;
       result.notes = group.notes;
-
-      await User.findByPk(group.owner_id).then((owner) => {
-        if (owner) {
-          result.owner = {
-            id: owner.id,
-            firstname: owner.first_name,
-            lastname: owner.last_name,
-            avatar: owner.avatar,
-          };
-        }
-      });
+      result.owner = {
+        id: group.user.id,
+        firstname: group.user.first_name,
+        lastname: group.user.last_name,
+        avatar: group.user.avatar,
+      };
 
       await GroupMembers.findAll({
+        raw: true,
+        attributes: [
+          [Sequelize.col("user.id"), "id"],
+          [Sequelize.col("user.first_name"), "firstname"],
+          [Sequelize.col("user.last_name"), "lastname"],
+          [Sequelize.col("user.avatar"), "avatar"],
+          [Sequelize.col("updated_at"), "addedAt"],
+        ],
         where: {
           group_id: groupId,
           state: GroupMemberState.APPROVED.id,
         },
-      }).then(async (members) => {
-        var memberIds = [];
-        for (var i = 0; i < members.length; i++) {
-          let member = members[i];
-          memberIds.push(member.user_id);
-        }
-        await User.findAll({
-          where: {
-            id: memberIds,
-          },
-        }).then((users) => {
-          var members = [];
-          for (var i = 0; i < users.length; i++) {
-            let member = users[i];
-            members.push({
-              id: member.id,
-              firstname: member.first_name,
-              lastname: member.last_name,
-              avatar: member.avatar,
-            });
-          }
-          result.members = members;
-        });
+        include: {
+          model: User,
+          attributes: [],
+        },
+        order: [["updated_at", "ASC"]],
+      }).then((members) => {
+        result.members = members;
       });
 
       return result;
     });
+  }
+
+  getUserGroupList(userId) {
+    return GroupMembers.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.col("tenant_group.id"), "id"],
+        [Sequelize.col("tenant_group.name"), "name"],
+        [Sequelize.col("tenant_group.description"), "description"],
+        [Sequelize.col("updated_at"), "addedAt"],
+      ],
+      where: {
+        user_id: userId,
+        state: [GroupMemberState.APPROVED.id, GroupMemberState.OWNER.id],
+      },
+      include: {
+        model: TenantGroups,
+        attributes: [],
+      },
+    })
+      .then((groups) => {
+        return groups;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
   }
 
   respondInvitation(userId, groupId, accept) {
@@ -417,7 +469,6 @@ class TenantGroupService {
   }
 
   verifyGroupOnwer(userId, groupId) {
-    console.log(userId);
     return TenantGroups.findByPk(groupId).then((group) => {
       if (!group) {
         console.log("Cannot Find the group: " + groupId);
@@ -436,13 +487,14 @@ class TenantGroupService {
       where: {
         user_id: userId,
         group_id: groupId,
-        state: GroupMemberState.APPROVED.id,
+        state: [GroupMemberState.APPROVED.id, GroupMemberState.OWNER.id],
       },
     }).then((approved) => {
       if (approved) {
         return true;
+      } else {
+        return false;
       }
-      return this.verifyGroupOnwer(userId, groupId);
     });
   }
 }

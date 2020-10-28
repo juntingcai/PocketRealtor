@@ -38,11 +38,10 @@
 * [Delete Group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#delete-group)
 * [Get group (Owner and Member side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-group-owner-and-member-side)
 * [Get group (Guest side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-group-guest-side)
-
+* [Get User's group list](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-user-group-list)
 * [Invite a tenant](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#invite-a-tenant)
-* [Get invitations (TODO) ]()
+* [Get invitees ](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-invitees)
 * [Accept / Reject a invitation](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#accept--reject-a-invitation)
-
 * [Apply for a group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#apply-for-a-group)
 * [Get applications(Group Owner Side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-applicationsgroup-owner-side)
 * [Get applications(Applicant Side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-applicationsapplicant-side)

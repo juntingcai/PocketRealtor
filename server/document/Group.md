@@ -26,9 +26,9 @@ If the group is successfully created, it will return:
 
 ### Update group
 
-The group owner can update the group information.  
-groupId is neccessary,  
-name and description are optional here, but must provide at least one of them.
+The group owner can update the group information.   
+groupId is neccessary;   
+name and description are optional here, but must provide at least one of them.   
 
 ```
 POST: localhost:3000/tenant/group/update
@@ -55,7 +55,7 @@ e.g. localhost:3000/tenant/group/delete/11
 GET localhost:3000/tenant/group/:id
 ```
 
-If the user(token) calling this api is the owner or member of the group, it will return some detail.
+If the user(token) calling this api is the owner or member of the group, it will return some detail.   
 The filed "notes" represents the messages that members wrote.  See [Note](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#notes-discusstion-board)
 ```
 {
@@ -120,11 +120,36 @@ The api is as the same as member/owner's side, but if the user does not belong t
 }
 ```
 
-Note: size is the number of poeple in this group
+size is the number of poeple in this group
+
+### Get user group list
+This api is to get which groups the user(token) is in(including group owner).   
+
+```
+GET localhost:3000/tenant/groups
+```
+
+It returns : 
+```
+[
+    {
+        "id": 12,
+        "name": "Group 12",
+        "description": "This is Group 12",
+        "addedAt": "2020-10-26T06:51:18.395Z"
+    },
+    {
+        "id": 13,
+        "name": "I Love San Francisco",
+        "description": "We'd like to find somewhere to live in San Francisco",
+        "addedAt": "2019-8-13T11:50:12.748Z"
+    }
+]
+```
 
 ## Invitation
 
-A group owner can invites other tenants to join its group, the invitees can accept or reject the invitation.
+A group owner can invites other tenants to join its group, the invitees can accept or reject the invitation.   
 
 ### Invite a tenant
 
@@ -149,15 +174,47 @@ POST localhost:3000/tenant/group/invite/
 }
 ```
 
-### Get invitations 
-** Not completed yet **
+### Get invitees
 
-This api is going to look up the invitations of a group owner made.  
+This api is to find invitations that a group owner made.   
+Give a group id and the user's token must be the owner.   
+
+```
+GET localhost:3000/tenant/group/invite/:groupId
+```
+This api returns the invitees: (If no invitees, it's simply an empty array)   
+```
+[
+    {
+        "id": 300,
+        "firstname": "Edgard",
+        "lastname": "McCreedy",
+        "avatar": "https://i.imgur.com/0avxl7q.jpg",
+        "invitedAt": "2020-10-28T02:31:35.438Z"
+    },
+    {
+        "id": 302,
+        "firstname": "Lilith",
+        "lastname": "Lant",
+        "avatar": "https://i.imgur.com/0avxl7q.jpg",
+        "invitedAt": "2020-10-28T02:31:47.982Z"
+    },
+    {
+        "id": 303,
+        "firstname": "Janetta",
+        "lastname": "Tolumello",
+        "avatar": "https://i.imgur.com/0avxl7q.jpg",
+        "invitedAt": "2020-10-28T02:31:50.864Z"
+    }
+]
+```
+
+
 
 ### Accept / Reject a invitation
 
-Invitees can accept or reject an invitation
-To accept:
+Invitees can accept or reject an invitation   
+To accept:   
 
 ```
 PUT localhost:3000/tenant/group/invite/accept/:groupId
@@ -171,11 +228,11 @@ PUT localhost:3000/tenant/group/invite/reject/:groupId
 
 ## Applications
 
-Tenants can apply for joining a group, group owner can approve or reject it.
+Tenants can apply for joining a group, group owner can approve or reject it.  
 
 ### Apply for a group
 
-Provide the :groupId to make a application to join
+Provide the :groupId to apply for the group
 
 ```
 POST localhost:3000/tenant/group/apply/:groupId
@@ -192,19 +249,30 @@ The following example returns the users who has applied for group 8 and is waiti
 
 ```
 GET localhost:3000/tenant/group/waiting/8
-
+```
+RETURN: 
+```
 [
     {
-        "id": 600,
-        "firstname": "Sigismundo",
-        "lastname": "Mabe",
-        "avatar": "https://i.imgur.com/0avxl7q.jpg"
+        "id": 900,
+        "firstname": "Dorie",
+        "lsstname": "Dacre",
+        "avatar": "https://i.imgur.com/0avxl7q.jpg",
+        "applyAt": "2020-10-28T05:27:58.271Z"
     },
     {
-        "id": 254,
-        "firstname": "Eadith",
-        "lastname": "Philbrook",
-        "avatar": "https://i.imgur.com/0avxl7q.jpg"
+        "id": 901,
+        "firstname": "Mattheus",
+        "lsstname": "McSaul",
+        "avatar": "https://i.imgur.com/0avxl7q.jpg",
+        "applyAt": "2020-10-28T05:28:00.929Z"
+    },
+    {
+        "id": 902,
+        "firstname": "Maurits",
+        "lsstname": "Kinkade",
+        "avatar": "https://i.imgur.com/0avxl7q.jpg",
+        "applyAt": "2020-10-28T05:28:04.034Z"
     }
 ]
 
@@ -217,16 +285,14 @@ This api returns which groups the user(token) has applied.
 ```
 GET localhost:3000/tenant/group/applied/list
 ```
-
+It returns the groups that the user applied(Not responded by owner yet)
 ```
 [
     {
-        "groupId": 8,
-        "name": "Group 8"
-    },
-    {
-        "groupId": 9,
-        "name": "Group 9"
+        "id": 8,
+        "name": "123",
+        "description": "23232",
+        "applyAt": "2020-10-27T13:32:12.526Z"
     }
 ]
 ```

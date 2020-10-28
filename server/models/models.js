@@ -76,6 +76,21 @@ User.belongsToMany(TenantGroups, {
   foreignKey: "user_id",  
 });
 
+GroupMembers.belongsTo(User, {foreignKey: "user_id"})
+GroupMembers.belongsTo(TenantGroups, {foreignKey: "group_id"})
+
+User.hasMany(GroupMembers, {foreignKey: "user_id"})
+TenantGroups.hasMany(GroupMembers, {foreignKey: "group_id"});
+
+
+/**
+Player.belongsToMany(GameTeam, { through: PlayerGameTeam });
+GameTeam.belongsToMany(Player, { through: PlayerGameTeam });
+PlayerGameTeam.belongsTo(Player);
+PlayerGameTeam.belongsTo(GameTeam);
+Player.hasMany(PlayerGameTeam);
+GameTeam.hasMany(PlayerGameTeam);
+ */
 
 Listing.belongsToMany(TenantGroups, {through: TenantGroupListings, foreignKey: "listing_id"});
 TenantGroups.belongsToMany(Listing, {through: TenantGroupListings, foreignKey: "group_id"})
