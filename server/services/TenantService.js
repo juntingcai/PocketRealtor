@@ -6,7 +6,7 @@ const {
   FavoriteListing,
   Listing,
 } = require("../models/models");
-const { Op, where } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const RoleType = require("../static/RoleType");
 const zipCodeUtil = require("../utils/ZipCodeUtil");
 
@@ -193,7 +193,6 @@ class TenantService {
   }
 
   async addToFavorite(userId, listingId) {
-    let now = new Date();
     return await FavoriteListing.findOne({
       where: {
         user_id: userId,
@@ -203,10 +202,10 @@ class TenantService {
       if (row) {
         return true;
       }
-      FavoriteListing.create({
+      return FavoriteListing.create({
         user_id: userId,
         listing_id: listingId,
-        create_time: now.getTime(),
+        create_time: Sequelize.fn("NOW"),
       })
         .then(() => {
           return true;
@@ -218,8 +217,8 @@ class TenantService {
     });
   }
 
-  async deleteFavorite(userId, listingId) {
-    return await FavoriteListing.findOne({
+  deleteFavorite(userId, listingId) {
+    return FavoriteListing.findOne({
       where: {
         user_id: userId,
         listing_id: listingId,
@@ -229,9 +228,15 @@ class TenantService {
         if (!row) {
           return true;
         }
-        row.destroy().then(() => {
-          return true;
-        });
+        return row
+          .destroy()
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -239,38 +244,23 @@ class TenantService {
       });
   }
 
-  async getUserFavoriteListings(userId) {
-    return await FavoriteListing.findAll({
-      attributes: ["listing_id"],
+  getUserFavoriteListings(userId) {
+    return FavoriteListing.findAll({
+      attributes: [
+        ["listing_id", "id"],
+        [Sequelize.col("listing.title"), "title"],
+        [Sequelize.col("create_time"), "addAt"],
+      ],
       raw: true,
       where: { user_id: userId },
       order: [["create_time", "DESC"]],
+      include: {
+        model: Listing,
+        attributes: [],
+      },
     })
-      .then((listingIds) => {
-        if (!listingIds) {
-          return undefined;
-        }
-
-        var ids = [];
-        for (var i = 0; i < listingIds.length; i++) {
-          let listingId = listingIds[i];
-          ids.push(listingId.listing_id);
-        }
-
-        return Listing.findAll({
-          raw: true,
-          attributes: ["id", "title"],
-          where: {
-            id: ids,
-          },
-        })
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            console.log(err);
-            return undefined;
-          });
+      .then((result) => {
+        return result;
       })
       .catch((err) => {
         console.log(err);
@@ -278,8 +268,24 @@ class TenantService {
       });
   }
 
-  //==============================
-  testZip(req, res) {}
+  test(userId) {
+    return FavoriteListing.findAll({
+      attributes: [
+        ["listing_id", "id"],
+        [Sequelize.col("listing.title"), "title"],
+        [Sequelize.col("create_time"), "addAt"],
+      ],
+      raw: true,
+      where: { user_id: userId },
+      order: [["create_time", "DESC"]],
+      include: {
+        model: Listing,
+        attributes: [],
+      },
+    }).then((result) => {
+      return result;
+    });
+  }
 }
 
 module.exports = new TenantService();

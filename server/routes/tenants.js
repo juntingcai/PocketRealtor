@@ -44,8 +44,7 @@ router.delete(
 
 router.get(
   "/tenant/favorite/",
-  User.verifyToken,
-  Tenant.verifyTenantRole,
+  User.interpretToken,
   Tenant.getFavoriteListings
 );
 
@@ -156,8 +155,6 @@ router.get(
   TenantGroup.getUserGroups
 );
 
-
-
-router.get("/test", TenantGroup.test);
+router.get("/test", Tenant.test);
 
 module.exports = router;

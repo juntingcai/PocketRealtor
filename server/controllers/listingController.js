@@ -49,12 +49,25 @@ class ListingController {
 
   getListingById(req, res, next) {
     let listingId = req.params.id;
+    let user = req.body.user;
     if (listingId) {
       ListingService.getListingById(listingId).then((listing) => {
         if (listing) {
-          res.json(listing);
-          if (req.body.user) {
-            HistoryService.viewListing(req.body.user.id, listingId);
+          if (user) {
+            ListingService.isFavoriteListing(user.id, listing.id).then(
+              (isFavorite) => {
+                if (isFavorite) {
+                  listing.isFavorite = true;
+                } else {
+                  listing.isFavorite = false;
+                }
+                res.json(listing);
+              }
+            );
+            HistoryService.viewListing(user.id, listingId);
+          } else {
+            listing.isFavorite = false;
+            res.json(listing);
           }
         } else {
           res.status(404).json(resTemplate.NO_DATA);

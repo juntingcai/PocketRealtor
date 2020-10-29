@@ -109,10 +109,10 @@ class TenantController {
 
     if (!userId) {
       res.status(403).json(resTemplate.MISS_FIELD);
+      return;
     }
 
     TenantService.getUserFavoriteListings(userId).then((favorites) => {
-      console.log(favorites);
       if (favorites) {
         res.json(favorites);
       } else {
@@ -138,7 +138,9 @@ class TenantController {
 
   //===========
   test(req, res) {
-    TenantService.testZip(req, res);
+    TenantService.test(10).then((ressult) => {
+      res.json(ressult);
+    });
   }
 }
 

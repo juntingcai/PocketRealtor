@@ -1,4 +1,4 @@
-const { Listing } = require("../models/models");
+const { Listing, FavoriteListing } = require("../models/models");
 const { Op } = require("sequelize");
 const ListingStatus = require("../../common/Constans/ListingStatus");
 
@@ -8,6 +8,7 @@ class ListingService {
     if (queryOptions == undefined) {
       return undefined;
     }
+
     return Listing.findAll({ raw: true, where: queryOptions }).then(
       (listings) => {
         return listings;
@@ -16,7 +17,7 @@ class ListingService {
   }
 
   getListingById(listingId) {
-    return Listing.findByPk(listingId).then((listing) => {
+    return Listing.findByPk(listingId, { raw: true }).then((listing) => {
       return listing;
     });
   }
@@ -184,6 +185,26 @@ class ListingService {
       }
       return true;
     });
+  }
+
+  isFavoriteListing(userId, listingId) {
+    return FavoriteListing.count({
+      where: {
+        user_id: userId,
+        listing_id: listingId,
+      },
+    })
+      .then((cnt) => {
+        if (cnt > 0) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
   }
 }
 

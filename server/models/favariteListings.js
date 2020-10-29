@@ -3,7 +3,7 @@ module.exports = function (sequelize, DataTypes) {
     "favorite_listings",
     {
       create_time: {
-        type: DataTypes.BIGINT(),
+        type: DataTypes.DATE(),
       },
     },
     {

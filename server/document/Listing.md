@@ -85,7 +85,7 @@ Also, it returns the listings that the status is 1 (i.e. Available)
 Required parameters
 - lat // latitude
 - lng // longitude
-- radius // in miles
+- radius // in kilometers
 - type // 1 = rent, 2 = sale
 
 Optional parameters
@@ -96,11 +96,85 @@ Optional parameters
 
 Here are some examples:
 ```
-localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=3&type=1
-localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=100&type=1&minPrice=202&maxPrice=5000&bedrooms=1&bathrooms=1
+GET localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=3&type=1
+GET localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=100&type=1&minPrice=202&maxPrice=5000&bedrooms=1&bathrooms=1
+
+The reuslt is an json array having all fitting listings.
+[
+    {
+        "id": 113,
+        "title": "vulputate vitae nisl",
+        "type": "Sonsing",
+        "age": 69,
+        "description": "Sed ante. Vivamus tortor. Duis mattis egestas metus.",
+        "address": "27 Darwin Lane",
+        "city": "Kimberton",
+        "state": "PA",
+        "zip_code": 19442,
+        "latitude": "45.015900",
+        "longitude": "-93.471900",
+        "sale_price": "10116973.32",
+        "rent_price": "4479.71",
+        "area": "8939.00",
+        "rooms": 8,
+        "bath_rooms": 3,
+        "image_links": null,
+        "status": 1,
+        "owner_id": 83
+    },
+    {
+        "id": 614,
+        "title": "dui vel",
+        "type": "Alpha",
+        "age": 63,
+        "description": "Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat.",
+        "address": "2608 Artisan Trail",
+        "city": "San Jose",
+        "state": "CA",
+        "zip_code": 95136,
+        "latitude": "45.015900",
+        "longitude": "-93.471900",
+        "sale_price": "23590178.69",
+        "rent_price": "1631.60",
+        "area": "5973.78",
+        "rooms": 9,
+        "bath_rooms": 4,
+        "image_links": null,
+        "status": 1,
+        "owner_id": 218
+    }
+]
 ```
 
 ## GET A LISTING
 ```
 GET localhost:3000/listing/:id
+```
+The following example shows the listing with id 202
+```
+For example : 
+GET localhost:3000/listing/202
+
+{
+    "id": 202,
+    "title": "orci",
+    "type": "Greenlam",
+    "age": 21,
+    "description": "Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat.\r\n\r\nCurabitur gravida nisi at nibh. In hac habitasse platea dictumst. Aliquam augue quam, sollicitudin vitae, consectetuer eget, rutrum at, lorem.",
+    "address": "4 Hintze Road",
+    "city": "Cumberland Gap",
+    "state": "TN",
+    "zip_code": 37724,
+    "latitude": "41.945300",
+    "longitude": "-87.747400",
+    "sale_price": "22075340.45",
+    "rent_price": "2982.10",
+    "area": "5482.32",
+    "rooms": 6,
+    "bath_rooms": 2,
+    "image_links": null,
+    "status": 1,
+    "owner_id": 186,
+    "isFavorite": true
+}
 ```

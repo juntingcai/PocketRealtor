@@ -61,6 +61,13 @@ Listing.belongsToMany(User, {
   foreignKey: "listing_id",
 });
 
+FavoriteListing.belongsTo(User, {foreignKey: "user_id"})
+FavoriteListing.belongsTo(Listing, {foreignKey: "listing_id"})
+User.hasMany(FavoriteListing, {foreignKey: "user_id"})
+Listing.hasMany(FavoriteListing, {foreignKey: "listing_id"});
+
+
+
 // user has one TenantGroups
 
 User.hasMany(TenantGroups, { foreignKey: "owner_id" });

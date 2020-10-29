@@ -29,6 +29,10 @@
 1. Add a filed "status" in listing table.(About status, see [ListingStatus.js]())
 2. Listing owner can update liting's status now.
 
+### 10/29
+1. Add "isFavorite" field into [GET-LISTING](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-a-listing)
+
+
 ## Set up
 
 - Input your database's setting in database/config.js
