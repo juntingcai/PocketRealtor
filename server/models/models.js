@@ -82,18 +82,12 @@ GroupMembers.belongsTo(TenantGroups, {foreignKey: "group_id"})
 User.hasMany(GroupMembers, {foreignKey: "user_id"})
 TenantGroups.hasMany(GroupMembers, {foreignKey: "group_id"});
 
-
-/**
-Player.belongsToMany(GameTeam, { through: PlayerGameTeam });
-GameTeam.belongsToMany(Player, { through: PlayerGameTeam });
-PlayerGameTeam.belongsTo(Player);
-PlayerGameTeam.belongsTo(GameTeam);
-Player.hasMany(PlayerGameTeam);
-GameTeam.hasMany(PlayerGameTeam);
- */
-
+// tenant group and listings
 Listing.belongsToMany(TenantGroups, {through: TenantGroupListings, foreignKey: "listing_id"});
 TenantGroups.belongsToMany(Listing, {through: TenantGroupListings, foreignKey: "group_id"})
+
+User.hasMany(TenantGroupListings, {foreignKey: "added_user_id"});
+TenantGroupListings.belongsTo(User, {foreignKey: "added_user_id"})
 
 
 sequelize.sync({ alter: true }).then(() => {

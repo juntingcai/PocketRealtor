@@ -4,6 +4,7 @@
 Before a user creating a listing, the user must be a Host.
 (See [Update user's role](https://github.com/sfdevshop/PocketRealtorApp/tree/master/server#update-users-role-token-needed))
 
+
 ```
 POST: localhost:3000/listing/create
 {
@@ -22,7 +23,8 @@ POST: localhost:3000/listing/create
         "sale_price" : 999999,
         "bath_rooms" : 2,
         "area" : 55000.12,
-        "age" : 30
+        "age" : 30,
+        "status" : 1
     }
 }
 ```
@@ -35,7 +37,7 @@ POST: localhost:3000/listing/create
 PUT: localhost:3000/listing/duplicate/:listingId
 ```
 
-## Update a house listing(Owner token needed)
+## Update a house listing property(Owner token needed)
 ```
 PUT: localhost:3000/listing/update
 {   "id": 3004,
@@ -59,6 +61,16 @@ PUT: localhost:3000/listing/update
 }
 ```
 
+## Update a house listing status
+The status Id can be found in common/Constants/ListingStatus.js
+```
+PUT: localhost:3000/listing/update/status
+{   
+    "id": 3004,
+    "statud" : 2
+}
+```
+
 ## Delete a house listing(Owner token needed)
 
 **Note: The user calling this api must be the owner of the house.**
@@ -69,7 +81,7 @@ DELETE localhost:3000/listing/delete/:listingid
 
 ## Search for listings
 Given a center from coordinate and radius(mile), this api will provides the house listings in the range.  
-
+Also, it returns the listings that the status is 1 (i.e. Available)
 Required parameters
 - lat // latitude
 - lng // longitude

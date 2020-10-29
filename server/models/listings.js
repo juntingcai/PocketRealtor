@@ -71,6 +71,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: true,
       },
+      status: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       underscored: true,

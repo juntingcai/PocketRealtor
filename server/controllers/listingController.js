@@ -37,13 +37,14 @@ class ListingController {
     if (req.query.bathrooms) {
       condition.bathrooms = req.query.bathrooms;
     }
-    if (type == 1) {
-      ListingService.findRentListings(condition, res);
-    } else if (type == 2) {
-      ListingService.findRentListings(condition, res);
-    } else {
-      res.json(resTemplate.NO_DATA);
-    }
+    let isFindingRent = type == 1;
+    ListingService.findListings(condition, isFindingRent).then((result) => {
+      if (result) {
+        res.json(result);
+      } else {
+        res.status(404).json(resTemplate.NO_DATA);
+      }
+    });
   }
 
   getListingById(req, res, next) {
@@ -65,9 +66,17 @@ class ListingController {
   createListing(req, res, next) {
     let property = req.body.property;
     if (property) {
-      ListingService.createListing(req.body.user.id, property, res);
+      ListingService.createListing(req.body.user.id, property).then(
+        (result) => {
+          if (result) {
+            res.json(result);
+          } else {
+            res.status(500).json(resTemplate.DATABASE_ERROR);
+          }
+        }
+      );
     } else {
-      res.status(400);
+      res.status(400).json(resTemplate.MISS_FIELD);
     }
   }
 
@@ -75,31 +84,94 @@ class ListingController {
     let user = req.body.user;
     let listingId = req.params.id;
     if (listingId) {
-      ListingService.duplicateListing(user.id, listingId, res);
+      ListingService.duplicateListing(user.id, listingId).then((result) => {
+        if (result) {
+          res.json(result);
+        } else if (result == false) {
+          res.status(404).json(resTemplate.NO_DATA);
+        } else {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+        }
+      });
     } else {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
     }
   }
 
-  updateListing(req, res, next) {
+  updateListingProperty(req, res, next) {
     let userId = req.body.user.id;
     let properties = req.body.property;
     let listingId = req.body.id;
     if (!listingId || !properties) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
-    ListingService.updateListing(userId, listingId, properties, res);
+    ListingService.verifyListingOwner(userId, listingId).then((isOwner) => {
+      if (!isOwner) {
+        res.status(403).json(resTemplate.PERMISSION_DENY);
+        return;
+      }
+      ListingService.updateListingProperty(listingId, properties).then(
+        (result) => {
+          if (result) {
+            res.json(resTemplate.SUCCESS);
+          } else {
+            res.status(500).json(resTemplate.DATABASE_ERROR);
+          }
+        }
+      );
+    });
+  }
+
+  updateListingStatus(req, res, next) {
+    let user = req.body.user;
+    let listingId = req.body.id;
+    let statusId = req.body.status;
+
+    if (!user) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+
+    if (!listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+
+    if (!statusId || statusId > 4 || statusId < 0) {
+      res.status(400).json(resTemplate.INVALID_INPUT);
+      return;
+    }
+
+    ListingService.updateListingStatus(listingId, statusId).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+      }
+    });
   }
 
   deleteListing(req, res, next) {
     let userId = req.body.user.id;
     let listingId = req.params.id;
     if (!listingId) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
-    ListingService.deleteListing(userId, listingId, res);
+    ListingService.verifyListingOwner(userId, listingId).then((isOwner) => {
+      if (!isOwner) {
+        res.status(401).json(resTemplate.PERMISSION_DENY);
+        return;
+      }
+      ListingService.deleteListing(listingId).then((result) => {
+        if (result) {
+          res.json(resTemplate.SUCCESS);
+        } else {
+          res.json(resTemplate.FAIL);
+        }
+      });
+    });
   }
 
   verifyHostRole(req, res, next) {

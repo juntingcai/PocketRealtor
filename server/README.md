@@ -22,8 +22,12 @@
 2. Tenants are able to like a listing, and delete it
 3. Modify some structures
 
-### 10/28
+### 10/27
 1. Implemented grouping functionalities. [See Here](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document#tenant-group)
+
+### 10/28
+1. Add a filed "status" in listing table.(About status, see [ListingStatus.js]())
+2. Listing owner can update liting's status now.
 
 ## Set up
 

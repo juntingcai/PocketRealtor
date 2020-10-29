@@ -1,49 +1,47 @@
-const { User, Listing } = require("../models/models");
+const { Listing } = require("../models/models");
 const { Op } = require("sequelize");
-const resTemplate = require("../static/ResponseTemplate");
+const ListingStatus = require("../../common/Constans/ListingStatus");
 
 class ListingService {
-  findRentListings(conditions, res) {
-    let queryOptions = getFindListingQueryOptions(conditions, true);
-
-    Listing.findAll({ raw: true, where: queryOptions }).then((listings) => {
-      res.json(listings);
-    });
+  findListings(conditions, isRent) {
+    let queryOptions = getFindListingQueryOptions(conditions, isRent);
+    if (queryOptions == undefined) {
+      return undefined;
+    }
+    return Listing.findAll({ raw: true, where: queryOptions }).then(
+      (listings) => {
+        return listings;
+      }
+    );
   }
 
-  findSaleListings(conditions, res) {
-    let queryOptions = getFindListingQueryOptions(conditions, false);
-    Listing.findAll({ raw: true, where: queryOptions }).then((listings) => {
-      res.json(listings);
-    });
-  }
-
-  async getListingById(listingId) {
-    return await Listing.findByPk(listingId).then((listing) => {
+  getListingById(listingId) {
+    return Listing.findByPk(listingId).then((listing) => {
       return listing;
     });
   }
 
-  createListing(ownerId, property, res) {
+  createListing(ownerId, property) {
     property.owner_id = ownerId;
-    Listing.create(property)
+    if (!property.status) {
+      property.status = ListingStatus.AVAILABLE.id;
+    }
+    return Listing.create(property)
       .then((listing) => {
-        res.json(listing);
+        return listing;
       })
       .catch((err) => {
         console.log(err);
-        res.status(500);
+        return undefined;
       });
   }
 
-  duplicateListing(ownerId, listingId, res) {
-    Listing.findByPk(listingId)
+  duplicateListing(ownerId, listingId) {
+    return Listing.findByPk(listingId)
       .then((listing) => {
         if (!listing) {
-          res.json(resTemplate.NO_DATA);
-          return;
+          return false;
         }
-
         let replicatedListing = {
           title: listing.get("title"),
           description: listing.get("description"),
@@ -59,129 +57,134 @@ class ListingService {
           bath_rooms: listing.get("bath_rooms"),
           area: listing.get("area"),
           age: listing.get("age"),
+          status: listing.status,
           owner_id: ownerId,
         };
 
-        Listing.create(replicatedListing).then((newListing) => {
+        return Listing.create(replicatedListing).then((newListing) => {
           if (newListing) {
-            res.json(newListing);
+            return newListing;
           } else {
-            console.log("Fail to add the listing");
-            res.status(500);
+            return undefined;
           }
         });
       })
       .catch((err) => {
         console.log(err);
-        res.status(500);
+        return undefined;
       });
   }
 
-  updateListing(userId, listingId, property, res) {
-    Listing.findByPk(listingId).then((listing) => {
+  updateListingProperty(listingId, property) {
+    return Listing.findByPk(listingId).then((listing) => {
       if (listing) {
-        if (listing.owner_id != userId) {
-          res.json(resTemplate.PERMISSION_DENY);
-          return;
-        } else {
-          if (property.title) {
-            listing.title = property.title;
-          }
-          if (property.description) {
-            listing.description = property.description;
-          }
-          if (property.address) {
-            listing.address = property.address;
-          }
-          if (property.city) {
-            listing.city = property.city;
-          }
-          if (property.state) {
-            listing.state = property.state;
-          }
-          if (property.latitude) {
-            listing.latitude = property.latitude;
-          }
-          if (property.longitude) {
-            listing.longitude = property.longitude;
-          }
-          if (property.rooms) {
-            listing.rooms = property.rooms;
-          }
-          if (property.zip_code) {
-            listing.zip_code = property.zip_code;
-          }
-          if (property.type) {
-            listing.type = property.type;
-          }
-          if (property.rent_price) {
-            listing.rent_price = property.rent_price;
-          }
-          if (property.sale_price) {
-            listing.sale_price = property.sale_price;
-          }
-          if (property.bath_rooms) {
-            listing.bath_rooms = property.bath_rooms;
-          }
-          if (property.area) {
-            listing.area = property.area;
-          }
-          if (property.age) {
-            listing.age = property.age;
-          }
-
-          listing
-            .save()
-            .then(() => {
-              res.json(listing);
-            })
-            .catch((err) => {
-              console.log(err);
-              res.json(resTemplate.INVALID_INPUT);
-            });
+        if (property.title) {
+          listing.title = property.title;
         }
+        if (property.description) {
+          listing.description = property.description;
+        }
+        if (property.address) {
+          listing.address = property.address;
+        }
+        if (property.city) {
+          listing.city = property.city;
+        }
+        if (property.state) {
+          listing.state = property.state;
+        }
+        if (property.latitude) {
+          listing.latitude = property.latitude;
+        }
+        if (property.longitude) {
+          listing.longitude = property.longitude;
+        }
+        if (property.rooms) {
+          listing.rooms = property.rooms;
+        }
+        if (property.zip_code) {
+          listing.zip_code = property.zip_code;
+        }
+        if (property.type) {
+          listing.type = property.type;
+        }
+        if (property.rent_price) {
+          listing.rent_price = property.rent_price;
+        }
+        if (property.sale_price) {
+          listing.sale_price = property.sale_price;
+        }
+        if (property.bath_rooms) {
+          listing.bath_rooms = property.bath_rooms;
+        }
+        if (property.area) {
+          listing.area = property.area;
+        }
+        if (property.age) {
+          listing.age = property.age;
+        }
+        return listing
+          .save()
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return undefined;
+          });
       } else {
-        res.json(resTemplate.NO_DATA);
+        return false;
       }
     });
   }
 
-  deleteListing(userId, listingId, res) {
-    Listing.findByPk(listingId)
-      .then((listing) => {
-        if (listing.owner_id != userId) {
-          res.json(resTemplate.PERMISSION_DENY);
-          return;
-        }
-        listing.destroy().then(() => {
-          res.json(resTemplate.SUCCESS);
+  updateListingStatus(listingId, statusId) {
+    return Listing.findByPk(listingId).then((listing) => {
+      if (!listing) {
+        return false;
+      }
+      listing.status = statusId;
+      return listing
+        .save(() => {
+          return true;
+        })
+        .catch((err) => {
+          console.log(err);
+          return false;
         });
+    });
+  }
+
+  deleteListing(listingId) {
+    return Listing.findByPk(listingId)
+      .then((listing) => {
+        return listing
+          .destroy()
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
       })
       .catch((err) => {
         console.log(err);
-        res.status(500);
+        return false;
       });
   }
-}
 
-function getRangeInMile(latitude, longitude, radiusMile) {
-  let degree = (24901 * 1609) / 360.0;
-  let dpmLat = 1 / degree;
-  let radiusLat = dpmLat * radiusMile;
-  let minLat = latitude - radiusLat;
-  let maxLat = latitude + radiusLat;
-  let mpdLng = degree * Math.cos(latitude * (Math.PI / 180));
-  let dpmLng = 1 / mpdLng;
-  let radiusLng = dpmLng * radiusMile;
-  let minLng = longitude - radiusLng;
-  let maxLng = longitude + radiusLng;
-
-  return {
-    minLat: minLat,
-    maxLat: maxLat,
-    minLng: minLng,
-    maxLng: maxLng,
-  };
+  verifyListingOwner(userId, listingId) {
+    return Listing.findByPk(listingId).then((listing) => {
+      if (!listing) {
+        return false;
+      }
+      if (userId != listing.owner_id) {
+        return false;
+      }
+      return true;
+    });
+  }
 }
 
 function getRangeInKm(latitude, longitude, radiusInKm) {
@@ -208,8 +211,7 @@ function getFindListingQueryOptions(conditions, isRenting) {
   let radius = conditions.radius;
 
   if (!latitude || !longitude || !radius) {
-    res.json(resTemplate.MISS_FIELD);
-    return;
+    return undefined;
   }
   let range = getRangeInKm(latitude, longitude, radius);
 
@@ -249,6 +251,7 @@ function getFindListingQueryOptions(conditions, isRenting) {
   if (bathrooms && bathrooms > 0) {
     queryOptions.bath_rooms = { [Op.gte]: bathrooms };
   }
+  queryOptions.status = ListingStatus.AVAILABLE.id;
   console.log(queryOptions);
   return queryOptions;
 }

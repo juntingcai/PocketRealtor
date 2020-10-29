@@ -1,4 +1,10 @@
-const { User, TenantGroups, GroupMembers } = require("../models/models");
+const {
+  User,
+  TenantGroups,
+  GroupMembers,
+  Listing,
+  TenantGroupListings,
+} = require("../models/models");
 const { Op, Sequelize } = require("sequelize");
 
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
@@ -465,7 +471,35 @@ class TenantGroupService {
   }
 
   addListing(userId, groupId, listingId) {
-    //TODO:
+    return this.verifyGroupMember(userId, groupId).then((isGroupMember) => {
+      if (!isGroupMember) {
+        return false;
+      }
+
+      return TenantGroupListings.findOne({
+        where: { group_id: groupId, listing_id: listingId },
+      }).then((existedListing) => {
+        if (existedListing) {
+          return false;
+        }
+        return TenantGroupListings.create({
+          group_id: groupId,
+          listing_id: listingId,
+          added_user_id: userId,
+        })
+          .then((success) => {
+            if (success) {
+              return true;
+            } else {
+              return false;
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            return undefined;
+          });
+      });
+    });
   }
 
   verifyGroupOnwer(userId, groupId) {
