@@ -11,7 +11,9 @@ router.post(
   Listing.createListing
 );
 router.get("/listings", Listing.findListings);
+
 router.get("/listing/:id", User.interpretToken, Listing.getListingById);
+
 router.put(
   "/listing/duplicate/:id",
   User.verifyToken,

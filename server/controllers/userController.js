@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const regex = require("../static/Regex");
 const UserService = require("../services/UserService");
 const HistoryService = require("../services/HistoryService");
+const RoleType = require("../static/RoleType");
 
 class UserController {
   constructor() {}
@@ -179,11 +180,29 @@ class UserController {
 
     if (!userId) {
       res.json(resTemplate.MISS_FIELD);
+      return;
     }
 
     UserService.getUserRoles(userId)
-      .then((result) => {
-        res.json(result);
+      .then((roles) => {
+        console.log(roles);
+        let userrole = {
+          isRenter: false,
+          isHost: false,
+          isAgent: false,
+        };
+        for (var i = 0; i < roles.length; i++) {
+          let role = roles[i];
+          if (role.role_id == RoleType.RENTER.id) {
+            userrole.isRenter = true;
+          } else if (role.role_id == RoleType.HOST.id) {
+            userrole.isHost = true;
+          } else if (role.role_id == RoleType.AGENT.id) {
+            userrole.isAgent = true;
+          }
+        }
+
+        res.json(userrole);
       })
       .catch((err) => {
         console.log(err);

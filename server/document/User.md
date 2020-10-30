@@ -154,40 +154,18 @@ If the user does not exist, a json will be returned like:
 }
 ```
 
-## GET User's role
-
+## GET User's role 
+(10/30 modified)  
 To get a user's role, please make a GET request and provide the user's id
 
 ```
 GET: localhost:3000/user/role/:userId
 ```
-
-Response will be a json array  
-One role
-
+The return value whould be a json with 3 role fields: 
 ```
-[
-    {
-        "user_id": 1,
-        "role_id": 1,
-        "role_name": "Renter"
-    }
-]
-```
-
-Two roles
-
-```
-[
-    {
-        "user_id": 1,
-        "role_id": 2,
-        "role_name": "Host"
-    },
-    {
-        "user_id": 1,
-        "role_id": 1,
-        "role_name": "Renter"
-    }
-]
+{
+    "isRenter": false,
+    "isHost": true,
+    "isAgent": false
+}
 ```

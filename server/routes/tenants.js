@@ -32,13 +32,11 @@ router.get("/tenants", Tenant.searchTenants);
 router.put(
   "/tenant/favorite/:listingId",
   User.verifyToken,
-  Tenant.verifyTenantRole,
   Tenant.addListingToFavorite
 );
 router.delete(
   "/tenant/favorite/:listingId",
   User.verifyToken,
-  Tenant.verifyTenantRole,
   Tenant.deleteOneFavoriteListing
 );
 
@@ -50,7 +48,6 @@ router.get(
 
 router.get(
   "/tenant/favorite/:userId",
-  User.verifyToken,
   Tenant.getFavoriteListings
 );
 

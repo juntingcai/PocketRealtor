@@ -118,7 +118,7 @@ The reuslt is an json array having all fitting listings.
         "area": "8939.00",
         "rooms": 8,
         "bath_rooms": 3,
-        "image_links": null,
+        "image_links": "",
         "status": 1,
         "owner_id": 83
     },
@@ -139,7 +139,7 @@ The reuslt is an json array having all fitting listings.
         "area": "5973.78",
         "rooms": 9,
         "bath_rooms": 4,
-        "image_links": null,
+        "image_links": "link1",
         "status": 1,
         "owner_id": 218
     }
@@ -153,28 +153,34 @@ GET localhost:3000/listing/:id
 The following example shows the listing with id 202
 ```
 For example : 
-GET localhost:3000/listing/202
+GET localhost:3000/listing/300
 
 {
-    "id": 202,
-    "title": "orci",
-    "type": "Greenlam",
-    "age": 21,
-    "description": "Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat.\r\n\r\nCurabitur gravida nisi at nibh. In hac habitasse platea dictumst. Aliquam augue quam, sollicitudin vitae, consectetuer eget, rutrum at, lorem.",
-    "address": "4 Hintze Road",
-    "city": "Cumberland Gap",
-    "state": "TN",
-    "zip_code": 37724,
-    "latitude": "41.945300",
-    "longitude": "-87.747400",
-    "sale_price": "22075340.45",
-    "rent_price": "2982.10",
-    "area": "5482.32",
-    "rooms": 6,
-    "bath_rooms": 2,
-    "image_links": null,
+    "id": 300,
+    "title": "amet",
+    "type": "Cookley",
+    "age": 85,
+    "description": "Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.\r\n\r\nDuis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.",
+    "address": "8071 Forest Drive",
+    "city": "Kansas City",
+    "state": "KS",
+    "zip_code": 66160,
+    "latitude": "47.432300",
+    "longitude": "-121.803400",
+    "sale_price": "14794255.84",
+    "rent_price": "1632.35",
+    "area": "691.59",
+    "rooms": 5,
+    "bath_rooms": 4,
+    "image_links": [
+        "link1",
+        "link2",
+        "",
+        "",
+        ""
+    ],
     "status": 1,
-    "owner_id": 186,
-    "isFavorite": true
+    "owner_id": 53,
+    "isFavorite": false
 }
 ```

@@ -32,6 +32,12 @@
 ### 10/29
 1. Add "isFavorite" field into [GET-LISTING](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-a-listing)
 
+### 10/30
+1. Change output from [getUserRole](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/User.md#update-users-role-token-needed)
+2. When calling getListing, now the image_links will return a array containing at least 5 elements(could be empty strings if images are not enough). 
+3. When searching listings, the image_links will only be the first image_link in the database. If no images, it will be a empty string 
+4. Remove the restriction of being a tenant while putting/deleting/getting favorite listings 
+
 
 ## Set up
 

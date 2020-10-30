@@ -194,36 +194,13 @@ class UserService {
       });
   }
 
-  async getUserRoles(userId) {
-    return await UserRole.findAll({
+  getUserRoles(userId) {
+    return UserRole.findAll({
+      attributes: ["role_id"],
       raw: true,
       where: { user_id: userId },
     }).then((roles) => {
-      var resRoles = [];
-      if (!roles) {
-        return resRoles;
-      }
-
-      for (var i = 0; i < roles.length; i++) {
-        let role = roles[i];
-        let roleId = role.role_id;
-        switch (roleId) {
-          case RoleType.RENTER.id:
-            role.role_name = RoleType.RENTER.name;
-            break;
-          case RoleType.HOST.id:
-            role.role_name = RoleType.HOST.name;
-            break;
-          case RoleType.AGENT.id:
-            role.role_name = RoleType.AGENT.name;
-            break;
-
-          default:
-            break;
-        }
-        resRoles.push(role);
-      }
-      return resRoles;
+      return roles;
     });
   }
 

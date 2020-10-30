@@ -3,6 +3,7 @@ const RoleType = require("../static/RoleType");
 const UserService = require("../services/UserService");
 const ListingService = require("../services/ListingService");
 const HistoryService = require("../services/HistoryService");
+const listings = require("../models/listings");
 
 class ListingController {
   findListings(req, res, next) {
@@ -38,9 +39,17 @@ class ListingController {
       condition.bathrooms = req.query.bathrooms;
     }
     let isFindingRent = type == 1;
-    ListingService.findListings(condition, isFindingRent).then((result) => {
-      if (result) {
-        res.json(result);
+    ListingService.findListings(condition, isFindingRent).then((listings) => {
+      if (listings) {
+        for(var i=0; i< listings.length; i++){
+          let listing = listings[i];
+          if(!listing.image_links){
+            listing.image_links = "";
+          }else{
+            listing.image_links = listing.image_links[0];
+          }
+        }
+        res.json(listings);
       } else {
         res.status(404).json(resTemplate.NO_DATA);
       }
@@ -51,10 +60,20 @@ class ListingController {
     let listingId = req.params.id;
     let user = req.body.user;
     if (listingId) {
-      ListingService.getListingById(listingId).then((listing) => {
+      ListingService.getListingById(listingId).then(async (listing) => {
         if (listing) {
+          let images = listing.image_links;
+          if (!images) {
+            listing.image_links = ["", "", "", "", ""];
+          } else if (images.length < 5) {
+            for (var size = images.length; size < 5; size++) {
+              images.push("");
+            }
+            listing.image_links = images;
+          }
+
           if (user) {
-            ListingService.isFavoriteListing(user.id, listing.id).then(
+            await ListingService.isFavoriteListing(user.id, listing.id).then(
               (isFavorite) => {
                 if (isFavorite) {
                   listing.isFavorite = true;
@@ -62,12 +81,14 @@ class ListingController {
                   listing.isFavorite = false;
                 }
                 res.json(listing);
+                return;
               }
             );
             HistoryService.viewListing(user.id, listingId);
           } else {
             listing.isFavorite = false;
             res.json(listing);
+            return;
           }
         } else {
           res.status(404).json(resTemplate.NO_DATA);
