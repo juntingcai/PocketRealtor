@@ -39,7 +39,7 @@
 4. Remove the restriction of being a tenant while putting/deleting/getting favorite listings 
 
 ### 10/31
-1. Now the [GetFavorite]((https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Tenant.md#view-favorite-list-token-needed)) returns listing's address and price
+1. Now the [GetFavorite](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Tenant.md#view-favorite-list-token-needed) returns listing's address and price
 2. [Get User's Invitaions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-invitations)
 3. [View all groups](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#view-all-groups)
 
