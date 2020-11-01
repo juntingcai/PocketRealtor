@@ -8,7 +8,7 @@ const User = require("../controllers/userController");
 //   res.send('Usually this is not available');
 // });
 
-router.get("/user/:userId/", User.interpretToken, User.getUserProfile);
+router.get("/user/:userId", User.getUserProfile);
 router.get("/user/role/:userId/", User.getUserRole);
 
 router.post("/user/register", User.register);

@@ -102,12 +102,12 @@ class TenantController {
   }
 
   getFavoriteListings(req, res) {
-    var userId = req.params.userId;
-    if (!userId) {
-      userId = req.body.user.id;
-    }
-
-    if (!userId) {
+    console.log(req.body.user);
+    if(req.params.userId != undefined){
+      var userId = req.params.userId;
+    }else if(req.body.user){
+      var userId = req.body.user.id;
+    }else{
       res.status(403).json(resTemplate.MISS_FIELD);
       return;
     }

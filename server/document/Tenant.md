@@ -117,6 +117,34 @@ This api shows a tenant's(from token) favorite listings
 ```
 GET localhost:3000/tenant/favorite/
 ```
+It returns a json array containg the listing's information, where addAt is the time that the user added the listing
+```
+[
+    {
+        "id": 302,
+        "title": "volutpat erat",
+        "salePrice": "18496558.40",
+        "rentPrice": "5307.17",
+        "address": "33 Leroy Street",
+        "city": "Shawnee",
+        "state": "KS",
+        "zipcode": 66216,
+        "addAt": "2020-10-29T10:54:58.232Z"
+    },
+    {
+        "id": 300,
+        "title": "amet",
+        "salePrice": "14794255.84",
+        "rentPrice": "1632.35",
+        "address": "8071 Forest Drive",
+        "city": "Kansas City",
+        "state": "KS",
+        "zipcode": 66160,
+        "addAt": "2020-10-29T10:54:48.911Z"
+    }
+]
+```
+
 
 If given an user id, the token is not important, it will return the given user's favorite listings
 ```

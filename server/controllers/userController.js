@@ -267,6 +267,7 @@ class UserController {
   }
 
   interpretToken(req, res, next) {
+    
     const token = req.header("Authorization");
     if (!token) {
       next();
@@ -275,6 +276,7 @@ class UserController {
       if (err) {
         next();
       } else {
+        console.log(decoded);
         let decodedUser = decoded.user;
         if (!decodedUser) {
           next();

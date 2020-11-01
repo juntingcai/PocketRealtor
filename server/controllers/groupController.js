@@ -140,6 +140,15 @@ class GroupController {
     }
   }
 
+  findAllGroup(req, res) {
+    TenantGroupService.findAllGroups().then((groups) => {
+      if (groups == undefined) {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+      }
+      res.json(groups);
+    });
+  }
+
   // to get groups that an user is in
   getUserGroups(req, res) {
     let user = req.body.user;
@@ -439,7 +448,7 @@ class GroupController {
         return;
       }
 
-      TenantGroupService.getInvitation(groupId).then((result) => {
+      TenantGroupService.getGroupInvitation(groupId).then((result) => {
         if (result == undefined) {
           res.status(500).json(resTemplate.DATABASE_ERROR);
           return;
@@ -449,11 +458,25 @@ class GroupController {
     });
   }
 
-  test(req, res) {
-    TenantGroupService.verifyGroupMember(600, 8).then(result =>{
-      res.json(result);
+  getInvitations(req, res) {
+    let user = req.body.user;
+    if (!user) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    TenantGroupService.getUserInvitation(user.id).then((invitations) => {
+      if (invitations == undefined) {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+        return;
+      }
+      res.json(invitations);
+    });
+  }
 
-    })
+  test(req, res) {
+    TenantGroupService.verifyGroupMember(600, 8).then((result) => {
+      res.json(result);
+    });
   }
 }
 

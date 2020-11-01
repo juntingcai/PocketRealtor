@@ -131,6 +131,20 @@ class TenantGroupService {
       });
   }
 
+  findAllGroups() {
+    return TenantGroups.findAll({
+      raw: true,
+      attributes: ["id", "name", "description"],
+    })
+      .then((groups) => {
+        return groups;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
   //getWaitingTenant
   getWaitingTenants(groupId) {
     return GroupMembers.findAll({
@@ -208,7 +222,7 @@ class TenantGroupService {
 
   // get invitation
 
-  getInvitation(groupId) {
+  getGroupInvitation(groupId) {
     return GroupMembers.findAll({
       raw: true,
       attributes: [
@@ -230,6 +244,33 @@ class TenantGroupService {
     })
       .then((invitees) => {
         return invitees;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
+  getUserInvitation(userId) {
+    return GroupMembers.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.col("tenant_group.id"), "groupId"],
+        [Sequelize.col("tenant_group.name"), "name"],
+        [Sequelize.col("tenant_group.description"), "description"],
+        [Sequelize.col("created_at"), "invitedAt"],
+      ],
+      where: {
+        user_id: userId,
+        state: GroupMemberState.INVITED.id,
+      },
+      include: {
+        model: TenantGroups,
+        attributes: [],
+      },
+    })
+      .then((invitations) => {
+        return invitations;
       })
       .catch((err) => {
         console.log(err);

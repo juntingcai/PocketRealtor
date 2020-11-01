@@ -249,6 +249,12 @@ class TenantService {
       attributes: [
         ["listing_id", "id"],
         [Sequelize.col("listing.title"), "title"],
+        [Sequelize.col("listing.sale_price"), "salePrice"],
+        [Sequelize.col("listing.rent_price"), "rentPrice"],
+        [Sequelize.col("listing.address"), "address"],
+        [Sequelize.col("listing.city"), "city"],
+        [Sequelize.col("listing.state"), "state"],
+        [Sequelize.col("listing.zip_code"), "zipcode"],
         [Sequelize.col("create_time"), "addAt"],
       ],
       raw: true,

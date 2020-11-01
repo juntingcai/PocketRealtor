@@ -131,6 +131,13 @@ router.get(
   TenantGroup.getGroupInvitees
 );
 
+router.get(
+  "/tenant/invitations",
+  User.verifyToken,
+  Tenant.verifyTenantRole,
+  TenantGroup.getInvitations
+);
+
 router.delete(
   "/tenant/group/applied/cancel/:groupId",
   User.verifyToken,
@@ -144,6 +151,12 @@ router.put(
   Tenant.verifyTenantRole,
   TenantGroup.putMessage
 );
+
+router.get(
+  "/tenant/find/groups",
+  TenantGroup.findAllGroup
+);
+
 
 router.get(
   "/tenant/groups",

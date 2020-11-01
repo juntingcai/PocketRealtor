@@ -122,6 +122,28 @@ The api is as the same as member/owner's side, but if the user does not belong t
 
 size is the number of poeple in this group
 
+### View all groups
+This api will return all groups in the database
+```
+GET localhost:3000/tenant/find/groups
+```
+
+```
+[
+    {
+        "id": 2,
+        "name": "Group1",
+        "description": "This is group one"
+    },
+    {
+        "id": 5,
+        "name": "Group5",
+        "description": "Hello World!!!"
+    },
+]
+```
+
+
 ### Get user group list
 This api is to get which groups the user(token) is in(including group owner).   
 
@@ -209,6 +231,34 @@ This api returns the invitees: (If no invitees, it's simply an empty array)
 ]
 ```
 
+### Get Invitations
+This api returns all invitations for a user (Token needed)
+```
+GET localhost:3000/tenant/invitations
+```
+It returns a json array which contains the inviations from different groups
+```
+[
+    {
+        "groupId": 9,
+        "name": "111",
+        "description": "23211132",
+        "invitedAt": "2020-10-28T02:31:35.438Z"
+    },
+    {
+        "groupId": 12,
+        "name": "e1",
+        "description": "1234T",
+        "invitedAt": "2020-11-01T02:45:24.815Z"
+    },
+    {
+        "groupId": 8,
+        "name": "GG",
+        "description": "GGGGGGGGGGGGGGGGG",
+        "invitedAt": "2020-11-01T02:45:38.864Z"
+    }
+]
+```
 
 
 ### Accept / Reject a invitation
