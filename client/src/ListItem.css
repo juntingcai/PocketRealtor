@@ -1,4 +1,4 @@
-.property-card{
+.property-card {
     width: 100%;
     border-top: solid 1px #0002;
     height: 15rem;
@@ -6,50 +6,56 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
-
+    cursor: pointer;
 }
-.property-card>.picture-wrap{
+
+.property-card>.picture-wrap {
     border-radius: 5px;
     width: 40%;
     height: 100%;
 }
-.property-card>.info-wrap{
+
+.property-card>.info-wrap {
     position: relative;
     width: 60%;
     height: 100%;
-    
     margin-left: 1rem;
 }
-.property-card .property-title{
+
+.property-card .property-title {
     margin-top: 0.2rem;
-    width:100%;
-    font-size: 1.2rem;
+    width: 100%;
+    font-size: 1.5rem;
     overflow: hidden;
-white-space: nowrap;
-text-overflow: ellipsis;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
-.property-card .property-address{
+
+.property-card .property-address {
     font-size: 0.9rem;
     color: #0008;
 }
 
-.property-card .property-rooms{
+.property-card .property-rooms {
     display: flex;
     flex-direction: row;
-    margin-top: 0.2rem;
+    margin-top: 0.3rem;
     font-size: 1rem;
     line-height: 1rem;
     height: 1rem;
-
+    color: #1b1b25;
 }
-.property-card .property-rooms .divider{
+
+.property-card .property-rooms .divider {
     width: 0;
     margin: 0.2rem 0.5rem 0 0.5rem;
     border-left: solid 1px #0007;
 }
-.property-card .property-price{
+
+.property-card .property-price {
     position: absolute;
     bottom: 0;
     right: 0;
     font-size: 1.8rem;
+    font-weight: bold;
 }

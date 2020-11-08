@@ -7,11 +7,11 @@ export const loadUser = () => async (dispatch) => {
     setAuthToken(localStorage.token);
   }
   try {
-    const response = await axios.get("http://localhost:5000/verifyuser");
+    const response = await axios.post("http://52.53.200.228:3080/user/verifyuser");
     if (response.data.msg === "Invalid token") {
       dispatch({ type: "AUTH_ERROR" });
     } else {
-      dispatch({ type: "USER_LOADED", payload: response.data });
+      dispatch({ type: "USER_LOADED", payload: response });
     }
   } catch (error) {
     dispatch({
@@ -31,7 +31,7 @@ export const register = ({ firstname, lastname, email, password }) => async (
   const body = JSON.stringify({ firstname, lastname, email, password });
   try {
     const response = await axios.post(
-      "http://localhost:5000/user/register",
+      "http://52.53.200.228:3080/user/register",
       body,
       config
     );
@@ -64,7 +64,7 @@ export const login = ({ email, password }) => async (dispatch) => {
   const body = JSON.stringify({ email, password });
   try {
     const response = await axios.post(
-      "http://localhost:5000/user/login/",
+      "http://52.53.200.228:3080/user/login",
       body,
       config
     );

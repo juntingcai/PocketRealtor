@@ -1,0 +1,402 @@
+import React, { Fragment, useEffect, useState } from 'react';
+import '../css/Property.css';
+import { withRouter } from 'react-router-dom';
+import AddIcon from '@material-ui/icons/AddCircle';
+import SavedIcon from '@material-ui/icons/Favorite';
+import UnsavedIcon from '@material-ui/icons/FavoriteBorder';
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import Button from '@material-ui/core/Button';
+import FormControl from '@material-ui/core/FormControl';
+import PersonRoundedIcon from '@material-ui/icons/PersonRounded';
+import PhoneRoundedIcon from '@material-ui/icons/PhoneRounded';
+import EmailRoundedIcon from '@material-ui/icons/EmailRounded';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Map from './propertyMap';
+import { toLogin } from '../actions/dialog';
+import Axios from 'axios';
+
+/*
+    prop : {
+        
+        id
+        owner_id
+        title
+        introduction
+        address
+        state
+        zip_code
+        latitude
+        longitude
+        price
+        rooms
+
+    }
+*/
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0
+})
+
+
+
+const Property = (props) => {
+    const [contactForm, setContectForm] = useState({
+        name: "",
+        phone: "",
+        email: "",
+        content: ""
+
+    })
+    const {
+        name,
+        phone,
+        email,
+        content,
+    } = contactForm;
+
+    const [data, setData] = useState({
+        address: "",
+        age: 0,
+        area: "",
+        bath_rooms: 0,
+        city: "",
+        description: "",
+        id: 0,
+        image_links: [],
+        latitude: "",
+        longitude: "",
+        owner_id: 0,
+        rent_price: "",
+        rooms: 0,
+        sale_price: "",
+        state: "",
+        title: "",
+        type: "",
+        zip_code: 0,
+        forSale: true,
+        isFavorite: false,
+    })
+
+    const {
+        address,
+        age,
+        area,
+        bath_rooms,
+        city,
+        description,
+        id,
+        image_links,
+        latitude,
+        longitude,
+        owner_id,
+        rent_price,
+        rooms,
+        sale_price,
+        state,
+        title,
+        type,
+        zip_code,
+        forSale,
+        isFavorite,
+    } = data
+
+    useEffect(() => {
+
+        if (!props.match.params.id)
+            props.history.replace('/');
+        const pid = props.match.params.id;
+        Axios.get("http://52.53.200.228:3080/listing/" + pid)
+            .then(res => {
+                console.log(res)
+                res.data.image_links[0] = require('../static/noimg.jpg');
+                setData({
+                    ...res.data,
+                    forSale: 1,
+                })
+
+            })
+            .catch(err => {
+                console.error(err);
+                props.history.replace('/');
+            })
+
+
+
+        // var links = [require('../static/noimg.jpg'), "none", "none", "none", "none", "none"];
+        // setData({
+        //     ...data,
+        //     image_links: links,
+        //     forSale: props.history.location.state.type != 2,
+        //     saved: false,
+
+        // })
+        if (props.user != null) {
+            setContectForm({
+                ...contactForm,
+                name: props.user.first_name + " " + props.user.last_name,
+                email: props.user.email,
+            })
+        }
+
+    }, [props.isAuth])
+
+    const onSaveList = () => {
+        if (!props.isAuth) {
+            props.toLogin();
+            return;
+        }
+        if (isFavorite) {
+            Axios.delete("http://52.53.200.228:3080/tenant/favorite/" + id)
+                .then(res => {
+                    console.log(res);
+                    setData({
+                        ...data,
+                        isFavorite: false
+                    })
+                    
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+        }
+        else {
+            Axios.put("http://52.53.200.228:3080/tenant/favorite/" + id)
+                .then(res => {
+                    console.log(res);
+                    setData({
+                        ...data,
+                        isFavorite: true
+                    })
+                    
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+        }
+
+    }
+
+    const handleChangeForm = e => {
+        setContectForm({
+            ...contactForm,
+            [e.target.id]: e.target.value,
+
+        })
+    }
+
+    const submitContactForm = () => {
+        console.log(contactForm);
+    }
+
+    const getObjArray = () => {
+        var dataArray = [];
+        dataArray.push(data);
+        return dataArray;
+    }
+
+    const showPicture = (link, index) => {
+
+        var validLink = link === "" ? "#0008" : "url(" + link + ")";
+        var firstLink = index === 0;
+        const style = {
+            float: "left",
+            background: validLink,
+            backgroundSize: "cover",
+            backgroundPosition: "center center",
+            width: firstLink ? "50%" : "24%",
+            height: firstLink ? "100%" : "49%",
+            marginLeft: firstLink ? "0" : "1%",
+            marginBottom: "1%",
+            color: "#fff",
+
+
+
+        }
+        return (
+
+            <div style={style}>
+                <div className="picture-content">
+                    {link === "" && <div>{index}</div>}
+                </div>
+            </div>
+
+        )
+
+
+
+    }
+
+    return (
+        <Fragment>
+            <div id="property">
+                <div className="property-wrap">
+                    <div className="title-block">
+                        <div className="title">{title}</div>
+                        <div className="addr-buttons">
+                            <div className="address">{address + ", " + city + ", " + state + " " + zip_code}</div>
+                            <div className="buttons">
+                                <Button startIcon={<AddIcon className="theme-color" />}>
+                                    Group
+                            </Button>
+                                {isFavorite ? <Button onClick={onSaveList} startIcon={<SavedIcon style={{ color: "red" }} />}>
+                                    Saved
+                                </Button> : <Button onClick={onSaveList} startIcon={<UnsavedIcon style={{ color: "red" }} />}>
+                                        Save
+                                </Button>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="picture-block">
+
+                        {
+                            image_links.map((link, index) => { return showPicture(link, index) })
+                        }
+
+                    </div>
+
+                    <div className="detail-block">
+                        <div className="info-block">
+                            <div className="spec-price">
+                                <div className="spec">
+                                    <div className="type">{type + " for " + (forSale ? "sale" : "rent")}</div>
+                                    <div className="property-rooms">
+                                        <span>{rooms} bedrooms</span>
+                                        <div className="divider" />
+                                        <span>{bath_rooms} baths</span>
+                                        <div className="divider" />
+                                        <span>{area} sqft</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div className="intro">
+                                <div className="title">Description</div>
+                                <div className="content">{description}</div>
+
+                            </div>
+                            <div className="map">
+                                <div className="title">Location</div>
+                                <div className="map-frame">
+                                    <Map data={{
+                                        lat: Number(latitude),
+                                        lng: Number(longitude),
+                                        list: getObjArray(),
+                                        zoom: 14,
+                                    }} />
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="contact-block">
+                            <div className="price">
+                                {formatter.format(forSale ? sale_price : rent_price)} <span>/</span><span id="small">{forSale ? "total" : "month"}</span>
+
+                            </div>
+                            <div className="apply-btn">
+                                <Button variant="contained" color="primary" style={{ width: "100%", height: "100%", fontSize: "1.2rem", borderRadius: "8px", boxSizing: "border-box" }}>
+                                    Apply For Property
+                                </Button>
+
+                            </div>
+                            <div className="contact">
+                                <div className="contact-text">
+                                    Contact Host
+                                </div>
+                                <FormControl variant="outlined">
+                                    <OutlinedInput
+                                        id="name"
+                                        value={name}
+                                        onChange={handleChangeForm}
+                                        startAdornment={
+                                            <InputAdornment position="start">
+                                                <PersonRoundedIcon />
+                                            </InputAdornment>
+                                        }
+                                        aria-describedby="name"
+                                        placeholder={"Full Name"}
+                                    />
+
+                                </FormControl>
+                                <FormControl variant="outlined">
+                                    <OutlinedInput
+                                        id="phone"
+                                        value={phone}
+                                        onChange={handleChangeForm}
+                                        startAdornment={
+                                            <InputAdornment position="start">
+                                                <PhoneRoundedIcon />
+                                            </InputAdornment>
+                                        }
+                                        aria-describedby="phone"
+                                        placeholder={"Phone Number"}
+                                    />
+
+                                </FormControl>
+                                <FormControl variant="outlined">
+                                    <OutlinedInput
+                                        id="email"
+                                        value={email}
+                                        onChange={handleChangeForm}
+                                        startAdornment={
+                                            <InputAdornment position="start">
+                                                <EmailRoundedIcon />
+                                            </InputAdornment>
+                                        }
+                                        aria-describedby="email"
+                                        placeholder={"Email Address"}
+                                    />
+
+                                </FormControl>
+
+                                <FormControl variant="outlined">
+                                    <OutlinedInput
+                                        id="content"
+                                        value={content}
+                                        onChange={handleChangeForm}
+                                        multiline
+                                        rows={4}
+                                        aria-describedby="content"
+                                        placeholder={"Enter Message"}
+                                    />
+
+                                </FormControl>
+                                <Button variant="contained" className="theme-color-bg-2 contact-btn" disableElevation onClick={submitContactForm}>
+                                    Contact Host
+                                </Button>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div className="suggest-block">
+                        <div className="title">
+                            More similar properties nearby
+                        </div>
+                        <div className="prop-list">
+                            Coming soon
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Fragment>
+    )
+}
+
+Property.propTypes = {
+    toLogin: PropTypes.func.isRequired,
+    isAuth: PropTypes.bool.isRequired,
+    user: PropTypes.object,
+};
+
+const mapStateToProps = (state) => ({
+    isAuth: state.auth.isAuthenticated,
+    user: state.auth.user
+});
+
+export default withRouter(connect(mapStateToProps, { toLogin })(Property))

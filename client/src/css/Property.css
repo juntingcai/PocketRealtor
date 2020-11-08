@@ -1,0 +1,212 @@
+#property{
+    width: 100%;
+    height: 100%;   
+}
+.property-wrap{
+    margin: 0 auto;
+    max-width: 60rem;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.property-wrap>.title-block{
+    width: 100%;
+    margin: 1rem 0 0.3rem;
+}
+.property-wrap>.title-block .title{
+    font-size: 2rem;
+    font-weight: bold;
+}
+.property-wrap>.title-block .addr-buttons{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    
+}
+.property-wrap>.title-block .address{
+    color: #797979;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    text-decoration: underline;
+
+}
+.property-wrap>.title-block .MuiButton-root{
+    width: 6rem;
+    box-sizing: border-box;
+    text-align: left;
+    font-size: 1.2rem;
+    
+}
+.property-wrap>.title-block .MuiSvgIcon-root{
+    font-size: 1.5rem;
+}
+.property-wrap>.picture-block{
+    width: 100%;
+    max-height: 30rem;
+    height: 49vw;
+    
+    border-radius: 1rem;
+    
+    overflow: hidden;
+    position: relative;
+}
+.property-wrap>.picture-block .picture-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+.property-wrap>.picture-block .picture-content:hover{
+    background: #0003;
+   
+}
+.property-wrap>.detail-block{
+    display: flex;
+    flex-direction: row;
+    margin: 2rem 0;
+    justify-content: space-between;
+    border-bottom: solid 1px #0004;
+}
+
+.property-wrap>.detail-block .info-block{
+    width: 52%;
+    display: flex;
+    flex-direction: column;
+}
+
+.property-wrap>.detail-block .contact-block{
+    width: 42%;
+    
+}
+.property-wrap>.detail-block .spec-price{
+    padding-bottom: 1.5rem;
+    border-bottom: solid 1px #0003;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.property-wrap>.detail-block .type{
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.property-wrap>.detail-block .property-rooms{
+    display: flex;
+    flex-direction: row;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    line-height: 1rem;
+    height: 1rem;
+    color: #4c4b4b;
+
+}
+.property-wrap>.detail-block .property-rooms .divider{
+    width: 0;
+    margin: 0.2rem 0.5rem 0 0.5rem;
+    border-left: solid 1px #0007;
+}
+
+.property-wrap>.detail-block .price{
+    
+    font-size: 2.6rem;
+    text-align: right;
+}
+
+.property-wrap>.detail-block .price span{
+    
+    color: #797979;
+}
+.property-wrap>.detail-block .price #small{
+    font-size: 1.5rem;
+}
+.property-wrap>.detail-block .intro>.title{
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.property-wrap>.detail-block .intro{
+    padding: 2rem 0;
+    min-height: 20rem;
+    
+    border-bottom: solid 1px #0003;
+}
+.property-wrap>.detail-block .intro>.content{
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    color: #4c4b4b;
+}
+.property-wrap>.detail-block .map>.title{
+    font-size: 1.5rem;
+    font-weight: bold;
+    
+}
+.property-wrap>.detail-block .map>.map-frame{
+    margin-top:1rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    width: 100%;
+    height: 52vw;
+    max-height: 31rem;
+}
+.property-wrap>.detail-block .map{
+    padding: 2rem 0;
+    width: 100%;
+    height: auto;
+}
+.property-wrap>.detail-block .apply-btn{
+    padding: 1rem 0 2rem;
+    width: 100%;
+    height: 3rem;
+    font-size: 2.6rem;
+    border-bottom: solid 1px #0003;
+    display: flex;
+    box-sizing: content-box;
+
+}
+.property-wrap>.detail-block .contact{
+    margin-top: 2rem;
+    width: 100%;
+    padding: 1rem 1rem 2rem 1rem;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px #0003;
+    border: solid 1px #0003;
+    border-radius: 1rem;
+    min-height: 10rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.property-wrap>.detail-block .contact-text{
+    width: 100%;
+    padding: 1rem 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.property-wrap>.detail-block .contact .MuiFormControl-root{
+    margin-bottom: 1rem;
+}
+
+.property-wrap>.detail-block .contact .MuiButton-root{
+    width: 100%;
+    height: 3rem;
+    
+    font-size: 1.1rem;
+    
+}
+.suggest-block{
+    margin: 2rem 0;
+}
+
+.suggest-block>.title{
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.suggest-block>.prop-list{
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

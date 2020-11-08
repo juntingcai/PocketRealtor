@@ -3,7 +3,7 @@ import Avatar from '@material-ui/core/Avatar';
 import MenuIcon from '@material-ui/icons/Menu';
 import Popover from '@material-ui/core/Popover';
 import { Link } from "react-router-dom";
-import './../NaviBar.css';
+import './../css/NaviBar.css';
 import { connect } from "react-redux";
 import { toLogin, toRegister } from '../actions/dialog';
 import { logout } from '../actions/auth';
@@ -27,11 +27,13 @@ const NaviBar = (props) => {
         if(!props.isAuthenticated){
             props.toLogin()
         }
-        console.log(e.target.id)
-        props.history.push(e.target.id);
+        else{
+            console.log(e.target.id)
+            props.history.push("/" + e.target.id);
+        }
     };
-    const goto = () => {
-
+    const goto = (e) => {
+      props.history.push("/" + e.target.id);
     }
     const open = Boolean(anchorEl);
     return (
@@ -40,7 +42,7 @@ const NaviBar = (props) => {
                 <Link to="/" className="logo">Pocket Realtor</Link>
                 <div className="button-group">
                     <div id="sell" onClick={authRoute} className="link theme">Sell Property</div>
-                    <div id="tenants" onClick={authRoute} className="link theme">Find Tenants</div>
+                    <div id="findtenants" onClick={authRoute} className="link theme">Find Tenants</div>
                     <div className="menu-button-wrap" onClick={handleClick}>
                         <MenuIcon fontSize="large" style={{ color: '#1634d8', marginRight: '0.5rem' }} />
                         <Avatar alt="" src={props.avatar} />
@@ -70,10 +72,10 @@ const NaviBar = (props) => {
 
                             {
                                 props.isAuthenticated && <div className="link-group auth-link-group">
-                                    <div onClick={goto}>Profile </div>
+                                    <div id="myprofile" onClick={goto}>Profile </div>
                                     <div onClick={goto}>Notifications</div>
                                     <div onClick={goto}>Messages</div>
-                                    <div onClick={goto}>My list</div>
+                                    <div id="savedlist" onClick={goto}>My list</div>
                                     <div onClick={goto}>My group</div>
 
                                 </div>

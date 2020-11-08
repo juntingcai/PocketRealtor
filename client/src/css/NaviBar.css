@@ -3,8 +3,9 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 0 5rem;
+    padding: 0 4rem;
     box-sizing: border-box;
+    box-shadow: 0 4px 6px #0002;
 }
 .navi-wrap .logo{
     display: flex;
@@ -90,8 +91,11 @@
     color: #1634d8;
     text-decoration: none;
     margin-right: 1.5rem;
-    height: 2rem;
+    height: 100%;
+    box-sizing: border-box;
 }
 .navi-wrap .button-group .link:hover{
-    border-bottom: solid 2px  #1634d8;
+    border-top: solid 4px transparent;
+    border-bottom: solid 4px  #1634d8;
+    cursor: pointer;
 }

@@ -1,7 +1,7 @@
 .home-wrap{
     height: 100%;
     width: 100%;
-    background: url('./static/bg.jpg');
+    background: url('../static/bg.jpg');
     background-position: center center;
     background-size: cover;
 }
@@ -30,7 +30,6 @@
     border-radius: 2rem;
     box-sizing: border-box;
     overflow: hidden;
-    
 }
 
 .home-shadow .search-box>.input-box{
@@ -55,6 +54,7 @@
     outline: none;
     border-style: none;
     font-size: 1.2rem;
+    margin-left: 4rem;
 }
 
 .home-wrap .autocomplete-dropdown-container{
@@ -101,4 +101,58 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 
+}
+.home-wrap .search-type{
+    width: 5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    cursor: pointer;
+    
+}
+.home-wrap .search-type:hover{
+    background: #0001;
+}
+.home-wrap .search-type .search-type-btn{
+    margin:1rem 0 1rem 2rem;
+    
+    height: 2rem;
+    width: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: solid 1px  #0003;
+    color: #797979;
+    
+    font-size: 1.1rem;
+    
+}
+
+.home-wrap .search-type .MuiButton-root{
+    height: 100%;
+    width: 100%;
+    padding: 0;
+
+}
+
+.home-wrap .input-box .MuiSvgIcon-root{
+    border-left: solid 1px #0003;
+    padding-left: 0.8rem;
+    font-size: 2.5rem;
+    height: 2rem;
+}
+
+#search-type-popover .MuiPopover-paper{
+    margin-top: 1rem;
+    border-radius: 0;
+    width: 8rem;
+}
+
+#search-type-popover .pop-title{
+    margin: 0.5rem 1rem 0 1rem;
+    padding-bottom: 0.5rem;
+    color: #797979;
+    font-size: 1rem;
+    border-bottom: solid 1px #0002;
 }

@@ -2,7 +2,7 @@ import React, { Fragment, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { login } from "../../actions/auth";
-import { closeDialog } from '../../actions/dialog';
+import { closeDialog, toRegister } from '../../actions/dialog';
 import PropTypes from "prop-types";
 
 import Avatar from '@material-ui/core/Avatar';
@@ -20,30 +20,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Copyright from '../Copyright';
 
+import '../../css/Auth.css';
 
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: '1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 const Login = (props) => {
-  const classes = useStyles();
+  
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -60,49 +42,19 @@ const Login = (props) => {
   };
 
   
-  // return (
-  //   <Fragment>
-  //     <h1 className="large text-primary">Sign In</h1>
-  //     <form className="form" onSubmit={(e) => onSubmit(e)}>
-  //       <div className="form-group">
-  //         <label for="email">Email:</label>
-  //         <input
-  //           type="email"
-  //           name="email"
-  //           value={email}
-  //           onChange={(e) => onChange(e)}
-  //           required
-  //         />
-  //       </div>
-  //       <div className="form-group">
-  //         <label for="password">Password:</label>
-  //         <input
-  //           type="password"
-  //           name="password"
-  //           value={password}
-  //           onChange={(e) => onChange(e)}
-  //           minLength="8"
-  //         />
-  //       </div>
-  //       <input type="submit" className="btn btn-light" value="Login" />
-  //     </form>
-  //     <p className="my-1">
-  //       Don't have an account? <Link to="/register">Sign Up</Link>
-  //     </p>
-  //   </Fragment>
-  // );
+  
   return (
     <Fragment>
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
+      <div className="paper">
+        <Avatar className="avatar">
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate onSubmit={onSubmit}>
+        <form className="form" noValidate onSubmit={onSubmit}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -136,7 +88,8 @@ const Login = (props) => {
             fullWidth
             variant="contained"
             color="primary"
-            className={classes.submit}
+            className="submit"
+            
           >
             Sign In
           </Button>
@@ -147,7 +100,7 @@ const Login = (props) => {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link onClick={props.toRegister} variant="body2" className="links">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
@@ -166,10 +119,12 @@ Login.propTypes = {
   login: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool,
   closeDialog: PropTypes.func.isRequired,
+  toRegister: PropTypes.func.isRequired,
+  
 };
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
 });
 
-export default connect(mapStateToProps, { login, closeDialog })(Login);
+export default connect(mapStateToProps, { login, closeDialog, toRegister })(Login);

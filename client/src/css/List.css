@@ -1,0 +1,80 @@
+#property-list{
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.search-bar-wrap{
+    display: flex;
+    justify-content: flex-start;
+    height: 4.4rem;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    border-bottom: solid 1px #0002;
+    
+}
+.search-bar-wrap button{
+    width: 7rem;
+    margin-left: 0.5rem;
+    height: 100%;
+}
+
+
+.content-wrap{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: calc(100% - 4rem);
+
+}
+.map-wrap{
+    flex: 1
+
+}
+.list-wrap{
+    z-index: 100;
+    max-width: 60%;
+    width: 55rem;
+   
+    box-shadow: -5px 2px 5px #0002, -10px 2px 8px #0001;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow: scroll;
+}
+.list-wrap>.title{
+    margin: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+
+#property-list .place-input-box-wrap{
+    margin: 0 1rem;
+    position: relative;
+    width: auto;
+    height: 100%;
+    
+}
+#property-list .place-input-box{
+    width: auto;
+    height: 100%;
+    border-radius: 1.1rem;
+    box-sizing: border-box;
+    border: solid 1px #0006;
+}
+#property-list .place-input-box input{
+    
+    width: 12rem;
+}
+#property-list .place-input-box input:focus{
+    
+    animation: oninput 0.5s;
+    width: 18rem;
+    
+}
+
+@keyframes oninput{
+    from {width: 12rem;}
+    to {width: 18rem;}
+}

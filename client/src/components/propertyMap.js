@@ -1,37 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import { GoogleMap, InfoWindow, Marker } from '@react-google-maps/api';
-import {
-    geocodeByAddress,
-    getLatLng,
-} from 'react-places-autocomplete';
-
 
 const Map = (props) => {
-    const [loc, setLoc] = useState({
-        lat: 0,
-        lng: 0,
-    })
-
-    useEffect(() => {
-        var lat = 0, lng = 0;
-        geocodeByAddress(props.address)
-            .then(results => getLatLng(results[0]))
-            .then(latLng => {
-                lat = latLng.lat;
-                lng = latLng.lng;
-
-            })
-            .catch(error => console.error('Error', error))
-            .finally(() => {
-                    setLoc({
-                        lat: lat,
-                        lng: lng,
-                    })
-                }
-            )
-        
-
-    },[props.address])
 
     const containerStyle = {
         width: '100%',
@@ -64,21 +34,22 @@ const Map = (props) => {
                 <GoogleMap
                     mapContainerStyle={containerStyle}
                     center={{
-                        lat: loc.lat,
-                        lng: loc.lng,
+                        lat: props.data.lat,
+                        lng: props.data.lng,
                     }}
-                    zoom={12}
+                    zoom={props.data.zoom}
                     
                     
                 >
                     {
-                        props.list.map(item => (
+                        props.data.list.map(item => (
                             <Marker
                                 key={item.id}
                                 position={
                                     {
-                                        lat: item.latitude,
-                                        lng: item.longitude
+                                        
+                                        lat: Number(item.latitude),
+                                        lng: Number(item.longitude)
                                     }
                                 }
                                 onMouseOver={() => {setSelectProp(item)}}
@@ -94,8 +65,8 @@ const Map = (props) => {
                             <InfoWindow
                                 position={
                                     {
-                                        lat: selectProp.latitude + 0.002,
-                                        lng: selectProp.longitude
+                                        lat: Number(selectProp.latitude) + 0.001,
+                                        lng: Number(selectProp.longitude)
                                     }
                                 }
                                 onCloseClick={() => {
@@ -103,7 +74,7 @@ const Map = (props) => {
                                 }}
                             >
                                 <div>
-                                    {selectProp.price}
+                                    {selectProp.sale_price}
                                 </div>
 
                             </InfoWindow>
