@@ -649,6 +649,7 @@ class TenantGroupService {
         [Sequelize.col("listing.id"), "id"],
         [Sequelize.col("listing.title"), "name"],
         [Sequelize.col("listing.description"), "description"],
+        "approved_by",
         [
           Sequelize.fn("array_length", Sequelize.col("approved_by"), 1),
           "approvements",
@@ -662,13 +663,6 @@ class TenantGroupService {
       order: [[Sequelize.col("approvements"), "DESC NULLS LAST"]],
     })
       .then((listings) => {
-        for (var i = 0; i < listings.length; i++) {
-          let listing = listings[i];
-          if (listing.approvements == null) {
-            listing.approvements = 0;
-          }
-        }
-
         return listings;
       })
       .catch((err) => {

@@ -2,6 +2,7 @@ const resTemplate = require("../static/ResponseTemplate");
 const TenantGroupService = require("../services/TenantGroupService");
 const { User } = require("../models/models");
 const { PERMISSION_DENY } = require("../static/ResponseTemplate");
+const listings = require("../models/listings");
 
 class GroupController {
   // Group CRUD
@@ -579,10 +580,22 @@ class GroupController {
         res.status(403).json(resTemplate.PERMISSION_DENY);
         return;
       }
-      
-      TenantGroupService.getGroupListings(groupId).then((result) => {
-        if (result) {
-          res.json(result);
+
+      TenantGroupService.getGroupListings(groupId).then((listings) => {
+        if (listings) {
+          for (var i = 0; i < listings.length; i++) {
+            let listing = listings[i];
+            if (listing.approvements == null) {
+              listing.approvements = 0;
+            }
+            if (listing.approved_by.includes(user.id)) {
+              listing.isApproved = true;
+            } else {
+              listing.isApproved = false;
+            }
+            delete listing["approved_by"];
+          }
+          res.json(listings);
         } else {
           res.status(500).json(resTemplate.DATABASE_ERROR);
         }

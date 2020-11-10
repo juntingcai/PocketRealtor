@@ -14,11 +14,11 @@ POST: localhost:3000/tenant/group/addListing
 ```
 
 ### View Listings in Group
-This api returns listings added by members in a group. 
+This api returns listings added by members in a group.   
 **GET: localhost:3000/tenant/group/view/listings/:groupId**   
 The following example shows all listings in group 9(order by "approvements").   
-Note: the "approvements" means how many members have approved this listing. 
-
+Note: the "approvements" means how many members have approved this listing,   
+"isApproved" means if the viewing user has approved the listing.   
 ```
 GET localhost:3000/tenant/group/view/listings/9
 ```
@@ -29,19 +29,22 @@ RETURN:
         "id": 302,
         "name": "volutpat erat",
         "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.\r\n\r\nVestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.",
-        "approvements": 2
+        "approvements": 2,
+        "isApproved": true
     },
     {
         "id": 301,
         "name": "vel nisl",
         "description": "Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.\r\n\r\nSed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.\r\n\r\nPellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.",
-        "approvements": 1
+        "approvements": 1,
+        "isApproved": false
     },
     {
         "id": 300,
         "name": "amet",
         "description": "Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.\r\n\r\nDuis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.",
-        "approvements": 1
+        "approvements": 1,
+        "isApproved": false
     }
 ]
 ```
