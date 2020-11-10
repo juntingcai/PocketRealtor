@@ -43,6 +43,9 @@
 2. [Get User's Invitaions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-invitations)
 3. [View all groups](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#view-all-groups)
 
+### 11/9
+1. Create a few [group-listing functions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#listings-in-groups)
+
 ## Set up
 
 - Input your database's setting in database/config.js

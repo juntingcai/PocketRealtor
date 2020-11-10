@@ -55,3 +55,12 @@
 
 
 ### Listings in Groups
+
+* [Add a listing to group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#add-a-listing-to-a-group)
+* [View listings in a group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#view-listings-in-group)
+* [Approve a listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#approve-a-listing)
+* [Withdraw a approvement](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#withdraw-an-approvement)
+* [View who has approved a listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#view-who-has-approved-a-listing)
+
+
+
