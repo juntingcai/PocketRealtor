@@ -5,9 +5,10 @@ const {
   Listing,
   TenantGroupListings,
 } = require("../models/models");
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, where } = require("sequelize");
 
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
+const sequelize = require("../database/dbConnection");
 
 class TenantGroupService {
   // owner
@@ -511,7 +512,7 @@ class TenantGroupService {
     });
   }
 
-  addListing(userId, groupId, listingId) {
+  addListingToGroup(userId, groupId, listingId) {
     return this.verifyGroupMember(userId, groupId).then((isGroupMember) => {
       if (!isGroupMember) {
         return false;
@@ -527,6 +528,7 @@ class TenantGroupService {
           group_id: groupId,
           listing_id: listingId,
           added_user_id: userId,
+          approved_by: [],
         })
           .then((success) => {
             if (success) {
@@ -541,6 +543,138 @@ class TenantGroupService {
           });
       });
     });
+  }
+
+  approveListing(userId, groupId, listingId) {
+    return TenantGroupListings.update(
+      {
+        approved_by: Sequelize.fn(
+          "array_append",
+          Sequelize.col("approved_by"),
+          userId
+        ),
+      },
+      {
+        where: {
+          group_id: groupId,
+          listing_id: listingId,
+        },
+      }
+    )
+      .then((result) => {
+        if (result) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
+  withdrawApprove(userId, groupId, listingId) {
+    return TenantGroupListings.findOne({
+      where: {
+        group_id: groupId,
+        listing_id: listingId,
+      },
+    })
+      .then((groupListing) => {
+        if (!groupListing) {
+          return false;
+        }
+        let approvedUsers = groupListing.approved_by;
+        console.log(approvedUsers);
+        for (var i = 0; i < approvedUsers.length; i++) {
+          if (approvedUsers[i] == userId) {
+            approvedUsers.splice(i, i + 1);
+            return groupListing
+              .update(
+                {
+                  approved_by: approvedUsers,
+                },
+                {
+                  where: {
+                    group_id: groupId,
+                    listing_id: listingId,
+                  },
+                }
+              )
+              .then((lll) => {
+                console.log(lll);
+                return true;
+              })
+              .catch((err) => {
+                console.log(err);
+                return false;
+              });
+          }
+        }
+        return false;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
+  getApprovedMember(groupId, listingId) {
+    return TenantGroupListings.findOne({
+      where: {
+        group_id: groupId,
+        listing_id: listingId,
+      },
+    }).then((groupListing) => {
+      let approvedUserIds = groupListing.approved_by;
+      return User.findAll({
+        attributes: [
+          "id",
+          ["first_name", "firstname"],
+          ["last_name", "lastname"],
+          "avatar",
+        ],
+        where: { id: approvedUserIds },
+      }).then((users) => {
+        return users;
+      });
+    });
+  }
+
+  getGroupListings(groupId) {
+    return TenantGroupListings.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.col("listing.id"), "id"],
+        [Sequelize.col("listing.title"), "name"],
+        [Sequelize.col("listing.description"), "description"],
+        [
+          Sequelize.fn("array_length", Sequelize.col("approved_by"), 1),
+          "approvements",
+        ],
+      ],
+      where: { group_id: groupId },
+      include: {
+        model: Listing,
+        attributes: [],
+      },
+      order: [[Sequelize.col("approvements"), "DESC NULLS LAST"]],
+    })
+      .then((listings) => {
+        for (var i = 0; i < listings.length; i++) {
+          let listing = listings[i];
+          if (listing.approvements == null) {
+            listing.approvements = 0;
+          }
+        }
+
+        return listings;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
   }
 
   verifyGroupOnwer(userId, groupId) {

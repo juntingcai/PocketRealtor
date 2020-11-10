@@ -66,10 +66,7 @@ FavoriteListing.belongsTo(Listing, {foreignKey: "listing_id"})
 User.hasMany(FavoriteListing, {foreignKey: "user_id"})
 Listing.hasMany(FavoriteListing, {foreignKey: "listing_id"});
 
-
-
 // user has one TenantGroups
-
 User.hasMany(TenantGroups, { foreignKey: "owner_id" });
 TenantGroups.belongsTo(User, { foreignKey: "owner_id" });
 
@@ -95,6 +92,9 @@ TenantGroups.belongsToMany(Listing, {through: TenantGroupListings, foreignKey: "
 
 User.hasMany(TenantGroupListings, {foreignKey: "added_user_id"});
 TenantGroupListings.belongsTo(User, {foreignKey: "added_user_id"})
+
+TenantGroupListings.belongsTo(Listing, {foreignKey: "listing_id"})
+Listing.hasMany(TenantGroupListings, {foreignKey: "listing_id"})
 
 
 sequelize.sync({ alter: true }).then(() => {

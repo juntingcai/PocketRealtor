@@ -2,6 +2,7 @@ const resTemplate = require("../static/ResponseTemplate");
 const RoleType = require("../static/RoleType");
 const TenantService = require("../services/TenantService");
 const UserService = require("../services/UserService");
+const TenantGroupService = require("../services/TenantGroupService");
 
 class TenantController {
   addTenantZipPreference(req, res) {
@@ -138,7 +139,7 @@ class TenantController {
 
   //===========
   test(req, res) {
-    TenantService.test(10).then((ressult) => {
+    TenantGroupService.withdrawApprove(302, 9, 500).then((ressult) => {
       res.json(ressult);
     });
   }

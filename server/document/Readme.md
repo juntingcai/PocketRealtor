@@ -53,3 +53,5 @@
 * [Get Invitations](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-invitations)
 * [View all groups](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#view-all-groups)
 
+
+### Listings in Groups
