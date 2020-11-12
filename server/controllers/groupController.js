@@ -535,6 +535,32 @@ class GroupController {
     });
   }
 
+  withdrawApproment(req, res) {
+    let user = req.body.user;
+    if (!user) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let listingId = req.body.listingId;
+    let groupId = req.body.groupId;
+    if (!listingId || !groupId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+
+    TenantGroupService.withdrawApprove(user.id, groupId, listingId).then(
+      (result) => {
+        if (result) {
+          res.json(resTemplate.SUCCESS);
+        } else if (result == false) {
+          res.status(404).json(resTemplate.NO_DATA);
+        } else {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+        }
+      }
+    );
+  }
+
   getApprovedMember(req, res) {
     let user = req.body.user;
     if (!user) {

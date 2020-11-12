@@ -127,6 +127,13 @@ router.put(
   TenantGroup.approveListing
 );
 
+router.delete(
+  "/tenant/group/approve/listing",
+  User.verifyToken,
+  TenantGroup.withdrawApproment
+);
+
+
 router.get(
   "/tenant/group/listings/approved",
   User.verifyToken,

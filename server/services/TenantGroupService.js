@@ -585,31 +585,15 @@ class TenantGroupService {
         if (!groupListing) {
           return false;
         }
-        let approvedUsers = groupListing.approved_by;
+        let approvedUsers = Array.from(groupListing.approved_by);
         console.log(approvedUsers);
         for (var i = 0; i < approvedUsers.length; i++) {
           if (approvedUsers[i] == userId) {
             approvedUsers.splice(i, i + 1);
-            return groupListing
-              .update(
-                {
-                  approved_by: approvedUsers,
-                },
-                {
-                  where: {
-                    group_id: groupId,
-                    listing_id: listingId,
-                  },
-                }
-              )
-              .then((lll) => {
-                console.log(lll);
-                return true;
-              })
-              .catch((err) => {
-                console.log(err);
-                return false;
-              });
+            groupListing.approved_by = approvedUsers;
+            return groupListing.save().then((saved) => {
+              return saved;
+            });
           }
         }
         return false;

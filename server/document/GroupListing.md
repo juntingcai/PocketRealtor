@@ -62,7 +62,14 @@ PUT localhost:3000/tenant/group/approve/listing
 ```
 
 ### Withdraw an approvement
-**Not Completed Yet**
+A group member can take back an approvement.  
+```
+DELETE localhost:3000/tenant/group/approve/listing
+ {
+    "groupId" : 9,
+    "listingId" : 302
+}
+```
 
 
 
