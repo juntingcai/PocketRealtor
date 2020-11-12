@@ -86,7 +86,7 @@ Required parameters
 - lat // latitude
 - lng // longitude
 - radius // in kilometers
-- type // 1 = rent, 2 = sale
+- type // 0 = all, 1 = rent, 2 = sale
 
 Optional parameters
 - minPrice // rent/sale price >= minPrice

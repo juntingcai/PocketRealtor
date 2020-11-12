@@ -1,10 +1,11 @@
 const { Listing, FavoriteListing } = require("../models/models");
 const { Op } = require("sequelize");
 const ListingStatus = require("../../common/Constans/ListingStatus");
+const HouseSearchType = require("../../common/Constans/HouseSearchType");
 
 class ListingService {
-  findListings(conditions, isRent) {
-    let queryOptions = getFindListingQueryOptions(conditions, isRent);
+  findListings(conditions, type) {
+    let queryOptions = getFindListingQueryOptions(conditions, type);
     if (queryOptions == undefined) {
       return undefined;
     }
@@ -226,7 +227,7 @@ function getRangeInKm(latitude, longitude, radiusInKm) {
   };
 }
 
-function getFindListingQueryOptions(conditions, isRenting) {
+function getFindListingQueryOptions(conditions, type) {
   let latitude = conditions.latitude;
   let longitude = conditions.longitude;
   let radius = conditions.radius;
@@ -254,13 +255,20 @@ function getFindListingQueryOptions(conditions, isRenting) {
     maxPrice = conditions.maxPrice;
   }
 
-  if (isRenting) {
+  if ((type = HouseSearchType.RENT.id)) {
     queryOptions.rent_price = {
       [Op.or]: [{ [Op.between]: [minPrice, maxPrice] }, { [Op.is]: null }],
     };
-  } else {
+  } else if ((type = HouseSearchType.SALE.id)) {
     queryOptions.sale_price = {
       [Op.or]: [{ [Op.between]: [minPrice, maxPrice] }, { [Op.is]: null }],
+    };
+  } else if ((type = HouseSearchType.ALL.id)) {
+    queryOptions.sale_price = {
+      [Op.ne]: null,
+    };
+    queryOptions.rent_price = {
+      [Op.ne]: null,
     };
   }
 

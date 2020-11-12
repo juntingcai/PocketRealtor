@@ -46,6 +46,9 @@
 ### 11/9
 1. Create a few [group-listing functions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#listings-in-groups)
 
+### 10/10
+1. Add type=0 (both rent and sale) into listing search filter.
+
 ## Set up
 
 - Input your database's setting in database/config.js

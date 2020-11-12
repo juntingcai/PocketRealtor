@@ -38,8 +38,8 @@ class ListingController {
     if (req.query.bathrooms) {
       condition.bathrooms = req.query.bathrooms;
     }
-    let isFindingRent = type == 1;
-    ListingService.findListings(condition, isFindingRent).then((listings) => {
+
+    ListingService.findListings(condition, type).then((listings) => {
       if (listings) {
         for(var i=0; i< listings.length; i++){
           let listing = listings[i];
