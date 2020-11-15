@@ -633,7 +633,7 @@ class TenantGroupService {
         [Sequelize.col("listing.id"), "id"],
         [Sequelize.col("listing.title"), "name"],
         [Sequelize.col("listing.description"), "description"],
-        "approved_by",
+        [Sequelize.col("approved_by"), "approvers"],
         [
           Sequelize.fn("array_length", Sequelize.col("approved_by"), 1),
           "approvements",

@@ -614,12 +614,11 @@ class GroupController {
             if (listing.approvements == null) {
               listing.approvements = 0;
             }
-            if (listing.approved_by.includes(user.id)) {
+            if (listing.approvers.includes(user.id)) {
               listing.isApproved = true;
             } else {
               listing.isApproved = false;
             }
-            delete listing["approved_by"];
           }
           res.json(listings);
         } else {

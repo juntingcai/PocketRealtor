@@ -46,8 +46,11 @@
 ### 11/9
 1. Create a few [group-listing functions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#listings-in-groups)
 
-### 10/10
+### 11/10
 1. Add type=0 (both rent and sale) into listing search filter.
+
+### 11/15
+1. Return "approvers" when viewing listings in a group
 
 ## Set up
 
