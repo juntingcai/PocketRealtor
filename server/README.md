@@ -52,6 +52,10 @@
 ### 11/15
 1. Return "approvers" when viewing listings in a group
 
+### 11/21 
+1. Add createdAt and updatedAt on Listing
+2. Create a new route: [Get Owner's Listings](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-owners-listingstoken-needed)
+
 ## Set up
 
 - Input your database's setting in database/config.js
