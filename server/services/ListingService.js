@@ -77,6 +77,23 @@ class ListingService {
       });
   }
 
+  getListingsByOwnerId(ownerId) {
+    return Listing.findAll({
+      raw: true,
+      where: {
+        owner_id: ownerId,
+      },
+      order: [["created_at"]]
+    })
+      .then((listings) => {
+        return listings;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
   updateListingProperty(listingId, property) {
     return Listing.findByPk(listingId).then((listing) => {
       if (listing) {

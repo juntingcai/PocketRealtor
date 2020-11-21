@@ -33,6 +33,13 @@ router.put(
   Listing.updateListingStatus
 );
 
+router.get(
+  "/listing/owner/listings",
+  User.verifyToken,
+  Listing.verifyHostRole,
+  Listing.getListingsByOwnerId
+);
+
 router.delete(
   "/listing/delete/:id",
   User.verifyToken,

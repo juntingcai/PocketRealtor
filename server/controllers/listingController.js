@@ -41,11 +41,11 @@ class ListingController {
 
     ListingService.findListings(condition, type).then((listings) => {
       if (listings) {
-        for(var i=0; i< listings.length; i++){
+        for (var i = 0; i < listings.length; i++) {
           let listing = listings[i];
-          if(!listing.image_links){
+          if (!listing.image_links) {
             listing.image_links = "";
-          }else{
+          } else {
             listing.image_links = listing.image_links[0];
           }
         }
@@ -112,6 +112,21 @@ class ListingController {
     } else {
       res.status(400).json(resTemplate.MISS_FIELD);
     }
+  }
+
+  getListingsByOwnerId(req, res) {
+    let owner = req.body.user;
+    if (!owner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    ListingService.getListingsByOwnerId(owner.id).then((listings) => {
+      if (listings == undefined) {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+        return;
+      }
+      res.json(listings);
+    });
   }
 
   copyFromListing(req, res, next) {
