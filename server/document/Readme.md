@@ -17,7 +17,7 @@
 * [Delete Listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#delete-a-house-listingowner-token-needed)
 * [Search Listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#search-for-listings)
 * [Get Listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-a-listing)
-
+* [Get Owner's Listings](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-owners-listingstoken-needed)
 
 ### Tenant
 * [Indicate Living Preference](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Tenant.md#add-tenants-living-location-preference-tenant-token-needed)
