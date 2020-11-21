@@ -184,3 +184,106 @@ GET localhost:3000/listing/300
     "isFavorite": false
 }
 ```
+
+## GET Owner's Listings(Token needed)
+This route will return all listings(order by craeted_at) made by an user(from token).   
+
+The following example shows the listings which belongs to user 300
+
+```
+GET localhost:3000/listing/owner/listings
+[
+    {
+        "id": 665,
+        "title": "nulla",
+        "type": "Flexidy",
+        "age": 32,
+        "description": "Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.\n\nAenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.",
+        "address": "55 Dixon Road",
+        "city": "Natalbany",
+        "state": "LA",
+        "zip_code": 70451,
+        "latitude": "43.069600",
+        "longitude": "-89.423900",
+        "sale_price": "7444245.88",
+        "rent_price": "5498.70",
+        "area": "1161.02",
+        "rooms": 5,
+        "bath_rooms": 3,
+        "image_links": null,
+        "status": 1,
+        "createdAt": "2020-11-21T13:10:20.059Z",
+        "updatedAt": "2020-11-21T13:10:20.059Z",
+        "owner_id": 300
+    },
+    {
+        "id": 686,
+        "title": "penatibus",
+        "type": "Subin",
+        "age": 71,
+        "description": "Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.",
+        "address": "76 Elgar Plaza",
+        "city": "Deer Park",
+        "state": "WI",
+        "zip_code": 54007,
+        "latitude": "32.771400",
+        "longitude": "-97.291500",
+        "sale_price": "9405093.00",
+        "rent_price": "7418.33",
+        "area": "6356.96",
+        "rooms": 6,
+        "bath_rooms": 3,
+        "image_links": null,
+        "status": 1,
+        "createdAt": "2020-11-21T13:10:20.059Z",
+        "updatedAt": "2020-11-21T13:10:20.059Z",
+        "owner_id": 300
+    },
+    {
+        "id": 887,
+        "title": "nulla suspendisse",
+        "type": "Bitwolf",
+        "age": 79,
+        "description": "Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.\n\nVestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat.\n\nIn congue. Etiam justo. Etiam pretium iaculis justo.",
+        "address": "8495 Rutledge Trail",
+        "city": "Akron",
+        "state": "PA",
+        "zip_code": 17501,
+        "latitude": "37.274200",
+        "longitude": "-79.957900",
+        "sale_price": "22005569.45",
+        "rent_price": "4883.12",
+        "area": "2617.12",
+        "rooms": 5,
+        "bath_rooms": 3,
+        "image_links": null,
+        "status": 1,
+        "createdAt": "2020-11-21T13:10:20.059Z",
+        "updatedAt": "2020-11-21T13:10:20.059Z",
+        "owner_id": 300
+    },
+    {
+        "id": 215,
+        "title": "elit ac nulla",
+        "type": "Zathin",
+        "age": 100,
+        "description": "Fusce consequat. Nulla nisl. Nunc nisl.\n\nDuis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.\n\nIn hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.",
+        "address": "79 Jana Center",
+        "city": "Shreveport",
+        "state": "LA",
+        "zip_code": 71103,
+        "latitude": "40.177000",
+        "longitude": "-111.536000",
+        "sale_price": "14479752.44",
+        "rent_price": "4049.31",
+        "area": "2936.09",
+        "rooms": 4,
+        "bath_rooms": 5,
+        "image_links": null,
+        "status": 1,
+        "createdAt": "2020-11-21T13:10:20.059Z",
+        "updatedAt": "2020-11-21T13:10:20.059Z",
+        "owner_id": 300
+    }
+]
+```
