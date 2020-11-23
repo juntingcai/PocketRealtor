@@ -77,7 +77,7 @@ class UserService {
           code: resTemplate.SUCCESS.code,
           msg: resTemplate.SUCCESS.msg,
           token: token,
-          id: user.id
+          id: user.id,
         };
         res.json(resSuccess);
         return;
@@ -170,21 +170,23 @@ class UserService {
   }
 
   async getUserById(userId) {
-    return await User.findByPk(userId)
+    return await User.findByPk(userId, {
+      attributes: [
+        "id",
+        "email",
+        ["first_name", "firstname"],
+        ["last_name", "lastname"],
+        "nickname",
+        "birthday",
+        "gender",
+        "occupation",
+        "intro",
+        "avatar",
+      ],
+    })
       .then((user) => {
         if (user) {
-          let resUser = {
-            email: user.email,
-            firstname: user.first_name,
-            lastname: user.last_name,
-            nickname: user.nickname,
-            birthday: user.birthday,
-            gender: user.gender,
-            occupation: user.occupation,
-            intro: user.intro,
-            avatar: user.avatar,
-          };
-          return resUser;
+          return user;
         } else {
           return undefined;
         }

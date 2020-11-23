@@ -56,6 +56,10 @@
 1. Add createdAt and updatedAt on Listing
 2. Create a new route: [Get Owner's Listings](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-owners-listingstoken-needed)
 
+### 11/22
+1. Add user's id in getUserProfile
+2. Add "isAgent" in getting a listing
+
 ## Set up
 
 - Input your database's setting in database/config.js
