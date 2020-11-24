@@ -60,6 +60,9 @@
 1. Add user's id in getUserProfile
 2. Add "isAgent" in getting a listing
 
+### 11/23
+1. Add chat room functions 
+
 ## Set up
 
 - Input your database's setting in database/config.js
@@ -82,3 +85,4 @@ DEBUG=express-locallibrary-tutorial:* npm run devstart
 
 ## API
 See [documant/Readme.md](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document).
+

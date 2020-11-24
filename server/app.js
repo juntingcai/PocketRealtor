@@ -10,6 +10,7 @@ var usersRouter = require("./routes/users");
 var listingRouter = require("./routes/listings");
 var tenantRouter = require("./routes/tenants");
 var groupRouter = require("./routes/group");
+var chatroomRouter = require("./routes/chatroom");
 
 var app = express();
 
@@ -30,7 +31,7 @@ app.use("/", listingRouter);
 app.use("/", usersRouter);
 app.use("/", tenantRouter);
 app.use("/", groupRouter);
-
+app.use("/", chatroomRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

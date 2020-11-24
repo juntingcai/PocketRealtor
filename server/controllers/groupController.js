@@ -1,8 +1,6 @@
 const resTemplate = require("../static/ResponseTemplate");
 const TenantGroupService = require("../services/TenantGroupService");
 const { User } = require("../models/models");
-const { PERMISSION_DENY } = require("../static/ResponseTemplate");
-const listings = require("../models/listings");
 
 class GroupController {
   // Group CRUD

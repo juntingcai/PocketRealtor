@@ -4,11 +4,11 @@ const {
   GroupMembers,
   Listing,
   TenantGroupListings,
+  GroupChatRoom,
 } = require("../models/models");
-const { Op, Sequelize, where } = require("sequelize");
-
+const { Sequelize } = require("sequelize");
+const { uuid } = require("uuidv4");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
-const sequelize = require("../database/dbConnection");
 
 class TenantGroupService {
   // owner
@@ -32,6 +32,13 @@ class TenantGroupService {
             user_id: ownerId,
             state: GroupMemberState.OWNER.id,
           });
+          let chatRoomId = uuid();
+          GroupChatRoom.create({
+            id: chatRoomId,
+            group_id: group.id,
+            messages: [],
+          });
+
           return group.id;
         } else {
           return undefined;
@@ -484,31 +491,37 @@ class TenantGroupService {
       time: [date.getHours(), date.getMinutes(), date.getSeconds()].join(":"),
     };
 
-    await User.findByPk(userId).then((user) => {
+    return User.findByPk(userId).then((user) => {
       note.user = {
         id: user.id,
         firstname: user.first_name,
         last_name: user.last_name,
         avatar: user.avatar,
       };
-    });
 
-    return TenantGroups.findByPk(groupId).then((group) => {
-      if (!group) {
-        return false;
-      }
-      let notes = Array.from(group.notes);
-      notes.push(note);
-      group.notes = notes;
-      return group
-        .save()
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          console.log(err);
+      return TenantGroups.findByPk(groupId).then((group) => {
+        if (!group) {
           return false;
-        });
+        }
+
+        return TenantGroups.update(
+          {
+            notes: Sequelize.fn(
+              "array_append",
+              Sequelize.col("notes"),
+              JSON.stringify(note)
+            ),
+          },
+          { where: { id: groupId } }
+        )
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
+      });
     });
   }
 
