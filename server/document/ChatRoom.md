@@ -4,6 +4,8 @@ Tokne is needed in the all routes here.
 
 ### Find or create a personal chat
 This route will return a conversactionId between two users.  
+If the chat room does not exist, it wil create one for the two users.  
+
 ```
 GET: localhost:3000/conversaction/find/:targetUserId
 ```
