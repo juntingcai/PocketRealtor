@@ -84,7 +84,7 @@ class ChatRoomService {
               ct.recipient1 == userId ? ct.recipient2 : ct.recipient1;
             let userinfo = userNameMap.get(targetId);
             userChatRooms.push({
-              conversactionId: ct.id,
+              conversationId: ct.id,
               targetId: targetId,
               targetName: userinfo.name,
               messages: ct.messages,
@@ -168,7 +168,7 @@ class ChatRoomService {
           for (var i = 0; i < groupChatRooms.length; i++) {
             let ct = groupChatRooms[i];
             userGroupChatRooms.push({
-              conversactionId: ct.id,
+              conversationId: ct.id,
               targetId: ct.group_id,
               targetName: groupNameMap.get(ct.group_id),
               messages: ct.messages,
