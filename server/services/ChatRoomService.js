@@ -88,7 +88,7 @@ class ChatRoomService {
               conversactionId: ct.id,
               targetId: targetId,
               targetName: userinfo.name,
-              messgaes: ct.messages,
+              messages: ct.messages,
               img: userinfo.avatar,
             });
           }
@@ -133,7 +133,7 @@ class ChatRoomService {
             conversactionId: ct.id,
             targetId: ct.group_id,
             targetName: groupNameMap.get(ct.group_id),
-            messgaes: ct.messages,
+            messages: ct.messages,
             img: "/",
           });
         }
