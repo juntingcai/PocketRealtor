@@ -61,7 +61,7 @@
 2. Add "isAgent" in getting a listing
 
 ### 11/23
-1. Add chat room functions 
+1. Add [chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#chat-room) routes 
 
 ## Set up
 
