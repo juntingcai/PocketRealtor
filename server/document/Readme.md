@@ -62,5 +62,9 @@
 * [Withdraw a approvement](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#withdraw-an-approvement)
 * [View who has approved a listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#view-who-has-approved-a-listing)
 
-
+### Chat room
+* [Find or create a personal chat](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#find-or-create-a-personal-chat)
+* [Get all existing chat room for a user](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#get-all-existing-chat-room-for-a-user)
+* [Get a chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#get-a-chat-room)
+* [Send a message](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#send-a-message)
 
