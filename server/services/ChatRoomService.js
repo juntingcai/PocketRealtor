@@ -8,7 +8,6 @@ const {
 const { uuid } = require("uuidv4");
 const { Op, Sequelize } = require("sequelize");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
-
 class ChatRoomService {
   findOrCreatePersonalChat(hostId, targetId) {
     var r1 = hostId;
@@ -120,24 +119,65 @@ class ChatRoomService {
         groupIds.push(g.group_id);
         groupNameMap.set(g.group_id, g.name);
       }
-      return GroupChatRoom.findAll({
+      return GroupMembers.findAll({
         raw: true,
+        attributes: [
+          "group_id",
+          "user_id",
+          [Sequelize.col("user.first_name"), "firstname"],
+          [Sequelize.col("user.last_name"), "lastname"],
+          [Sequelize.col("user.avatar"), "avatar"],
+        ],
         where: {
           group_id: groupIds,
+          state: [GroupMemberState.OWNER.id, GroupMemberState.APPROVED.id],
         },
-      }).then((groupChatRooms) => {
-        let userGroupChatRooms = [];
-        for (var i = 0; i < groupChatRooms.length; i++) {
-          let ct = groupChatRooms[i];
-          userGroupChatRooms.push({
-            conversactionId: ct.id,
-            targetId: ct.group_id,
-            targetName: groupNameMap.get(ct.group_id),
-            messages: ct.messages,
-            img: "/",
-          });
+        include: {
+          model: User,
+          attributes: [],
+        },
+      }).then((members) => {
+        let memberMap = new Map();
+        for (var i = 0; i < members.length; i++) {
+          let m = members[i];
+          let gid = m.group_id;
+          if (memberMap.has(gid)) {
+            memberMap.get(gid).push({
+              id: m.user_id,
+              name: m.firstname + " " + m.lastname,
+              avatar: m.avatar,
+            });
+          } else {
+            memberMap.set(gid, [
+              {
+                id: m.user_id,
+                name: m.firstname + " " + m.lastname,
+                avatar: m.avatar,
+              },
+            ]);
+          }
         }
-        return userGroupChatRooms;
+
+        return GroupChatRoom.findAll({
+          raw: true,
+          where: {
+            group_id: groupIds,
+          },
+        }).then((groupChatRooms) => {
+          let userGroupChatRooms = [];
+          for (var i = 0; i < groupChatRooms.length; i++) {
+            let ct = groupChatRooms[i];
+            userGroupChatRooms.push({
+              conversactionId: ct.id,
+              targetId: ct.group_id,
+              targetName: groupNameMap.get(ct.group_id),
+              messages: ct.messages,
+              img: "/",
+              recipients: memberMap.get(ct.group_id),
+            });
+          }
+          return userGroupChatRooms;
+        });
       });
     });
   }
@@ -147,7 +187,7 @@ class ChatRoomService {
       if (!personalChat) {
         // group chat
         return GroupChatRoom.findByPk(chatRoomId, {
-          raw : true,
+          raw: true,
           attributes: [
             "group_id",
             "messages",
@@ -162,31 +202,63 @@ class ChatRoomService {
             if (!groupChat) {
               return undefined;
             }
-            console.log(groupChat);
-            return {
-              targetId: groupChat.group_id,
-              targetName: groupChat.name,
-              img: "/",
-              messages: groupChat.messages,
-              isGropuChat: true,
-            };
+            return GroupMembers.findAll({
+              raw: true,
+              attributes: [
+                "user_id",
+                [Sequelize.col("user.first_name"), "firstname"],
+                [Sequelize.col("user.last_name"), "lastname"],
+                [Sequelize.col("user.avatar"), "avatar"],
+              ],
+              where: {
+                group_id: groupChat.group_id,
+                state: [
+                  GroupMemberState.OWNER.id,
+                  GroupMemberState.APPROVED.id,
+                ],
+              },
+              include: {
+                model: User,
+                attributes: [],
+              },
+            }).then((members) => {
+              let recipients = [];
+              for (var i = 0; i < members.length; i++) {
+                let m = members[i];
+                recipients.push({
+                  id: m.user_id,
+                  name: m.firstname + " " + m.lastname,
+                  avatar: m.avatar,
+                });
+              }
+              return {
+                targetId: groupChat.group_id,
+                targetName: groupChat.name,
+                img: "/",
+                messages: groupChat.messages,
+                recipients: recipients,
+                isGropuChat: true,
+              };
+            });
           })
           .catch((err) => {
             console.log(err);
             return undefined;
           });
       }
-      console.log(personalChat);
+
       let targetId =
-      personalChat.recipient1 == userId ? personalChat.recipient2 : personalChat.recipient1;
+        personalChat.recipient1 == userId
+          ? personalChat.recipient2
+          : personalChat.recipient1;
       return User.findByPk(targetId).then((user) => {
         return {
-        targetId : targetId,
-        targetName : user.frst_name + " " + user.last_name,
-        img : user.avatar,
-        messages : personalChat.messages,
-        isGropuChat : false,
-      }
+          targetId: targetId,
+          targetName: user.frst_name + " " + user.last_name,
+          img: user.avatar,
+          messages: personalChat.messages,
+          isGropuChat: false,
+        };
       });
     });
   }
