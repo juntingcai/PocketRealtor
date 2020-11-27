@@ -9,7 +9,7 @@ const { uuid } = require("uuidv4");
 const { Op, Sequelize } = require("sequelize");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
 class ChatRoomService {
-  findOrCreatePersonalChat(hostId, targetId) {
+  findOrCreatePersonalChat(hostId, targetId, listingId) {
     var r1 = hostId;
     var r2 = targetId;
     if (targetId < hostId) {
@@ -30,11 +30,16 @@ class ChatRoomService {
             id: chatroomId,
             recipient1: r1,
             recipient2: r2,
+            listing_id: listingId,
             messages: [],
           }).then((newPersonalChatRoom) => {
             return newPersonalChatRoom.id;
           });
         } else {
+          if (chatroom.listing_id != listingId) {
+            chatroom.listing_id = listingId;
+            chatroom.save();
+          }
           return chatroom.id;
         }
       })
@@ -87,6 +92,7 @@ class ChatRoomService {
               conversationId: ct.id,
               targetId: targetId,
               targetName: userinfo.name,
+              listingId: ct.listing_id,
               messages: ct.messages,
               img: userinfo.avatar,
             });

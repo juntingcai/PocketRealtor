@@ -63,6 +63,11 @@
 ### 11/23
 1. Add [chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#chat-room) routes 
 
+### 11/26
+1. Fix typos
+2. Add listingId to personal chat room
+3. Order the chatrooms by the last message
+
 ## Set up
 
 - Input your database's setting in database/config.js

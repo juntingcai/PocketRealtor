@@ -16,6 +16,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      listing_id:{
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       messages:{
         type: DataTypes.ARRAY(DataTypes.JSON),
         allowNull: true,

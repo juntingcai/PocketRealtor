@@ -3,27 +3,29 @@ var router = express.Router();
 
 const ChatRoom = require("../controllers/chatRoomController");
 const User = require("../controllers/userController");
+const Tenant = require("../controllers/tenantController");
 
 router.get(
-  "/conversaction/find/:userId",
+  "/conversation/find/",
   User.verifyToken,
+  Tenant.verifyTenantRole,
   ChatRoom.findPersonalChatroom
 )
 
 router.get(
-  "/conversaction/all",
+  "/conversation/all",
   User.verifyToken,
   ChatRoom.getUserAllChatrooms
 );
 
 router.get(
-  "/conversaction/get/:conversactionId",
+  "/conversation/get/:conversationId",
   User.verifyToken,
   ChatRoom.getOneChatRoom
 );
 
 router.put(
-  "/conversaction/message",
+  "/conversation/message",
   User.verifyToken,
   ChatRoom.putMessage
 );
