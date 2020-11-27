@@ -41,6 +41,10 @@ class UserService {
               code: resTemplate.SUCCESS.code,
               msg: resTemplate.SUCCESS.msg,
               token: token,
+              id: user.id,
+              firstname: user.first_name,
+              lastname: user.last_name,
+              avatar: user.avatar,
             };
             res.json(resSuccess);
             return;
