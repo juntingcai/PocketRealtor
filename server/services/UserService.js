@@ -61,7 +61,7 @@ class UserService {
   login(email, password, res) {
     User.findOne({ where: { email: email } }).then((user) => {
       if (!user) {
-        res.json(resTemplate.USER_NOT_EXIST);
+        res.status(404).json(resTemplate.USER_NOT_EXIST);
         return;
       }
 
@@ -78,11 +78,14 @@ class UserService {
           msg: resTemplate.SUCCESS.msg,
           token: token,
           id: user.id,
+          firstname: user.first_name,
+          lastname: user.last_name,
+          avatar: user.avatar,
         };
         res.json(resSuccess);
         return;
       } else {
-        res.json(resTemplate.USER_NOT_EXIST);
+        res.status(404).json(resTemplate.USER_NOT_EXIST);
         return;
       }
     });

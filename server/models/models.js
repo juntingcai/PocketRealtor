@@ -21,7 +21,7 @@ const TenantHistory = require("./tenantHistory")(sequelize, DataTypes);
 const TenantGroups = require("./tenantGroups")(sequelize, DataTypes);
 const GroupMembers = require("./groupMembers")(sequelize, DataTypes);
 const TenantGroupListings = require("./tenantGroupListings")(sequelize, DataTypes);
-
+const ListingApplications = require("./listingApplication")(sequelize, DataTypes);
 const GroupChatRoom = require("./groupChatRoom")(sequelize, DataTypes);
 const PersonalChatRoom = require("./personalChatRooms")(sequelize, DataTypes);
 
@@ -102,8 +102,17 @@ Listing.hasMany(TenantGroupListings, {foreignKey: "listing_id"})
 TenantGroups.hasOne(GroupChatRoom, {foreignKey: "group_id"})
 GroupChatRoom.belongsTo(TenantGroups, {foreignKey: "group_id"})
 
+// listing <- ListingApplications -> TenantGroups
+Listing.belongsToMany(TenantGroups, {through: ListingApplications, foreignKey: "listing_id"});
+TenantGroups.belongsToMany(Listing, {through: ListingApplications, foreignKey: "group_id"})
 
-sequelize.sync({ alter: false }).then(() => {
+ListingApplications.belongsTo(Listing, {foreignKey: "listing_id"})
+Listing.hasMany(ListingApplications, {foreignKey: "listing_id"})
+
+ListingApplications.belongsTo(TenantGroups, {foreignKey: "group_id"})
+TenantGroups.hasMany(ListingApplications, {foreignKey: "group_id"})
+
+sequelize.sync({ alter: true }).then(() => {
   if (config.resetTables) {
     Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
 
@@ -128,5 +137,6 @@ module.exports = {
   GroupMembers,
   TenantGroupListings,
   GroupChatRoom,
-  PersonalChatRoom
+  PersonalChatRoom,
+  ListingApplications
 };

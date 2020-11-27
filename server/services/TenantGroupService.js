@@ -5,6 +5,7 @@ const {
   Listing,
   TenantGroupListings,
   GroupChatRoom,
+  ListingApplications,
 } = require("../models/models");
 const { Sequelize } = require("sequelize");
 const { uuid } = require("uuidv4");
@@ -367,6 +368,55 @@ class TenantGroupService {
       });
   }
 
+  getGroupMemberDetail(groupId) {
+    return TenantGroups.findByPk(groupId)
+      .then(async (group) => {
+        if (!group) {
+          console.log("Cannot find the group");
+          return undefined;
+        }
+
+        let groupInfo = {
+          id: group.id,
+          name: group.name,
+          description: group.description,
+        };
+
+        return GroupMembers.findAll({
+          raw: true,
+          attributes: ["user_id"],
+          where: {
+            group_id: group.id,
+            state: [GroupMemberState.APPROVED.id, GroupMemberState.OWNER.id],
+          },
+        }).then((approvedMembers) => {
+          let ids = [];
+          for (var i = 0; i < approvedMembers.length; i++) {
+            ids.push(approvedMembers[i].user_id);
+          }
+          return User.findAll({
+            raw: true,
+            attributes: [
+              "id",
+              ["first_name", "firstname"],
+              ["last_name", "lastname"],
+              "avatar",
+            ],
+            where: {
+              id: ids,
+            },
+          }).then((members) => {
+            groupInfo.members = members;
+            return groupInfo;
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
   getGroupDetail(groupId) {
     return TenantGroups.findByPk(groupId, {
       include: {
@@ -695,6 +745,20 @@ class TenantGroupService {
       } else {
         return false;
       }
+    });
+  }
+
+  getGroupMemberState(userId, groupId) {
+    return GroupMembers.findOne({
+      where: {
+        user_id: userId,
+        group_id: groupId,
+      },
+    }).then((member) => {
+      if (!member) {
+        return undefined;
+      }
+      return member.state;
     });
   }
 }
