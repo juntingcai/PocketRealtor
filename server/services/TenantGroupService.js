@@ -10,6 +10,7 @@ const {
 const { Sequelize } = require("sequelize");
 const { uuid } = require("uuidv4");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
+const ApplicationState = require("../../common/Constans/ApplicationState");
 
 class TenantGroupService {
   // owner
@@ -592,6 +593,7 @@ class TenantGroupService {
           listing_id: listingId,
           added_user_id: userId,
           approved_by: [],
+          state: ApplicationState.NA.id,
         })
           .then((success) => {
             if (success) {
@@ -606,6 +608,31 @@ class TenantGroupService {
           });
       });
     });
+  }
+
+  updateListingState(groupId, listingId, stateId) {
+    return TenantGroupListings.update(
+      {
+        state: stateId,
+      },
+      {
+        where: {
+          group_id: groupId,
+          listing_id: listingId,
+        },
+      }
+    )
+      .then((success) => {
+        if (success) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
   }
 
   approveListing(userId, groupId, listingId) {
@@ -697,6 +724,7 @@ class TenantGroupService {
         [Sequelize.col("listing.title"), "name"],
         [Sequelize.col("listing.description"), "description"],
         [Sequelize.col("approved_by"), "approvers"],
+        [Sequelize.col("state"), "state"],
         [
           Sequelize.fn("array_length", Sequelize.col("approved_by"), 1),
           "approvements",

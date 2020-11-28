@@ -3,6 +3,7 @@ const TenantGroupService = require("../services/TenantGroupService");
 const { User } = require("../models/models");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
 const ListingService = require("../services/ListingService");
+const ApplicationService = require("../services/ApplicationService");
 
 class GroupController {
   // Group CRUD
@@ -638,28 +639,110 @@ class GroupController {
     });
   }
 
-
-  groupApplyListing(req, res){
+  groupApplyListing(req, res) {
     let groupOwner = req.body.user;
-    if(!groupOwner){
+    if (!groupOwner) {
       res.status(401).json(resTemplate.TOKEN_ERR);
       return;
     }
     let groupId = req.body.groupId;
     let description = req.body.description;
-    // listingId
-    // listing id
-    
-    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(isOwner =>{
-      if(!isOwner){
-        res.status(403).json(resTemplate.PERMISSION_DENY);
+    let listingId = req.body.listingId;
+    if (!groupId || !listingId || !description || description.length == 0) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(
+      (isOwner) => {
+        if (!isOwner) {
+          res.status(403).json(resTemplate.PERMISSION_DENY);
+          return;
+        }
+        ListingService.getListingById(listingId).then((listing) => {
+          if (!listing) {
+            res.status(404).json(resTemplate.NO_DATA);
+            return;
+          }
+          ApplicationService.applyListing(
+            groupId,
+            listing.owner_id,
+            listingId,
+            description
+          ).then((application) => {
+            if (application) {
+              res.json(resTemplate.SUCCESS);
+            } else {
+              res.status(500).json(resTemplate.DATABASE_ERROR);
+            }
+          });
+        });
       }
-      // 
-    })
-    
-    
-    
-    
+    );
+  }
+
+  updateApplicationDescription(req, res) {
+    let groupOwner = req.body.user;
+    if (!groupOwner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let groupId = req.body.groupId;
+    let description = req.body.description;
+    let listingId = req.body.listingId;
+    if (!groupId || !listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(
+      (isOwner) => {
+        if (!isOwner) {
+          res.status(403).json(resTemplate.PERMISSION_DENY);
+          return;
+        }
+        ApplicationService.updateApplication(
+          groupId,
+          listingId,
+          description
+        ).then((application) => {
+          if (application) {
+            res.json(resTemplate.SUCCESS);
+          } else {
+            res.status(500).json(resTemplate.DATABASE_ERROR);
+          }
+        });
+      }
+    );
+  }
+
+  deleteApplication(req, res) {
+    let groupOwner = req.body.user;
+    if (!groupOwner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let groupId = req.body.groupId;
+    let listingId = req.body.listingId;
+    if (!groupId || !listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(
+      (isOwner) => {
+        if (!isOwner) {
+          res.status(403).json(resTemplate.PERMISSION_DENY);
+          return;
+        }
+        ApplicationService.deleteApplication(groupId, listingId).then(
+          (application) => {
+            if (application) {
+              res.json(resTemplate.SUCCESS);
+            } else {
+              res.status(500).json(resTemplate.DATABASE_ERROR);
+            }
+          }
+        );
+      }
+    );
   }
 
   test(req, res) {

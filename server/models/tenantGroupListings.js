@@ -9,6 +9,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
         allowNull: true,
       },
+      state: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      }
     },
     {
       underscored: true,

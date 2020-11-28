@@ -1,3 +1,4 @@
+const { Sequelize } = require("sequelize");
 const ApplicationState = require("../../common/Constans/ApplicationState");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
 const listingApplication = require("../models/listingApplication");
@@ -10,6 +11,8 @@ const {
   GroupChatRoom,
   ListingApplications,
 } = require("../models/models");
+const ListingService = require("./ListingService");
+const TenantGroupService = require("./TenantGroupService");
 
 class ApplicationService {
   applyListing(groupId, listing_owner_id, listingId, description) {
@@ -28,6 +31,11 @@ class ApplicationService {
         description: description,
         state: ApplicationState.PENDING.id,
       }).then(() => {
+        TenantGroupService.updateListingState(
+          groupId,
+          listingId,
+          ApplicationState.PENDING.id
+        );
         GroupMembers.create({
           group_id: groupId,
           user_id: listing_owner_id,
@@ -49,7 +57,7 @@ class ApplicationService {
         return false;
       }
       application.description = description;
-      application.save().then(() => {
+      return application.save().then(() => {
         return true;
       });
     });
@@ -65,15 +73,25 @@ class ApplicationService {
       if (!application) {
         return true;
       }
-      application.destroy().then(() => {
-        GroupMembers.destroy({
-          where: {
-            group_id: groupId,
-            user_id: listing_owner_id,
-            state: GroupMemberState.HOUSE_OWNER.id,
-          },
+      return application.destroy().then(() => {
+        return ListingService.getListingById(listingId).then((listing) => {
+          console.log("owner = " + listing.owner_id);
+          return GroupMembers.destroy({
+            where: {
+              group_id: groupId,
+              user_id: listing.owner_id,
+              state: GroupMemberState.HOUSE_OWNER.id,
+            },
+          }).then(() => {
+            return TenantGroupService.updateListingState(
+              groupId,
+              listingId,
+              ApplicationState.NA.id
+            ).then(() => {
+              return true;
+            });
+          });
         });
-        return true;
       });
     });
   }
@@ -92,6 +110,7 @@ class ApplicationService {
       application
         .save()
         .then(() => {
+          TenantGroupService.updateListingState(groupId, listingId, stateId);
           return true;
         })
         .catch((err) => {
@@ -102,26 +121,26 @@ class ApplicationService {
   }
 
   getApplicationsByListingId(listingId) {
-    return listingApplication
-      .findAll({
-        raw: true,
-        attributes: [
-          ["group_id", "groupId"],
-          ["tenant_groups.name", "name"],
-          ["tenant_groups.description", "description"],
-          "state"[("createdAt", "applyAt")],
-        ],
-        where: {
-          listing_id: listingId,
-        },
-        include: {
-          model: TenantGroups,
-          attributes: [],
-        },
-        order: [["createdAt", "DESC"]],
-      })
-      .then((groups) => {
-        return groups;
-      });
+    return ListingApplications.findAll({
+      raw: true,
+      attributes: [
+        ["group_id", "groupId"],
+        [Sequelize.col("tenant_group.name"), "name"],
+        [Sequelize.col("tenant_group.description"), "description"],
+        "state",
+        ["created_at", "applyAt"],
+      ],
+      where: {
+        listing_id: listingId,
+      },
+      include: {
+        model: TenantGroups,
+        attributes: [],
+      },
+      order: [["created_at", "DESC"]],
+    }).then((groups) => {
+      return groups;
+    });
   }
 }
+module.exports = new ApplicationService();
