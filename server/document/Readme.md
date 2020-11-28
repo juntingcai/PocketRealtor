@@ -68,3 +68,8 @@
 * [Get a chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#get-a-chat-room)
 * [Send a message](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#send-a-message)
 
+### Applications 
+* [Apply for a listing as a group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#apply-for-a-listing-as-a-group)
+* [Update an application](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#update-an-application)
+* [Delete an application](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#delete-an-application)
+* [Get Applications for each listing (listing owner side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#get-applications-for-each-listing-listing-owner-side)
