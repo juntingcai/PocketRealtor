@@ -44,7 +44,7 @@ class UserService {
               id: user.id,
               firstname: user.first_name,
               lastname: user.last_name,
-              avatar: user.avatar,
+              avatar: "",
             };
             res.json(resSuccess);
             return;
