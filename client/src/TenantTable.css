@@ -1,0 +1,11 @@
+.tenant-table{
+    width: 70%;
+    margin: 0 auto;
+}
+.tenant-table th{
+    text-align: left;
+}
+
+.table-head{
+    margin-left: 15%;
+}

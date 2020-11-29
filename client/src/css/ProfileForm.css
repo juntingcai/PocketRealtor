@@ -1,0 +1,146 @@
+.profile-form-wrap{
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 0;
+}
+
+.avatar-uploader{
+    margin-top: 4rem;
+    margin-left: 2rem;
+    width: 12rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.avatar-uploader .MuiAvatar-root{
+    height: 12rem;
+    width: 12rem;
+}
+
+.avatar-uploader button{
+    margin-top: 1rem;
+    width: 8rem;
+}
+
+.profile-form{
+    max-width: 35rem;
+
+}
+
+.profile-form .MuiFormControl-root{
+    margin-bottom: 2rem;
+}
+
+.profile-form .MuiFormControl-root.gender-selector{
+    width: 30%;
+    margin-right: 10%;
+}
+
+.profile-form .MuiFormControl-root.bd-selector{
+    width: 60%;
+}
+.profile-form>.form-head{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.profile-form>.form-head>.edit-btn{
+    height: 2.8rem;
+    width: 6rem;
+    font-size: 1rem;
+    color: #000;
+    border: solid 2px #000;
+
+}
+.profile-form .role-selector .MuiFormGroup-root{
+    display: flex;
+    flex-direction: row;
+    margin: 0.5rem 0;
+}
+
+.submit-button button{
+    width: 100%;
+    height: 2.6rem;
+    font-size: 1.2rem;
+}
+
+
+.profile-form .place-container{
+    margin-bottom: 2rem;
+    border-radius: 4px;
+    box-sizing: border-box;
+    height: 3.5rem;
+    border: solid 1px rgba(0, 0, 0, 0.23);
+    display: flex;
+    flex-direction: row;
+
+}
+
+.profile-form .place-container>.MuiButton-root{
+    color: #000;
+    border-left: solid 1px #0005;
+    border-radius: 0;
+    width: 15%;
+}
+
+.profile-form .place-container .zipcode-box{
+    outline: none;
+    padding: 2%;
+    font-size: 1rem;
+    border-style: none;
+    width: 85%;
+    box-sizing: border-box;
+    background: transparent;
+}
+.profile-form .preference{
+    padding: 2rem 0;
+    border-top: solid 1px #0005;
+}
+.profile-form .prefer-head{
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    line-height: 2.6rem;
+    align-items: center;
+}
+.profile-form .place-auto-complete{
+    width: 85%;
+}
+
+.profile-form .name-tag{
+    height: 1.6rem;
+    padding: 0 0.5rem;
+    border-radius: 0.8rem;
+    background: #0005;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0.6rem;
+}
+.profile-form .name-tag:hover{
+    background: #0006;
+}
+
+.profile-form .name-tag-title{
+    margin-right: 1rem;
+}
+.profile-form .name-tag .name{
+    font-size: 0.8rem;
+}
+
+.profile-form .name-tag .delete-btn{
+    font-size: 1rem;
+    cursor: pointer;
+}
+

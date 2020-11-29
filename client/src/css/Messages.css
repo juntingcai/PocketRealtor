@@ -1,0 +1,352 @@
+#message{
+    height: 100%;
+    width: 100%;
+}
+.message-wrap{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+.message-wrap .pane{
+    height: 100%;
+    
+}
+
+.message-wrap .pane>.title{
+    font-weight: 500;
+    font-size: 1.4rem;
+    width: 100%;
+    padding: 1rem;
+    height: 4rem;
+    box-sizing: border-box;
+    text-align: left;
+    border-bottom: solid 1px #0002;
+}
+
+.message-wrap .left-pane{
+    width: 25%;
+    border-right: solid 1px #0002;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    
+}
+.message-wrap .mid-pane{
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+}
+.message-wrap .right-pane{
+    width: 30%;
+    border-left: solid 1px #0002;
+}
+
+.message-wrap .left-pane .search-bar{
+    padding: 1rem;
+    
+    width: 100%;
+    box-sizing: border-box;
+    height: 4rem;
+    border-bottom: solid 1px #0002;
+}
+.message-wrap .left-pane .search-bar form{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.message-wrap .left-pane .search-bar .MuiInputBase-root{
+    margin-left: 1rem;
+    flex: 1;
+}
+
+.message-wrap .left-pane .chat-list{
+    flex: 1;
+    
+}
+.message-wrap .left-pane .chat-card{
+    padding: 0 1rem;
+    cursor: pointer;
+}
+.message-wrap .left-pane .chat-card:hover{
+    background-color: #0001 !important;
+    
+}
+.message-wrap .left-pane .chat-wrap{
+    padding: 1rem 0;
+    width: 100%;
+    border-bottom: solid 1px transparent;
+    border-image: linear-gradient(to right, #0000, #0001, #0002, #0002, #0002, #0001, #0000);
+    border-image-slice: 10;
+    background: none;
+    height: 5.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+}
+/* .message-wrap .left-pane .chat-wrap:hover{
+    border-bottom: solid 1px transparent;
+} */
+.message-wrap .left-pane .chat-card .MuiAvatar-root{
+    width: 3rem;
+    height: 3rem;
+    font-weight: bold;
+    font-family: inherit;
+}
+.message-wrap .left-pane .chat-card .info{
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 5rem);
+    font-size: 1rem;
+    height: 100%;
+}
+
+.message-wrap .left-pane .chat-card .title{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+}
+.message-wrap .left-pane .chat-card .title>.name{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 65%;
+}
+.message-wrap .left-pane .chat-card .info>.last-chat{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+    margin-top: 0.5rem;
+    color: #0009;
+}
+.message-wrap .left-pane .chat-card .last-update{
+    color: #0007;
+    width: 30%;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.message-wrap .mid-pane .chat-wrap{
+    height: calc(100% - 4rem);
+    display: flex;
+    flex-direction: column;
+}
+.message-wrap .mid-pane .chat-history{
+    padding: 0 1rem;
+    flex: 1;
+    overflow: scroll;
+}
+.message-wrap .mid-pane .chat-record{
+    margin: 1rem 0;
+    
+    
+}
+
+.message-wrap .mid-pane .chat-record>.avatar{
+    margin: 0;
+    border-radius: 100%;
+    width: 2rem;
+    height: 2rem;
+    
+}
+
+
+.message-wrap .mid-pane .chat-input{
+    width: 100%;
+    background: rgba(31, 31, 31, 0.048);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    box-sizing: border-box;
+}
+
+.message-wrap .mid-pane .chat-input>.text-input{
+    flex: 1;
+    box-sizing: border-box;
+    border-radius: 1rem;
+    min-height: 2rem;
+    margin: 12px;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.message-wrap .mid-pane .chat-input>.text-input textarea{
+    resize: vertical;
+    width: 100%;
+    vertical-align: bottom;
+    outline: none;
+    padding-right: 1rem;
+    
+    border-style: none;
+    margin: 0.5rem;
+    box-sizing: border-box;
+    font-family: inherit;
+
+}
+
+.message-wrap .mid-pane .chat-input .MuiSvgIcon-root {
+    font-size: 1.8rem;
+}
+
+.message-wrap .right-pane .list-block{
+    width: 100%;
+    flex: 1;
+    
+} 
+.message-wrap .right-pane .detail{
+    width: 100%;
+    height: calc(100% - 4rem);
+    padding: 0 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+}
+.message-wrap .right-pane .person{
+    width: 100%;
+    padding: 1rem 0;
+    border-bottom: solid 1px #0002;
+}
+.message-wrap .right-pane .person>.info{
+    display: flex;
+    flex-direction: row;
+    
+    align-items: center;
+    height: 4rem;
+}
+.message-wrap .right-pane .person>.intro{
+    padding: 0 0.5rem;
+    font-weight: 0.9rem;
+    color: #0009;
+    line-height: 1.5rem;
+}
+.message-wrap .right-pane .person>.info .MuiAvatar-root{
+    width: 3rem;
+    height: 3rem;
+}
+.message-wrap .right-pane .person>.info .name-role{
+    margin-left: 1rem;
+}
+.message-wrap .right-pane .person>.info .name{
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+.message-wrap .right-pane .person>.info .role{
+    margin-top: 0.2rem;
+    font-size: 1rem;
+    color: #797979;
+}
+.message-wrap .right-pane .person .intro-title{
+    margin: 0.5rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+.message-wrap .right-pane .property-block>.title{
+
+    margin: 1rem 0;
+    font-weight: bold;
+    font-size: 1.2rem;
+    
+}
+.message-wrap .right-pane .property-block{
+    padding: 0 0.5rem 2rem 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    border-bottom: solid 1px #0002;
+    margin-bottom: 1rem;
+    
+}
+
+
+.message-wrap .right-pane  .property-block .img{
+    width: 100%;
+    height: 15vw;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.message-wrap .right-pane  .property-block .info>.title{
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+.message-wrap .right-pane  .property-block .info>.address{
+    font-size: 1rem;
+}
+
+.message-wrap .right-pane  .property-block .property-rooms {
+    display: flex;
+    flex-direction: row;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    line-height: 1rem;
+    height: 1rem;
+    color: #1b1b25;
+}
+
+.message-wrap .right-pane  .property-block .property-rooms .divider {
+    width: 0;
+    margin: 0.2rem 0.5rem 0 0.5rem;
+    border-left: solid 1px #0007;
+}
+.message-wrap .right-pane   .detail-btn{
+    margin-top: 1rem;
+    width: 100%;
+    height: 2.5rem;
+}
+.message-wrap .right-pane   .detail-btn .MuiButton-root{
+    width: 100%;
+    height: 100%;
+    border: solid 2px #1b1b25;
+    color: #1b1b25;
+    font-size: 1.1rem;
+    
+}
+.message-wrap .right-pane .group{
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.message-wrap .right-pane .group>.title{
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color:  #1b1b25;
+}
+
+.message-wrap .right-pane .member-list{
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+}
+
+.message-wrap .right-pane .member-card{
+    padding: 1rem 0.5rem;
+    width: 25%;
+    box-sizing: border-box;
+
+}
+.message-wrap .right-pane .member-card .MuiAvatar-root{
+    width: 100%;
+    height: auto;
+}
+
+.message-wrap .right-pane .member-card .name{
+    font-size: 1rem;
+    text-align: center;
+}

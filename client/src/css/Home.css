@@ -1,0 +1,158 @@
+.home-wrap{
+    height: 100%;
+    width: 100%;
+    background: url('../static/bg.jpg');
+    background-position: center center;
+    background-size: cover;
+}
+.home-shadow{
+    height: 100%;
+    width: 100%;
+    background: #0003;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.home-title{
+    line-height: 3rem;
+    height: 3rem;
+    margin-top: 10%;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+.home-shadow>.search-box{
+    margin-top: 2rem;
+    height: auto;
+    width: 35%;
+    min-width: 40rem;
+    border-radius: 2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.home-shadow .search-box>.input-box{
+    
+    
+    overflow: hidden;
+    position: relative;
+    height: 4rem;
+    width: 100%;
+    
+    position: relative;
+    padding: 0.5rem 2rem;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    
+}
+.home-shadow .search-box>.input-box input{
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border-style: none;
+    font-size: 1.2rem;
+    margin-left: 4rem;
+}
+
+.home-wrap .autocomplete-dropdown-container{
+
+    
+    background: #fff;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    
+}
+.home-wrap .autocomplete-dropdown-container .divider{
+    margin: 0 2rem;
+    border-bottom: solid 1px #0005;
+}
+
+.home-wrap .suggestion-item, .home-wrap .suggestion-item--active{
+    
+    border-collapse: collapse;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 3.5rem;
+    line-height: 3rem;
+    font-size: 1.2rem;
+    width: 100%;
+    padding: 0 3rem 0 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.home-wrap .suggestion-item--active .MuiSvgIcon-root {
+    color: #fff;
+}
+.home-wrap .suggestion-item .MuiSvgIcon-root{
+    color: #1634d8;
+}
+.home-wrap .autocomplete-dropdown-container span{
+    
+    flex: 1;
+    
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+.home-wrap .search-type{
+    width: 5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    cursor: pointer;
+    
+}
+.home-wrap .search-type:hover{
+    background: #0001;
+}
+.home-wrap .search-type .search-type-btn{
+    margin:1rem 0 1rem 2rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+    height: 2rem;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: solid 1px  #0003;
+    font-weight: 500;
+    font-size: 1.1rem;
+    
+}
+
+.home-wrap .search-type .MuiButton-root{
+    height: 100%;
+    width: 100%;
+    padding: 0;
+
+}
+
+.home-wrap .input-box .MuiSvgIcon-root{
+    border-left: solid 1px #0003;
+    padding-left: 0.8rem;
+    font-size: 2.5rem;
+    height: 2rem;
+}
+
+#search-type-popover .MuiPopover-paper{
+    margin-top: 1rem;
+    border-radius: 0;
+    width: 8rem;
+}
+
+#search-type-popover .pop-title{
+    margin: 0.5rem 1rem 0 1rem;
+    padding-bottom: 0.5rem;
+    color: #797979;
+    font-size: 1rem;
+    border-bottom: solid 1px #0002;
+}

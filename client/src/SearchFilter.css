@@ -1,0 +1,54 @@
+.selector-popover{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+    min-width: 12rem;
+}
+.selector-field{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+}
+.selector-popover .selector-field span{
+    margin: 0 1.5rem;
+    color: #747474;
+    font-size: 1.5rem;
+}
+.selector-popover .MuiFormControl-root{
+    width: 10rem;
+}
+.selector-popover .PrivateNotchedOutline-legendLabelled-3{
+    width: 1.9rem;
+}
+/* .price-selector-popover .min-price, .price-selector-popover .max-price{
+    height: 100%;
+    padding: 0.5rem;
+    width: 40%;
+} */
+.selector-popover .selector-title{
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+.popover-confirm{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+#room-selector-popover .room-form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.popover-confirm .confirm-btn{
+    background: #1634d8;
+  color: #fff;
+  margin-left: 0.5rem;
+}
