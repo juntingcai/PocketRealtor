@@ -21,7 +21,7 @@ const PropertyList = (props) => {
         addr: '',
         lat: 0,
         lng: 0,
-        radius: 5,
+        radius: 10,
         type: 0,
         minPrice: 0,
         maxPrice: 0,

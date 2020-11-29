@@ -13,17 +13,24 @@ import { loadUser } from "./actions/auth";
 import setAuthToken from "./utils/setAuthToken";
 import AuthDialog from "./components/Login/AuthDialog";
 import PrivateRoute from "./components/PrivateRoute";
-import SellList from "./components/SellProperties/SellList";
-import CreateListing from "./components/SellProperties/CreateListing";
-import Listing from "./components/listings/CreateListing";
 import EditProfile from "./components/profile-forms/EditProfile";
-import FindTenants from "./components/dashboard/Dashboard";
-import CreateListingPage from "./components/listings/CreateListingPage";
+import FindTenants from "./components/tenants/Tenants";
+import Messages from './components/ChatRoom/Messages';
 import Property from './components/Property';
 import SavedList from './components/SavedList';
+import SocketProvider from "./context/SocketProvider";
+import { AlertProvider } from "./context/AlertProvider";
+import ConversationsProvider from "./context/ConversationsProvider";
+import CreateListingPage from './components/listings/CreateListingPage';
+import CreateListing from './components/listings/CreateListing';
+import GroupDashboard from "./components/groups/GroupDashboard";
+import CreateGroup from "./components/groups/CreateGroup";
+import HostTimeslots from "./components/schedule/HostTimeslots";
+import NotificationDashboard from "./components/notifications/NotificationDashboard";
 
 if (localStorage.token) {
-  setAuthToken(localStorage.token);
+  const token = JSON.parse(localStorage.getItem('token'));
+  setAuthToken(token.token);
 }
 
 function App() {
@@ -33,28 +40,41 @@ function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
-        <Fragment>
-          <div className="App">
-            <NaviBar />
-            <div className="body-wrap">
-              <Switch>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/list" component={PropertyList} />
-                <PrivateRoute exact path="/sell" component={SellList} />
-                <PrivateRoute exact path="/creat" component={CreateListing} />
-                <PrivateRoute exact path="/myprofile" component={EditProfile} />
-                <PrivateRoute exact path="/savedlist" component={SavedList} />
-                <Route exact path="/property/:id" component={Property} />
+        <SocketProvider>
+          <AlertProvider>
+            <ConversationsProvider>
+              <Fragment>
+                <div className="App">
+                  <NaviBar />
+                  <div className="body-wrap">
+                    <Switch>
+                      <Route exact path="/" component={Home} />
+                      <Route exact path="/list" component={PropertyList} />
+                      <PrivateRoute exact path="/createlisting" component={CreateListingPage} />
 
-                <Route path="/createlisting" component={Listing} />
+                      <PrivateRoute exact path="/sell" component={CreateListing} />
+                      <PrivateRoute exact path="/findtenants" component={FindTenants} />
+                      <PrivateRoute exact path="/myprofile" component={EditProfile} />
+                      <PrivateRoute exact path="/savedlist" component={SavedList} />
+                      <Route exact path="/property/:id" component={Property} />
+                      <PrivateRoute exact path="/messages" component={Messages} />
+                      <PrivateRoute path="/mygroup" component={GroupDashboard} />
+                      <PrivateRoute path="/creategroup" component={CreateGroup} />
+                      <Route path="/timeslots" component={HostTimeslots} />
+                      <PrivateRoute path="/notifications" component={NotificationDashboard} />
+
+                      {/* <Route path="/createlisting" component={Listing} />
                 <Route path="/newlisting" component={CreateListingPage} />
-                <Route path="/findtenants" component={FindTenants} />
-                
-              </Switch>
-            </div>
-            <AuthDialog />
-          </div>
-        </Fragment>
+                <Route path="/findtenants" component={FindTenants} /> */}
+
+                    </Switch>
+                  </div>
+                  <AuthDialog />
+                </div>
+              </Fragment>
+            </ConversationsProvider>
+          </AlertProvider>
+        </SocketProvider>
       </BrowserRouter>
     </Provider>
   );

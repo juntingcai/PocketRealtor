@@ -26,7 +26,7 @@ const formatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 0
 })
 
-const ListItem = (props) => {
+const ListItem = ({history, data}) => {
     const picStyle = {
         background: 'url(' + require('../static/noimg.jpg') + ') center center',
         backgroundSize: 'cover'
@@ -34,21 +34,21 @@ const ListItem = (props) => {
     
     return (
         <Fragment>
-            <div className="property-card" onClick={() => toPropertyDetail(props, props.data.id)}>
+            <div className="property-card" onClick={() => toPropertyDetail(history, data.id)}>
                 <div className="picture-wrap" style={picStyle} />
                 <div className="info-wrap">
-                    <div className="property-address">{props.data.address + ", " + props.data.city}</div>
-                    <div className="property-title">{props.data.title}</div>
+                    <div className="property-address">{data.address + ", " + data.city}</div>
+                    <div className="property-title">{data.title}</div>
 
                     <div className="property-rooms">
-                        <span>{props.data.rooms} bedrooms</span>
+                        <span>{data.rooms} bedrooms</span>
                         <div className="divider" />
-                        <span>{props.data.bath_rooms} baths</span>
+                        <span>{data.bath_rooms} baths</span>
                         <div className="divider" />
-                        <span>{props.data.area} sqft</span>
+                        <span>{data.area} sqft</span>
                     </div>
                     <div className="property-price">
-                        {formatter.format(props.data.sale_price)}
+                        {formatter.format(data.sale_price)}
                         {/* {fomatPrice(props.sale? props.data.sale_price : props.data.rent_price)} */}
                     </div>
 

@@ -4,15 +4,20 @@ import { connect } from "react-redux";
 import { Link, withRouter, Redirect } from "react-router-dom";
 import { updateProfile, getCurrentProfile } from "../../actions/profile";
 import axios from "axios";
+import {URL} from "../../utils/constants"
+import Container from '@material-ui/core/Container';
+
+import {Input, Button, TextField, Select} from "@material-ui/core"
 
 const CreateListingPage = ({
-  profile: { profile, loading },
-  updateProfile,
-  getCurrentProfile,
+  // profile: { profile, loading },
+  // updateProfile,
+  // getCurrentProfile,
   history,
+  userId,
 }) => {
-  console.log("profile++");
-  console.log(profile);
+  // console.log("profile++");
+  // console.log(profile);
   const [formData, setFormData] = useState({
     user_id: null,
     title: "",
@@ -22,15 +27,21 @@ const CreateListingPage = ({
     address: "",
     city: "",
     state: "",
-    zip_code: "",
-    latitude: "37.7749N",
-    longitude: "122.4194W",
+    zip_code: null,
+    latitude: "37.7749",
+    longitude: "-122.4194",
     sale_price: null,
     rent_price: null,
     area: null,
     rooms: null,
     bath_rooms: null,
-    is_host: true,
+    status: 1,
+    furnitured: "No",
+    garage: "No",
+    backyard: "No",
+    cooling: "No",
+    heating: "No", 
+    fireplace: "No"
   });
 
   const [file, setFile] = useState(null);
@@ -51,54 +62,64 @@ const CreateListingPage = ({
     area,
     rooms,
     bath_rooms,
-    is_host,
+    status,
+    furnitured,
+    garage,
+    backyard,
+    cooling,
+    heating, 
+    fireplace
   } = formData;
 
   const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(false)
+  
 
-  useEffect(() => {
-    if (!profile) getCurrentProfile();
-    if (!loading && profile) {
-      if (profile.data.listings.length > 0) {
-        var temp = [];
-        setListings(temp);
-      }
-    }
-  }, [loading, getCurrentProfile, profile]);
+    
+  console.log("verifyuser = ")
+  console.log(userId)
+
 
   const createListing = async (newListing) => {
-    const url = "http://localhost:5000/listing/create";
+    const url = `${URL}/listing/create`;
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
 
-    const user_id = profile.data.id;
-    setFormData({ user_id });
+
     const payload = {};
-    payload.user_id = user_id;
+    payload.owner_id = userId;
     payload.title = title;
     payload.type = type;
-    payload.age = age;
+    payload.age = parseInt(age);
     payload.description = description;
     payload.address = address;
     payload.city = city;
     payload.state = state;
-    payload.zip_code = zip_code;
+    payload.zip_code = parseInt(zip_code);
     payload.latitude = latitude;
     payload.longitude = longitude;
     payload.sale_price = sale_price;
     payload.rent_price = rent_price;
     payload.area = area;
-    payload.rooms = rooms;
-    payload.bath_rooms = bath_rooms;
-    payload.is_host = is_host;
+    payload.rooms = parseInt(rooms);
+    payload.bath_rooms = parseInt(bath_rooms);
+    payload.status = parseInt(status);
+    // payload.furnitured = furnitured;
+    // payload.garage = garage;
+    // payload.backyard = backyard;
+    // payload.cooling = cooling;
+    // payload.heating = heating;
+    // payload.fireplace = fireplace;
 
     const body = { property: payload };
+    console.log("Demo ")
+    console.log(body)
     try {
       const response = await axios.post(
-        "http://localhost:5000/listing/create",
+        `${URL}/listing/create`,
         body,
         config
       );
@@ -109,10 +130,7 @@ const CreateListingPage = ({
     }
   };
 
-  console.log(is_host);
-  if (!is_host) {
-    history.push("/");
-  }
+
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -138,6 +156,13 @@ const CreateListingPage = ({
         area,
         rooms,
         bath_rooms,
+        status,
+        // furnitured,
+        // garage,
+        // backyard,
+        // cooling,
+        // heating, 
+        // fireplace
       };
 
       var newListings = [];
@@ -168,6 +193,13 @@ const CreateListingPage = ({
         area,
         rooms,
         bath_rooms,
+        status,
+        // furnitured,
+        // garage,
+        // backyard,
+        // cooling,
+        // heating, 
+        // fireplace
       };
 
       newListings.push(listing);
@@ -182,12 +214,13 @@ const CreateListingPage = ({
 
   return (
     <Fragment>
-      {" "}
+      <Container>
       <h1 className="medium text-primary">Create Listing</h1>
       <form className="form" onSubmit={(e) => onSubmit(e)}>
         <div className="form-group">
           <p>Listing Title:</p>
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="Title"
             name="title"
@@ -209,7 +242,8 @@ const CreateListingPage = ({
         </div>
         <div className="form-group">
           <p>Age of Property:</p>
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="How many years old is the property?"
             name="age"
@@ -219,7 +253,8 @@ const CreateListingPage = ({
         </div>
         <div className="form-group">
           <p>Address:</p>
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="Address"
             name="address"
@@ -229,7 +264,8 @@ const CreateListingPage = ({
         </div>
         <div className="form-group">
           <p>City:</p>
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="City"
             name="city"
@@ -239,7 +275,8 @@ const CreateListingPage = ({
         </div>
         <p>State:</p>
         <div className="form-group">
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="State"
             name="state"
@@ -250,7 +287,8 @@ const CreateListingPage = ({
         <div>
           <p>Zip Code:</p>
           <div className="form-group">
-            <input
+            <Input
+            fullWidth
               type="text"
               placeholder="Zip Code"
               name="zip_code"
@@ -264,7 +302,8 @@ const CreateListingPage = ({
           <div className="form-group">
             <p>Sale Price:</p>
             <br />
-            <input
+            <Input
+            fullWidth
               type="text"
               placeholder="Interested in selling your property? Tell us your dream price"
               name="sale_price"
@@ -280,7 +319,8 @@ const CreateListingPage = ({
           </div>
         )}
         <div className="form-group">
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="Rent Price"
             name="rent_price"
@@ -290,7 +330,8 @@ const CreateListingPage = ({
         </div>
         <p>Square Feet:</p>
         <div className="form-group">
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="How many sq. ft is the space?"
             name="area"
@@ -300,7 +341,8 @@ const CreateListingPage = ({
         </div>
         <p>Number of Rooms:</p>
         <div className="form-group">
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="Number of Rooms"
             name="rooms"
@@ -310,7 +352,8 @@ const CreateListingPage = ({
         </div>
         <p>Number of Bath Rooms:</p>
         <div className="form-group">
-          <input
+          <Input
+          fullWidth
             type="text"
             placeholder="Number of Bath Rooms"
             name="bath_rooms"
@@ -320,25 +363,95 @@ const CreateListingPage = ({
         </div>
         <div className="form-group">
           <p>Description:</p>
-          <textarea
+          <TextField
+          fullWidth
             placeholder="Describe your listing"
             name="description"
             value={description}
             onChange={(e) => onChange(e)}
-          ></textarea>
+          ></TextField>
         </div>
-        <br />
-
+        <br/>
+        <p>Furnitured:</p>
+        <div className="form-group">
+          <Input
+          fullWidth
+            type="text"
+            placeholder="Does it come with furniture?"
+            name="furnitured"
+            value={furnitured}
+            onChange={(e) => onChange(e)}
+          />
+        </div>
+        <p>Garage:</p>
+        <div className="form-group">
+          <Input
+          fullWidth
+            type="text"
+            placeholder="Does it have a garage?"
+            name="garage"
+            value={garage}
+            onChange={(e) => onChange(e)}
+          />
+        </div>
+        <p>Backyard:</p>
+        <div className="form-group">
+          <Input
+          fullWidth
+            type="text"
+            placeholder="Does it have a backyard?"
+            name="backyard"
+            value={backyard}
+            onChange={(e) => onChange(e)}
+          />
+        </div>
+        <p>Cooling:</p>
+        <div className="form-group">
+          <Input
+          fullWidth
+            type="text"
+            placeholder="Does it have air conditioning?"
+            name="cooling"
+            value={cooling}
+            onChange={(e) => onChange(e)}
+          />
+        </div>
+        <p>Heating:</p>
+        <div className="form-group">
+          <Input
+          fullWidth
+            type="text"
+            placeholder="Does it have heating?"
+            name="heating"
+            value={heating}
+            onChange={(e) => onChange(e)}
+          />
+        </div>
+        <p>Fireplace:</p>
+        <div className="form-group">
+          <Input
+          fullWidth
+            type="text"
+            placeholder="Does it have a fireplace?"
+            name="fireplace"
+            value={fireplace}
+            onChange={(e) => onChange(e)}
+          />
+        </div>
+<br/>
         <h5>Add An Image</h5>
-        <input onChange={onFileChange} type="file" accept="image/*" />
+        <Input onChange={onFileChange} type="file" accept="image/*" />
         <br />
         <br />
-        <input type="submit" className="btn btn-success my-1" />
-
-        <a className="btn btn-light my-1" href="/createlisting">
+        <Input type="submit" variant="contained" color="primary" />
+        <br/>
+        <br/>
+        {/* <a className="btn btn-light my-1" href="/sell">
           Go Back
-        </a>
+        </a> */}
+        <Button  href="/sell">Back</Button>
       </form>
+      </Container>
     </Fragment>
   );
 };
@@ -347,10 +460,12 @@ CreateListingPage.propTypes = {
   updateProfile: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
+  userId: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   profile: state.profile,
+  userId: state.auth.id,
 });
 
 export default connect(mapStateToProps, {

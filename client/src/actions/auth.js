@@ -3,21 +3,18 @@ import setAuthToken from "../utils/setAuthToken";
 import { setAlert } from "./alert";
 
 export const loadUser = () => async (dispatch) => {
-  if (localStorage.token) {
-    setAuthToken(localStorage.token);
+
+  const token = localStorage.getItem('token');
+  console.log(token);
+  if(token === null)
+    dispatch({ type: "AUTH_ERROR" });
+  else{
+    const user = JSON.parse(token);
+    console.log(user);
+    setAuthToken(user.token);
+    dispatch({ type: "USER_LOADED", payload: user });
   }
-  try {
-    const response = await axios.post("http://52.53.200.228:3080/user/verifyuser");
-    if (response.data.msg === "Invalid token") {
-      dispatch({ type: "AUTH_ERROR" });
-    } else {
-      dispatch({ type: "USER_LOADED", payload: response });
-    }
-  } catch (error) {
-    dispatch({
-      type: "AUTH_ERROR",
-    });
-  }
+
 };
 
 export const register = ({ firstname, lastname, email, password }) => async (
@@ -43,9 +40,8 @@ export const register = ({ firstname, lastname, email, password }) => async (
     } else {
       dispatch({
         type: "REGISTER_SUCCESS",
-        payload: response.data.token,
+        payload: response.data,
       });
-      dispatch(loadUser());
       dispatch({ type: "CLOSE_DIALOG" });
     }
   } catch (error) {
@@ -75,11 +71,11 @@ export const login = ({ email, password }) => async (dispatch) => {
         type: "LOGIN_FAIL",
       });
     } else {
+      console.log(response)
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: response,
+        payload: response.data,
       });
-      dispatch(loadUser());
       dispatch({ type: "CLOSE_DIALOG" })
     }
   } catch (error) {

@@ -21,7 +21,7 @@ const PlaceInput = (props) => {
           highlightFirstSuggestion={true}
         >
           {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-            <form className="place-auto-complete">
+            <div className="place-auto-complete">
               
               <input
                 onFocusCapture={() => {
@@ -68,7 +68,7 @@ const PlaceInput = (props) => {
                   })}
                 </div>
               )}
-            </form>
+            </div>
           )}
         </PlacesAutocomplete>
       </Fragment>

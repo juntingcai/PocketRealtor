@@ -5,7 +5,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { toPropertyDetail } from '../utils/functions';
 import Axios from 'axios';
 
-const SavedList = (props) => {
+const SavedList = ({history}) => {
     const [data, setData] = useState({
         list: [],
     });
@@ -53,7 +53,7 @@ const SavedList = (props) => {
                 </div>
                     <div className="saved-list-body">
                         {data.list.map((item, index) => (<div key={index} className="saved-property-card" >
-                            <div className="img" onClick={() => toPropertyDetail(props, item.id)}>
+                            <div className="img" onClick={() => toPropertyDetail(history, item.id)}>
                                 <img src={require('../static/noimg.jpg')} alt="none" />
                             </div>
                             <div className="info">

@@ -110,6 +110,8 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
+    line-height: 2.6rem;
+    align-items: center;
 }
 .profile-form .place-auto-complete{
     width: 85%;
@@ -124,12 +126,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 1rem;
+    margin-right: 0.6rem;
 }
 .profile-form .name-tag:hover{
     background: #0006;
 }
 
+.profile-form .name-tag-title{
+    margin-right: 1rem;
+}
 .profile-form .name-tag .name{
     font-size: 0.8rem;
 }

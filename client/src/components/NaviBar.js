@@ -73,10 +73,10 @@ const NaviBar = (props) => {
                             {
                                 props.isAuthenticated && <div className="link-group auth-link-group">
                                     <div id="myprofile" onClick={goto}>Profile </div>
-                                    <div onClick={goto}>Notifications</div>
-                                    <div onClick={goto}>Messages</div>
+                                    <div id="notifications" onClick={goto}>Notifications</div>
+                                    <div id="messages" onClick={goto}>Messages</div>
                                     <div id="savedlist" onClick={goto}>My list</div>
-                                    <div onClick={goto}>My group</div>
+                                    <div id="mygroup" onClick={goto}>My group</div>
 
                                 </div>
                             }
@@ -110,7 +110,7 @@ NaviBar.propTypes = {
 };
 const mapStateToProps = (state) => ({
     isAuthenticated: state.auth.isAuthenticated,
-    avatar: (state.auth.user) ? state.auth.user.avatar : ""
+    avatar: state.auth.avatar
 });
 
 

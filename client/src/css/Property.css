@@ -45,7 +45,7 @@
 .property-wrap>.picture-block{
     width: 100%;
     max-height: 30rem;
-    height: 49vw;
+    height: 45vw;
     
     border-radius: 1rem;
     
@@ -82,15 +82,70 @@
     width: 42%;
     
 }
-.property-wrap>.detail-block .spec-price{
-    padding-bottom: 1.5rem;
+.property-wrap>.detail-block .saler{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: space-between;
+    padding: 2rem 0;
+    
+    
     border-bottom: solid 1px #0003;
+}
+.property-wrap>.detail-block .saler .info{
+    font-size: 1.1rem;
+    
+}
+.property-wrap>.detail-block .saler .MuiAvatar-root{
+    width: 5rem;
+    height: 5rem;
+    margin-left: 1.5rem;
+}
+.property-wrap>.detail-block .saler .name{
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+.property-wrap>.detail-block .saler .role{
+    color: #4c4b4b;
+    margin: 0.5rem 0;
+}
+.property-wrap>.detail-block .saler .intro{
+    line-height: 1.5rem;
+    
+}
+.property-wrap>.detail-block .amenities{
+    padding: 2rem 0;
+    border-bottom: solid 1px #0003;
+}
+.property-wrap>.detail-block .amenities .spec{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-top: 1rem;
+    padding-right: 2rem;
+}
+
+.property-wrap>.detail-block .amenities .spec-left div, 
+.property-wrap>.detail-block .amenities .spec-right div{
+    font-size: 1.1rem;
+    line-height: 1.5rem;
+    color:  #4c4b4b;
+    font-weight: 300;
+}
+.property-wrap>.detail-block .amenities .spec-left span, 
+.property-wrap>.detail-block .amenities .spec-right span{
+    font-weight: 400;
+    color: #000;
+    margin-right: 5px;
+}
+.property-wrap>.detail-block .amenities .title{
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 .property-wrap>.detail-block .type{
-    font-size: 1.5rem;
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
     font-weight: bold;
 }
 .property-wrap>.detail-block .property-rooms{
@@ -111,31 +166,37 @@
 
 .property-wrap>.detail-block .price{
     
-    font-size: 2.6rem;
-    text-align: right;
+    font-size: 2.5rem;
+    
 }
 
 .property-wrap>.detail-block .price span{
     
-    color: #797979;
+    color: #797979c2;
+}
+.property-wrap>.detail-block .price #slash{
+    font-weight: 300;
+    font-size: 2.4rem;
+    position: relative;
+    bottom: 0.2rem;
 }
 .property-wrap>.detail-block .price #small{
     font-size: 1.5rem;
 }
-.property-wrap>.detail-block .intro>.title{
-    font-size: 1.5rem;
+.property-wrap>.detail-block .description>.title{
+    font-size: 1.3rem;
     font-weight: bold;
 }
-.property-wrap>.detail-block .intro{
+.property-wrap>.detail-block .description{
     padding: 2rem 0;
     min-height: 20rem;
     
     border-bottom: solid 1px #0003;
 }
-.property-wrap>.detail-block .intro>.content{
+.property-wrap>.detail-block .description>.content{
     margin-top: 1rem;
-    font-size: 1.2rem;
-    color: #4c4b4b;
+    font-size: 1.1rem;
+    line-height: 1.5rem;
 }
 .property-wrap>.detail-block .map>.title{
     font-size: 1.5rem;
@@ -155,16 +216,32 @@
     width: 100%;
     height: auto;
 }
+
+.property-wrap>.detail-block .apply{
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    border: solid 1px #0003;
+    box-shadow: 0 4px 6px #0003;
+    border-radius: 1rem;
+
+}
 .property-wrap>.detail-block .apply-btn{
-    padding: 1rem 0 2rem;
+    
     width: 100%;
     height: 3rem;
-    font-size: 2.6rem;
-    border-bottom: solid 1px #0003;
+    
+    margin: 1rem 0;
     display: flex;
     box-sizing: content-box;
 
 }
+.property-wrap>.detail-block .apply-btn .MuiButton-root{
+    width: 100%;
+    height: 100%;
+    font-size: 1.1rem;
+}
+
 .property-wrap>.detail-block .contact{
     margin-top: 2rem;
     width: 100%;

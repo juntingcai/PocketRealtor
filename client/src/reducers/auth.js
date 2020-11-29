@@ -1,22 +1,17 @@
 const initialState = {
-  token: localStorage.getItem("token"),
-  isAuthenticated: false,
   loading: true,
-  user: null,
+  isAuthenticated: false,
+  token: null,
+  id: null,
+  firstname: "",
+  lastname: "",
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
     case "REGISTER_SUCCESS":
-      localStorage.setItem("token", action.payload);
-      return {
-        ...state,
-        ...action.payload,
-        isAuthenticated: true,
-        loading: false,
-      };
     case "LOGIN_SUCCESS":
-      localStorage.setItem("token", action.payload.data.token);
+      localStorage.setItem("token", JSON.stringify(action.payload));
       return {
         ...state,
         ...action.payload,
@@ -29,17 +24,16 @@ export default function (state = initialState, action) {
     case "AUTH_ERROR":
       localStorage.removeItem("token");
       return {
-        ...state,
-        token: null,
-        isAuthenticated: false,
+        ...initialState,
         loading: false,
       };
     case "USER_LOADED":
+      
       return {
         ...state,
+        ...action.payload,
         isAuthenticated: true,
         loading: false,
-        user: action.payload.data,
       };
     default:
       return state;

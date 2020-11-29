@@ -116,15 +116,15 @@
 }
 .home-wrap .search-type .search-type-btn{
     margin:1rem 0 1rem 2rem;
-    
+    padding-right: 1rem;
+    box-sizing: border-box;
     height: 2rem;
     width: 3rem;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     border-right: solid 1px  #0003;
-    color: #797979;
-    
+    font-weight: 500;
     font-size: 1.1rem;
     
 }

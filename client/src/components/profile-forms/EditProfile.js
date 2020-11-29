@@ -18,6 +18,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Avatar from '@material-ui/core/Avatar';
 import MenuItem from '@material-ui/core/MenuItem';
 import ClearRoundedIcon from '@material-ui/icons/ClearRounded';
+import { useAlert } from '../../context/AlertProvider';
 
 import Select from '@material-ui/core/Select';
 import '../../css/ProfileForm.css'
@@ -47,7 +48,7 @@ const EditProfile = (props) => {
     gender,
     occupation,
     avatar,
-    
+
   } = formData;
 
   const [file, setFile] = useState(null);
@@ -63,33 +64,35 @@ const EditProfile = (props) => {
 
   const [editing, setEditing] = useState(false);
 
+  const { setAlert } = useAlert();
+
   useEffect(() => {
-    if (!props.auth.loading) {
-      props.getCurrentProfile(props.auth.user.id)
+    if (props.userid) {
+      props.getCurrentProfile(props.userid)
       //Get user preferences
-      Axios.get("http://52.53.200.228:3080/tenant/preference/" + props.auth.user.id)
-      .then(res => {
-        console.log(res.data.preferedZips,res.data.preferredCities)
-        if(res.data)
-          setPreference({
-            zips: res.data.preferedZips,
-            cities: res.data.preferredCities,
-          })
-      }).catch( err => {
-        console.log(err)
-      })
+      Axios.get("http://52.53.200.228:3080/tenant/preference/" + props.userid)
+        .then(res => {
+          console.log(res.data.preferedZips, res.data.preferredCities)
+          if (res.data)
+            setPreference({
+              zips: res.data.preferedZips,
+              cities: res.data.preferredCities,
+            })
+        }).catch(err => {
+          console.log(err)
+        })
       //Get user roles
-      Axios.get("http://52.53.200.228:3080/user/role/" + props.auth.user.id)
-      .then(res => {
-        if(res.data){
-          setRole({
-            ...res.data,
-          })
-        }
-        
-      }).catch( err => {
-        console.log(err)
-      })
+      Axios.get("http://52.53.200.228:3080/user/role/" + props.userid)
+        .then(res => {
+          if (res.data) {
+            setRole({
+              ...res.data,
+            })
+          }
+
+        }).catch(err => {
+          console.log(err)
+        })
     }
 
     // const data = props.profile.profile.data;
@@ -101,7 +104,7 @@ const EditProfile = (props) => {
         lastname: data.lastname,
         role: data.role,
         birthday: (data.birthday === null) ? "" : data.birthday,
-        nickname: (data.nickname === null) ? "user" + props.auth.user.id : data.nickname,
+        nickname: (data.nickname === null) ? "user" + props.userid : data.nickname,
         intro: data.intro === null ? "" : data.intro,
         gender: (data.gender === null) ? 0 : data.gender,
         occupation: data.occupation === null ? "" : data.occupation,
@@ -109,7 +112,7 @@ const EditProfile = (props) => {
         preferredCity: data.preferredCity,
       });
     }
-  }, [props.profile.loading, props.auth.loading]);
+  }, [props.profile.loading, props.userid]);
   const [role, setRole] = React.useState({
     isRenter: true,
     isHost: false,
@@ -132,16 +135,16 @@ const EditProfile = (props) => {
 
   const nameTag = (name, index) => {
     return (
-      <Fragment>
+      
         <div className="name-tag" key={index}>
           <div className="name">
             {name}
           </div>
-          
-            <ClearRoundedIcon className="delete-btn" onClick={deleteTag(index)}/>
-          
+
+          <ClearRoundedIcon className="delete-btn" onClick={deleteTag(index)} />
+
         </div>
-      </Fragment>
+      
     )
   }
 
@@ -158,12 +161,12 @@ const EditProfile = (props) => {
       "http://52.53.200.228:3080/user/updateRole",
       role,
     )
-    .then(res => {
-      console.log(res)
-    })
-    .catch(err => {
-      console.log(err)
-    })
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
   };
 
   const onFileChange = (e) => {
@@ -180,12 +183,21 @@ const EditProfile = (props) => {
   }
 
   const addZipcode = () => {
-    if (zipcode.length < 5)
+    if (zipcode.length != 5)
       alert("invalid zipcode");
     else {
       Axios.put("http://52.53.200.228:3080/tenant/preference/" + zipcode)
         .then(res => {
-          console.log(res)
+          if (res.data.code === 10000) {
+            setPreference({
+              ...preference,
+              zips: [...preference.zips, zipcode]
+            })
+            setAlert(2, "Preferred Zipcode added");
+          }
+          else{
+            setAlert(0, res.data.msg);
+          }
         }).catch(err => {
           console.log(err);
         })
@@ -410,21 +422,29 @@ const EditProfile = (props) => {
           </div>
           {isRenter && <div className="preference">
             <div className="prefer-head">
-              {"Prefer Cities: "}
+              <div className="name-tag-title">
+                {"Preferred Cities: "}
+              </div>
+
               {preference.cities.map((item, index) => (
-                
+
                 nameTag(item, index)
               ))}
+
             </div>
             <div className="place-container">
               <PlaceInput value={placeValue} setValue={setPlaceValue} />
               <Button color="primary" onClick={addCity}>ADD</Button>
             </div>
             <div className="prefer-head">
-              {"Prefer ZIP Code: "}
+              <div className="name-tag-title">
+                {"Preferred ZIP Code: "}
+              </div>
+
               {preference.zips.map((item, index) => (
                 nameTag(item, index)
               ))}
+
             </div>
             <div className="place-container">
               <input className="zipcode-box" type="number" minLength={5} maxLength={6} placeholder={"Enter ZIP Code"} value={zipcode} onChange={(e) => setZipcode(e.target.value)} />
@@ -462,7 +482,7 @@ const EditProfile = (props) => {
         </FormControl> */}
 
 
-          
+
         </form>
       </div>
     </Fragment>
@@ -478,7 +498,7 @@ EditProfile.propTypes = {
 
 const mapStateToProps = (state) => ({
   profile: state.profile,
-  auth: state.auth,
+  userid: state.auth.id,
 });
 
 export default withRouter(connect(mapStateToProps, {
