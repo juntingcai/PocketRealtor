@@ -17,6 +17,7 @@
     "morgan": "~1.9.1",
     "pg": "^8.4.1",
     "sequelize": "^6.3.5",
+    "socket.io": "^3.0.3",
     "uuidv4": "^6.2.5"
   },
   "devDependencies": {

@@ -269,50 +269,47 @@ class ChatRoomService {
     });
   }
 
-  putMessage(userId, isGroupChat, chatRoomId, content) {
-    let now = new Date();
-    let message = {
-      senderId: userId,
-      content: content,
-      date: now,
-    };
-    if (isGroupChat) {
-      return GroupChatRoom.update(
-        {
-          messages: Sequelize.fn(
-            "array_append",
-            Sequelize.col("messages"),
-            JSON.stringify(message)
-          ),
-        },
-        { where: { id: chatRoomId } }
-      )
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          console.log(err);
-          return false;
-        });
-    } else {
-      return PersonalChatRoom.update(
-        {
-          messages: Sequelize.fn(
-            "array_append",
-            Sequelize.col("messages"),
-            JSON.stringify(message)
-          ),
-        },
-        { where: { id: chatRoomId } }
-      )
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          console.log(err);
-          return false;
-        });
-    }
+  putMessage(chatRoomId, message) {
+    return GroupChatRoom.findByPk(chatRoomId).then((groupRoom) => {
+      if (groupRoom) {
+        // is chat room
+        return GroupChatRoom.update(
+          {
+            messages: Sequelize.fn(
+              "array_append",
+              Sequelize.col("messages"),
+              JSON.stringify(message)
+            ),
+          },
+          { where: { id: chatRoomId } }
+        )
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
+      } else {
+        return PersonalChatRoom.update(
+          {
+            messages: Sequelize.fn(
+              "array_append",
+              Sequelize.col("messages"),
+              JSON.stringify(message)
+            ),
+          },
+          { where: { id: chatRoomId } }
+        )
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
+      }
+    });
   }
 }
 

@@ -17,10 +17,14 @@ class ChatRoomController {
       res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
-    ListingService.verifyListingOwner(targetId, listingId).then(isTargetOwner =>{
-      if(isTargetOwner){
-        ChatRoomService.findOrCreatePersonalChat(user.id, targetId, listingId).then(
-          (chatroomId) => {
+    ListingService.verifyListingOwner(targetId, listingId).then(
+      (isTargetOwner) => {
+        if (isTargetOwner) {
+          ChatRoomService.findOrCreatePersonalChat(
+            user.id,
+            targetId,
+            listingId
+          ).then((chatroomId) => {
             if (chatroomId) {
               res.json({
                 conversationId: chatroomId,
@@ -30,12 +34,12 @@ class ChatRoomController {
             } else {
               res.status(404).json(resTemplate.DATABASE_ERROR);
             }
-          }
-        );
-      }else{
-        res.status(404).send("The user does not own the listing")
+          });
+        } else {
+          res.status(404).send("The user does not own the listing");
+        }
       }
-    })
+    );
   }
 
   getUserAllChatrooms(req, res) {
@@ -56,8 +60,14 @@ class ChatRoomController {
         }
         let result = personalChats.concat(groupChats);
         result.sort((a, b) => {
-          let aLastChatTime = a.messages.length == 0 ? "0" : a.messages[a.messages.length-1].date
-          let bLastChatTime = b.messages.length == 0 ? "0" : b.messages[b.messages.length-1].date
+          let aLastChatTime =
+            a.messages.length == 0
+              ? "0"
+              : a.messages[a.messages.length - 1].date;
+          let bLastChatTime =
+            b.messages.length == 0
+              ? "0"
+              : b.messages[b.messages.length - 1].date;
 
           if (aLastChatTime >= bLastChatTime) {
             return -1;
@@ -90,39 +100,6 @@ class ChatRoomController {
         res.status(500).json(resTemplate.DATABASE_ERROR);
       }
     });
-  }
-
-  putMessage(req, res) {
-    let user = req.body.user;
-    if (!user) {
-      res.status(403).json(resTemplate.TOKEN_ERR);
-      return;
-    }
-    let message = req.body.message;
-    let chatroomId = req.body.conversationId;
-    let isGroupChat = req.body.isGroupChat;
-    if (!isUuid(chatroomId)) {
-      res.status(400).send(chatroomId + " is not a valid UUID");
-      return;
-    }
-    if (!message || message === "") {
-      res.status(400).send("message is empty");
-      return;
-    }
-    if (isGroupChat == undefined) {
-      res.status(400).send("Must provide isGroupChat");
-      return;
-    }
-
-    ChatRoomService.putMessage(user.id, isGroupChat, chatroomId, message).then(
-      (result) => {
-        if (result) {
-          res.json(resTemplate.SUCCESS);
-        } else {
-          res.status(500).json(resTemplate.DATABASE_ERROR);
-        }
-      }
-    );
   }
 }
 

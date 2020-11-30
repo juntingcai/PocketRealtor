@@ -10,25 +10,13 @@ router.get(
   User.verifyToken,
   Tenant.verifyTenantRole,
   ChatRoom.findPersonalChatroom
-)
-
-router.get(
-  "/conversation/all",
-  User.verifyToken,
-  ChatRoom.getUserAllChatrooms
 );
+
+router.get("/conversation/all", User.verifyToken, ChatRoom.getUserAllChatrooms);
 
 router.get(
   "/conversation/get/:conversationId",
   User.verifyToken,
   ChatRoom.getOneChatRoom
 );
-
-router.put(
-  "/conversation/message",
-  User.verifyToken,
-  ChatRoom.putMessage
-);
-
-
 module.exports = router;

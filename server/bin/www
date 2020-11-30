@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const config = require('../config');
+const ChatRoomService = require('../services/ChatRoomService')
 /**
  * Module dependencies.
  */
@@ -20,7 +21,36 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
+io.on('connection', socket => {
+  const id = socket.handshake.query.id;
+  socket.join(id);
+  console.log(id)
+
+  socket.on('send-message', ({ conversationId, recipients, message }) => {
+    console.log(conversationId, recipients, message)
+    //add message to conversation on database
+    ChatRoomService.putMessage(conversationId, message)
+    recipients.forEach(recipient => {
+      console.log("sending to " +  recipient.id)
+      console.log(conversationId)
+      console.log(message)
+      
+      const room = recipient.id.toString();
+      
+      socket.broadcast.to(room).emit('receive-message', {
+        conversationId, message
+      })
+
+    });
+  })
+})
 /**
  * Listen on provided port, on all network interfaces.
  */
