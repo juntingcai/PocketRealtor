@@ -69,7 +69,7 @@ class ChatRoomService {
       if (userIds.length != 0) {
         return User.findAll({
           raw: true,
-          attributes: ["id", "first_name", "last_name", "avatar"],
+          attributes: ["id", "first_name", "last_name", "avatar", "intro"],
           where: {
             id: userIds,
           },
@@ -79,6 +79,7 @@ class ChatRoomService {
             userNameMap.set(user.id, {
               name: user.first_name + " " + user.last_name,
               avatar: user.avatar,
+              intro: user.intro,
             });
           }
 
@@ -92,6 +93,7 @@ class ChatRoomService {
               conversationId: ct.id,
               targetId: targetId,
               targetName: userinfo.name,
+              targetDescription: userinfo.intro,
               listingId: ct.listing_id,
               messages: ct.messages,
               img: userinfo.avatar,
@@ -108,7 +110,11 @@ class ChatRoomService {
   getUserGroupChatRooms(userId) {
     return GroupMembers.findAll({
       raw: true,
-      attributes: ["group_id", [Sequelize.col("tenant_group.name"), "name"]],
+      attributes: [
+        "group_id",
+        [Sequelize.col("tenant_group.name"), "name"],
+        [Sequelize.col("tenant_group.description"), "description"],
+      ],
       where: {
         user_id: userId,
         state: [GroupMemberState.OWNER.id, GroupMemberState.APPROVED.id],
@@ -123,7 +129,7 @@ class ChatRoomService {
       for (var i = 0; i < groups.length; i++) {
         let g = groups[i];
         groupIds.push(g.group_id);
-        groupNameMap.set(g.group_id, g.name);
+        groupNameMap.set(g.group_id, [g.name, g.description]);
       }
       return GroupMembers.findAll({
         raw: true,
@@ -176,7 +182,8 @@ class ChatRoomService {
             userGroupChatRooms.push({
               conversationId: ct.id,
               targetId: ct.group_id,
-              targetName: groupNameMap.get(ct.group_id),
+              targetName: groupNameMap.get(ct.group_id)[0], // [0] = name
+              targetDescription: groupNameMap.get(ct.group_id)[1], // [1] = description
               messages: ct.messages,
               img: "/",
               recipients: memberMap.get(ct.group_id),
@@ -198,6 +205,7 @@ class ChatRoomService {
             "group_id",
             "messages",
             [Sequelize.col("tenant_group.name"), "name"],
+            [Sequelize.col("tenant_group.description"), "description"],
           ],
           include: {
             model: TenantGroups,
@@ -240,6 +248,7 @@ class ChatRoomService {
               return {
                 targetId: groupChat.group_id,
                 targetName: groupChat.name,
+                targetDescription: groupChat.description,
                 img: "/",
                 messages: groupChat.messages,
                 recipients: recipients,
@@ -261,6 +270,7 @@ class ChatRoomService {
         return {
           targetId: targetId,
           targetName: user.frst_name + " " + user.last_name,
+          targetDescription: user.intro,
           img: user.avatar,
           messages: personalChat.messages,
           isGropuChat: false,
