@@ -538,6 +538,8 @@ class GroupController {
         (result) => {
           if (result) {
             res.json(resTemplate.SUCCESS);
+          } else if (result == false) {
+            res.status(404).json(resTemplate.FAIL);
           } else {
             res.status(500).json(resTemplate.DATABASE_ERROR);
           }

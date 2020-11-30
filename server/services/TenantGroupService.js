@@ -636,32 +636,46 @@ class TenantGroupService {
   }
 
   approveListing(userId, groupId, listingId) {
-    return TenantGroupListings.update(
-      {
-        approved_by: Sequelize.fn(
-          "array_append",
-          Sequelize.col("approved_by"),
-          userId
-        ),
+    return TenantGroupListings.findOne({
+      where: {
+        group_id: groupId,
+        listing_id: listingId,
       },
-      {
-        where: {
-          group_id: groupId,
-          listing_id: listingId,
-        },
+    }).then((groupListing) => {
+      if (!groupListing) {
+        return false;
       }
-    )
-      .then((result) => {
-        if (result) {
-          return true;
-        } else {
-          return false;
+      let approvedUsers = new Set(groupListing.approved_by);
+      if (approvedUsers.has(userId)) {
+        return false;
+      }
+      return TenantGroupListings.update(
+        {
+          approved_by: Sequelize.fn(
+            "array_append",
+            Sequelize.col("approved_by"),
+            userId
+          ),
+        },
+        {
+          where: {
+            group_id: groupId,
+            listing_id: listingId,
+          },
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        return undefined;
-      });
+      )
+        .then((result) => {
+          if (result) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          return undefined;
+        });
+    });
   }
 
   withdrawApprove(userId, groupId, listingId) {

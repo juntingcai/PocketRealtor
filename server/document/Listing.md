@@ -22,6 +22,11 @@ POST: localhost:3000/listing/create
         "rent_price": 2500,
         "sale_price" : 999999,
         "bath_rooms" : 2,
+        "image_links": [
+            "link1",
+            "link2",
+            "link3"
+        ],
         "area" : 55000.12,
         "age" : 30,
         "status" : 1
@@ -38,6 +43,7 @@ PUT: localhost:3000/listing/duplicate/:listingId
 ```
 
 ## Update a house listing property(Owner token needed)
+Note: the old image_links will be replaced by new (Not append)
 ```
 PUT: localhost:3000/listing/update
 {   "id": 3004,
@@ -55,6 +61,11 @@ PUT: localhost:3000/listing/update
         "rent_price": 2500,
         "sale_price" : 999999,
         "bath_rooms" : 2,
+        "image_links": [
+            "link1",
+            "link2",
+            "link100"
+        ],
         "area" : 55000.12,
         "age" : 30
     }
