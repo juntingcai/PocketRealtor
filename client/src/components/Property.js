@@ -20,6 +20,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { getConversationId, getUserProfile } from '../utils/functions';
 import { useSocket } from '../context/SocketProvider';
 import { useAlert } from '../context/AlertProvider';
+import { useConversations } from '../context/ConversationsProvider';
 
 /*
     prop : {
@@ -46,9 +47,10 @@ const formatter = new Intl.NumberFormat('en-US', {
 
 
 
-const Property = (props) => {
+const Property = ({ match, history, user, toLogin }) => {
     const socket = useSocket();
     const { setAlert } = useAlert();
+    const { addMessageToConversation } = useConversations();
     const [contactForm, setContectForm] = useState({
         name: "",
         phone: "",
@@ -94,6 +96,7 @@ const Property = (props) => {
     })
 
     const [saler, setSaler] = useState({
+        id: 0,
         email: "",
         firstname: "",
         lastname: "",
@@ -106,7 +109,7 @@ const Property = (props) => {
     })
 
 
-    
+
     const {
         address,
         age,
@@ -139,9 +142,9 @@ const Property = (props) => {
 
     useEffect(() => {
 
-        if (!props.match.params.id)
-            props.history.replace('/');
-        const pid = props.match.params.id;
+        if (!match.params.id)
+            history.replace('/');
+        const pid = match.params.id;
         Axios.get("http://52.53.200.228:3080/listing/" + pid)
             .then(res => {
                 console.log(res)
@@ -150,18 +153,18 @@ const Property = (props) => {
                     ...data,
                     ...res.data,
                     forSale: true,
-                }) 
+                })
 
             })
             .catch(err => {
                 console.error(err);
-                props.history.replace('/');
+                history.replace('/');
             })
 
-        if(owner_id !== 0){
+        if (owner_id !== 0) {
 
             getUserProfile(owner_id).then(owner => {
-                    setSaler(owner)
+                setSaler(owner)
             }).catch(err => alert(err));
 
         }
@@ -174,26 +177,25 @@ const Property = (props) => {
         //     saved: false,
 
         // })
-        if (props.user != null) {
+        if (user.isAuthenticated) {
             setContectForm({
                 ...contactForm,
-                name: props.user.first_name + " " + props.user.last_name,
-                email: props.user.email,
+                name: user.firstname + " " + user.lastname,
             })
         }
 
-    }, [props.isAuth, owner_id])
+    }, [user.isAuthenticated, owner_id])
 
     const onSaveList = () => {
 
-        if (!props.isAuth) {
-            props.toLogin();
+        if (!user.isAuthenticated) {
+            toLogin();
             return;
         }
         if (isFavorite) {
             Axios.delete("http://52.53.200.228:3080/tenant/favorite/" + id)
                 .then(res => {
-                    
+
                     console.log(res);
                     setData({
                         ...data,
@@ -233,23 +235,29 @@ const Property = (props) => {
     }
 
     const submitContactForm = () => {
-        if(!props.isAuth)
-            return
+        if (!user.isAuthenticated) return
         console.log(contactForm);
-        
-        const recipients = [saler, props.user];
-        const conversationId = getConversationId(recipients);
-        const message = {
-            sender: props.user.id,
-            text: content,
-            date: new Date().toString()
-        }
 
-        console.log(conversationId);
-        socket.emit('send-message', {
-            conversationId, recipients, message
+
+        getConversationId(owner_id, id).then(data => {
+            const conversationId = data.conversationId;
+            const message = {
+                senderId: user.id,
+                content: content,
+                date: new Date().toString()
+            }
+            const recipients = [{
+                id: saler.id,
+                firstname: saler.firstname,
+                lastname: saler.lastname,
+                avatar: saler.avatar
+            }]
+            socket.emit('send-message', {
+                conversationId, recipients, message
+            })
+            addMessageToConversation({conversationId, message});
         })
-
+        
     }
 
     const getObjArray = () => {
@@ -362,7 +370,7 @@ const Property = (props) => {
 
 
                                     <div className="name">{"Host by " + saler.nickname}</div>
-                                    <div className="role">{isAgent? "Agent" : "Owner"}</div>
+                                    <div className="role">{isAgent ? "Agent" : "Owner"}</div>
 
                                     <div className="intro">{saler.intro}</div>
 
@@ -388,7 +396,7 @@ const Property = (props) => {
                             <div className="apply">
                                 <div className="type">{type + " for " + (forSale ? "sale" : "rent")}</div>
                                 <div className="price">
-                                    {formatter.format(forSale ? sale_price : rent_price)} 
+                                    {formatter.format(forSale ? sale_price : rent_price)}
                                     {/* <span id="slash">/</span><span id="small">{forSale ? " total" : " month"}</span> */}
 
                                 </div>
@@ -486,13 +494,11 @@ const Property = (props) => {
 
 Property.propTypes = {
     toLogin: PropTypes.func.isRequired,
-    isAuth: PropTypes.bool.isRequired,
-    user: PropTypes.object,
+    user: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-    isAuth: state.auth.isAuthenticated,
-    user: state.auth.user
+    user: state.auth
 });
 
 export default withRouter(connect(mapStateToProps, { toLogin })(Property))

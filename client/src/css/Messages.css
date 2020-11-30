@@ -321,12 +321,24 @@
 
 .message-wrap .right-pane .group>.title{
     width: 100%;
-    text-align: center;
+    text-align: left;
     font-size: 1.5rem;
     font-weight: 500;
     color:  #1b1b25;
 }
 
+.message-wrap .right-pane .group>.sub-title{
+    margin: 1rem 0;
+    width: 100%;
+    text-align: left;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color:  #1b1b25;
+}
+.message-wrap .right-pane .group>.owner .MuiAvatar-root{
+    width: 4rem;
+    height: 4rem;
+}
 .message-wrap .right-pane .member-list{
     margin-top: 1rem;
     display: flex;

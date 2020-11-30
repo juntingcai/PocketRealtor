@@ -37,7 +37,7 @@ export const register = ({ firstname, lastname, email, password }) => async (
       dispatch({
         type: "REGISTER_FAIL",
       });
-    } else {
+    } else if(response.data.code === 10000){
       dispatch({
         type: "REGISTER_SUCCESS",
         payload: response.data,
@@ -70,7 +70,7 @@ export const login = ({ email, password }) => async (dispatch) => {
       dispatch({
         type: "LOGIN_FAIL",
       });
-    } else {
+    } else if(response.data.code === 10000){
       console.log(response)
       dispatch({
         type: "LOGIN_SUCCESS",

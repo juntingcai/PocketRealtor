@@ -2,7 +2,7 @@ import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { connect } from "react-redux";
 import io from 'socket.io-client';
 
-const ioServer = 'http://localhost:5000/';
+const ioServer = 'http://52.53.200.228:3080';
 
 const SocketContext = React.createContext();
 

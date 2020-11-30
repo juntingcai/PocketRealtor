@@ -3,13 +3,15 @@ import React, { Fragment } from "react";
 const NoData = () => {
     const style = {
         display: "flex",
-        alignItem: "center",
+        
+        flexDirection: "column",
+        justifyContent: "center",
         width: "100%",
         height: "100%",
     }
 
     const innerDiv = {
-        textAilgn: "center",
+        textAlign: "center",
         width: "100%",
         fontSize: "2em",
     }

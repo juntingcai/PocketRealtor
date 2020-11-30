@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
+import { get, post } from './axios';
 
 export const toPropertyDetail = (history, id) => {
 
@@ -23,17 +24,28 @@ export const backgroundPicture = (src) => {
     )
 }
 
-export function getConversationId(recipients) {
+export function getConversationId(hostId, listingId) {
     //check if exist
-    const conversationId = uuidv4();
-    return conversationId;
+    return new Promise((resolve, reject) => {
+        axios.get("http://52.53.200.228:3080/conversation/find/?" +
+            "hostId=" + hostId +
+            "&listingId=" + listingId
+        ).then(res => {
+            if (res.data)
+                resolve(res.data)
+            else
+                reject(res.data.msg)
+        }).catch(err => {
+            reject(err);
+        })
+    })
 }
 
 export function getUserProfile(userid) {
     return new Promise((resolve, reject) => {
         axios.get("http://52.53.200.228:3080/user/" + userid)
             .then(res => {
-                if(res.data.data)
+                if (res.data.data)
                     resolve(res.data.data)
                 else
                     reject(res.data.msg)
@@ -47,11 +59,11 @@ export function getGroup(groupId) {
     return new Promise((resolve, reject) => {
         axios.get("http://52.53.200.228:3080/tenant/group/" + groupId)
             .then(res => {
-                if(res.data)
+                if (res.data)
                     resolve(res.data)
                 else
                     reject(res.msg);
-                
+
             })
             .catch(err => {
                 reject(err);
@@ -59,31 +71,35 @@ export function getGroup(groupId) {
     })
 }
 
+// export function getConversations() {
+//     return new Promise((resolve, reject) => {
+//         axios.get("http://52.53.200.228:3080/conversation/all")
+//             .then(res => {
+//                 if (res.data)
+//                     resolve(res.data)
+//                 else
+//                     reject(res.msg)
+
+//             })
+//             .catch(err => {
+//                 reject(err);
+//             })
+//     })
+// }
 export function getConversations() {
-    return new Promise((resolve, reject) => {
-        axios.get("http://52.53.200.228:3080/conversation/all")
-            .then(res => {
-                if(res.data)
-                    resolve(res.data)
-                else
-                    reject(res.msg)
-                
-            })
-            .catch(err => {
-                reject(err);
-            })
-    })
+    return get("conversation/all")
+
 }
 
 export function getProperty(pid) {
     return new Promise((resolve, reject) => {
         axios.get("http://52.53.200.228:3080/listing/" + pid)
             .then(res => {
-                if(res.data){
+                if (res.data) {
                     res.data.image_links[0] = require('../static/noimg.jpg');
                     resolve(res.data);
                 }
-                    
+
                 else
                     reject(res.msg)
             })
@@ -97,10 +113,10 @@ export function getConversation(conversationId) {
     return new Promise((resolve, reject) => {
         axios.get("http://52.53.200.228:3080/conversation/get/" + conversationId)
             .then(res => {
-                if(res.data){
+                if (res.data) {
                     resolve(res.data);
                 }
-                    
+
                 else
                     reject(res.msg)
             })
