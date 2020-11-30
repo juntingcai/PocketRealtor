@@ -68,6 +68,10 @@
 2. Add listingId to personal chat room
 3. Order the chatrooms by the last message
 
+### 11/27
+1. Returns user basic info while login/register
+2. Add more features about [applications](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#applications)
+
 ## Set up
 
 - Input your database's setting in database/config.js

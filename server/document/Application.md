@@ -3,7 +3,7 @@
 A group owner can decide weather the group is going to apply a listing.
 All operations here are token needed
 
-### Apply for a listing as a agroup
+### Apply for a listing as a group
 
 When a gorup owner sends the application, the listing owner will be able to see each members in the group.  
 Also, the listing state (in the group) will be in pending(id = 1).
@@ -17,7 +17,7 @@ POST localhost:3000/tenant/group/listings/apply
 }
 ```
 
-### Update an applicatino
+### Update an application
 
 This route is for group owner to modify description after s/he sent the application.
 
