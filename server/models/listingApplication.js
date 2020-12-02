@@ -1,22 +1,21 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    "tenant_group_listings",
+    "listing_applications",
     {
-      // group id
-      // added by
       // listing id
-      approved_by: {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
+      // group id
+      description: {
+        type: DataTypes.TEXT,
         allowNull: true,
       },
-      state: {
+      state:{
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       }
     },
     {
       underscored: true,
-      timestamps: false,
+      timestamps: true,
       freezeTableName: true,
     }
   );

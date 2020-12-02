@@ -4,6 +4,8 @@ const UserService = require("../services/UserService");
 const ListingService = require("../services/ListingService");
 const HistoryService = require("../services/HistoryService");
 const listings = require("../models/listings");
+const ApplicationService = require("../services/ApplicationService");
+const { application } = require("express");
 
 class ListingController {
   findListings(req, res, next) {
@@ -198,6 +200,31 @@ class ListingController {
       } else {
         res.status(500).json(resTemplate.DATABASE_ERROR);
       }
+    });
+  }
+
+  getListingApplications(req, res) {
+    let user = req.body.user;
+    let listingId = req.params.id;
+
+    if (!user) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    if (!listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    ListingService.verifyListingOwner(user.id, listingId).then((isOwner) => {
+      if (!isOwner) {
+        res.status(403).json(resTemplate.PERMISSION_DENY);
+        return;
+      }
+      ApplicationService.getApplicationsByListingId(listingId).then(
+        (applications) => {
+          res.json(applications);
+        }
+      );
     });
   }
 

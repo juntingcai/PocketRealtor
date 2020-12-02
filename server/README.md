@@ -52,6 +52,26 @@
 ### 11/15
 1. Return "approvers" when viewing listings in a group
 
+### 11/21 
+1. Add createdAt and updatedAt on Listing
+2. Create a new route: [Get Owner's Listings](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-owners-listingstoken-needed)
+
+### 11/22
+1. Add user's id in getUserProfile
+2. Add "isAgent" in getting a listing
+
+### 11/23
+1. Add [chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#chat-room) routes 
+
+### 11/26
+1. Fix typos
+2. Add listingId to personal chat room
+3. Order the chatrooms by the last message
+
+### 11/27
+1. Returns user basic info while login/register
+2. Add more features about [applications](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#applications)
+
 ## Set up
 
 - Input your database's setting in database/config.js
@@ -74,3 +94,4 @@ DEBUG=express-locallibrary-tutorial:* npm run devstart
 
 ## API
 See [documant/Readme.md](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document).
+

@@ -1,8 +1,9 @@
 const resTemplate = require("../static/ResponseTemplate");
 const TenantGroupService = require("../services/TenantGroupService");
 const { User } = require("../models/models");
-const { PERMISSION_DENY } = require("../static/ResponseTemplate");
-const listings = require("../models/listings");
+const GroupMemberState = require("../../common/Constans/GroupMemberState");
+const ListingService = require("../services/ListingService");
+const ApplicationService = require("../services/ApplicationService");
 
 class GroupController {
   // Group CRUD
@@ -114,13 +115,23 @@ class GroupController {
     }
     var group = undefined;
     if (user) {
-      await TenantGroupService.verifyGroupMember(user.id, groupId).then(
-        async (isGroupMember) => {
-          if (isGroupMember) {
+      await TenantGroupService.getGroupMemberState(user.id, groupId).then(
+        async (stateId) => {
+          if (
+            stateId == GroupMemberState.APPROVED.id ||
+            stateId == GroupMemberState.OWNER.id
+          ) {
             await TenantGroupService.getGroupDetail(groupId).then((result) => {
               group = result;
             });
-          } else {
+          } else if (stateId == GroupMemberState.HOUSE_OWNER.id) {
+            await TenantGroupService.getGroupMemberDetail(groupId).then(
+              (result) => {
+                group = result;
+              }
+            );
+          } else if (stateId == undefined) {
+            // guest
             await TenantGroupService.getGroupDescription(groupId).then(
               (result) => {
                 group = result;
@@ -527,6 +538,8 @@ class GroupController {
         (result) => {
           if (result) {
             res.json(resTemplate.SUCCESS);
+          } else if (result == false) {
+            res.status(404).json(resTemplate.FAIL);
           } else {
             res.status(500).json(resTemplate.DATABASE_ERROR);
           }
@@ -626,6 +639,112 @@ class GroupController {
         }
       });
     });
+  }
+
+  groupApplyListing(req, res) {
+    let groupOwner = req.body.user;
+    if (!groupOwner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let groupId = req.body.groupId;
+    let description = req.body.description;
+    let listingId = req.body.listingId;
+    if (!groupId || !listingId || !description || description.length == 0) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(
+      (isOwner) => {
+        if (!isOwner) {
+          res.status(403).json(resTemplate.PERMISSION_DENY);
+          return;
+        }
+        ListingService.getListingById(listingId).then((listing) => {
+          if (!listing) {
+            res.status(404).json(resTemplate.NO_DATA);
+            return;
+          }
+          ApplicationService.applyListing(
+            groupId,
+            listing.owner_id,
+            listingId,
+            description
+          ).then((application) => {
+            if (application) {
+              res.json(resTemplate.SUCCESS);
+            } else {
+              res.status(500).json(resTemplate.DATABASE_ERROR);
+            }
+          });
+        });
+      }
+    );
+  }
+
+  updateApplicationDescription(req, res) {
+    let groupOwner = req.body.user;
+    if (!groupOwner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let groupId = req.body.groupId;
+    let description = req.body.description;
+    let listingId = req.body.listingId;
+    if (!groupId || !listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(
+      (isOwner) => {
+        if (!isOwner) {
+          res.status(403).json(resTemplate.PERMISSION_DENY);
+          return;
+        }
+        ApplicationService.updateApplication(
+          groupId,
+          listingId,
+          description
+        ).then((application) => {
+          if (application) {
+            res.json(resTemplate.SUCCESS);
+          } else {
+            res.status(500).json(resTemplate.DATABASE_ERROR);
+          }
+        });
+      }
+    );
+  }
+
+  deleteApplication(req, res) {
+    let groupOwner = req.body.user;
+    if (!groupOwner) {
+      res.status(401).json(resTemplate.TOKEN_ERR);
+      return;
+    }
+    let groupId = req.body.groupId;
+    let listingId = req.body.listingId;
+    if (!groupId || !listingId) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    }
+    TenantGroupService.verifyGroupOnwer(groupOwner.id, groupId).then(
+      (isOwner) => {
+        if (!isOwner) {
+          res.status(403).json(resTemplate.PERMISSION_DENY);
+          return;
+        }
+        ApplicationService.deleteApplication(groupId, listingId).then(
+          (application) => {
+            if (application) {
+              res.json(resTemplate.SUCCESS);
+            } else {
+              res.status(500).json(resTemplate.DATABASE_ERROR);
+            }
+          }
+        );
+      }
+    );
   }
 
   test(req, res) {

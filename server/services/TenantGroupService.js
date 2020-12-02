@@ -4,11 +4,13 @@ const {
   GroupMembers,
   Listing,
   TenantGroupListings,
+  GroupChatRoom,
+  ListingApplications,
 } = require("../models/models");
-const { Op, Sequelize, where } = require("sequelize");
-
+const { Sequelize } = require("sequelize");
+const { uuid } = require("uuidv4");
 const GroupMemberState = require("../../common/Constans/GroupMemberState");
-const sequelize = require("../database/dbConnection");
+const ApplicationState = require("../../common/Constans/ApplicationState");
 
 class TenantGroupService {
   // owner
@@ -32,6 +34,13 @@ class TenantGroupService {
             user_id: ownerId,
             state: GroupMemberState.OWNER.id,
           });
+          let chatRoomId = uuid();
+          GroupChatRoom.create({
+            id: chatRoomId,
+            group_id: group.id,
+            messages: [],
+          });
+
           return group.id;
         } else {
           return undefined;
@@ -360,6 +369,55 @@ class TenantGroupService {
       });
   }
 
+  getGroupMemberDetail(groupId) {
+    return TenantGroups.findByPk(groupId)
+      .then(async (group) => {
+        if (!group) {
+          console.log("Cannot find the group");
+          return undefined;
+        }
+
+        let groupInfo = {
+          id: group.id,
+          name: group.name,
+          description: group.description,
+        };
+
+        return GroupMembers.findAll({
+          raw: true,
+          attributes: ["user_id"],
+          where: {
+            group_id: group.id,
+            state: [GroupMemberState.APPROVED.id, GroupMemberState.OWNER.id],
+          },
+        }).then((approvedMembers) => {
+          let ids = [];
+          for (var i = 0; i < approvedMembers.length; i++) {
+            ids.push(approvedMembers[i].user_id);
+          }
+          return User.findAll({
+            raw: true,
+            attributes: [
+              "id",
+              ["first_name", "firstname"],
+              ["last_name", "lastname"],
+              "avatar",
+            ],
+            where: {
+              id: ids,
+            },
+          }).then((members) => {
+            groupInfo.members = members;
+            return groupInfo;
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
   getGroupDetail(groupId) {
     return TenantGroups.findByPk(groupId, {
       include: {
@@ -484,31 +542,37 @@ class TenantGroupService {
       time: [date.getHours(), date.getMinutes(), date.getSeconds()].join(":"),
     };
 
-    await User.findByPk(userId).then((user) => {
+    return User.findByPk(userId).then((user) => {
       note.user = {
         id: user.id,
         firstname: user.first_name,
         last_name: user.last_name,
         avatar: user.avatar,
       };
-    });
 
-    return TenantGroups.findByPk(groupId).then((group) => {
-      if (!group) {
-        return false;
-      }
-      let notes = Array.from(group.notes);
-      notes.push(note);
-      group.notes = notes;
-      return group
-        .save()
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          console.log(err);
+      return TenantGroups.findByPk(groupId).then((group) => {
+        if (!group) {
           return false;
-        });
+        }
+
+        return TenantGroups.update(
+          {
+            notes: Sequelize.fn(
+              "array_append",
+              Sequelize.col("notes"),
+              JSON.stringify(note)
+            ),
+          },
+          { where: { id: groupId } }
+        )
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
+      });
     });
   }
 
@@ -529,6 +593,7 @@ class TenantGroupService {
           listing_id: listingId,
           added_user_id: userId,
           approved_by: [],
+          state: ApplicationState.NA.id,
         })
           .then((success) => {
             if (success) {
@@ -545,14 +610,10 @@ class TenantGroupService {
     });
   }
 
-  approveListing(userId, groupId, listingId) {
+  updateListingState(groupId, listingId, stateId) {
     return TenantGroupListings.update(
       {
-        approved_by: Sequelize.fn(
-          "array_append",
-          Sequelize.col("approved_by"),
-          userId
-        ),
+        state: stateId,
       },
       {
         where: {
@@ -561,8 +622,8 @@ class TenantGroupService {
         },
       }
     )
-      .then((result) => {
-        if (result) {
+      .then((success) => {
+        if (success) {
           return true;
         } else {
           return false;
@@ -570,8 +631,51 @@ class TenantGroupService {
       })
       .catch((err) => {
         console.log(err);
-        return undefined;
+        return false;
       });
+  }
+
+  approveListing(userId, groupId, listingId) {
+    return TenantGroupListings.findOne({
+      where: {
+        group_id: groupId,
+        listing_id: listingId,
+      },
+    }).then((groupListing) => {
+      if (!groupListing) {
+        return false;
+      }
+      let approvedUsers = new Set(groupListing.approved_by);
+      if (approvedUsers.has(userId)) {
+        return false;
+      }
+      return TenantGroupListings.update(
+        {
+          approved_by: Sequelize.fn(
+            "array_append",
+            Sequelize.col("approved_by"),
+            userId
+          ),
+        },
+        {
+          where: {
+            group_id: groupId,
+            listing_id: listingId,
+          },
+        }
+      )
+        .then((result) => {
+          if (result) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          return undefined;
+        });
+    });
   }
 
   withdrawApprove(userId, groupId, listingId) {
@@ -634,6 +738,7 @@ class TenantGroupService {
         [Sequelize.col("listing.title"), "name"],
         [Sequelize.col("listing.description"), "description"],
         [Sequelize.col("approved_by"), "approvers"],
+        [Sequelize.col("tenant_group_listings.state"), "state"],
         [
           Sequelize.fn("array_length", Sequelize.col("approved_by"), 1),
           "approvements",
@@ -682,6 +787,20 @@ class TenantGroupService {
       } else {
         return false;
       }
+    });
+  }
+
+  getGroupMemberState(userId, groupId) {
+    return GroupMembers.findOne({
+      where: {
+        user_id: userId,
+        group_id: groupId,
+      },
+    }).then((member) => {
+      if (!member) {
+        return undefined;
+      }
+      return member.state;
     });
   }
 }

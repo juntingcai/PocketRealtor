@@ -133,7 +133,6 @@ router.delete(
   TenantGroup.withdrawApproment
 );
 
-
 router.get(
   "/tenant/group/listings/approved",
   User.verifyToken,
@@ -144,6 +143,24 @@ router.get(
   "/tenant/group/view/listings/:groupId",
   User.verifyToken,
   TenantGroup.getGroupListings
+);
+
+router.post(
+  "/tenant/group/listings/apply",
+  User.verifyToken,
+  TenantGroup.groupApplyListing
+);
+
+router.put(
+  "/tenant/group/listing/application/update",
+  User.verifyToken,
+  TenantGroup.updateApplicationDescription
+);
+
+router.delete(
+  "/tenant/group/listing/application/delete",
+  User.verifyToken,
+  TenantGroup.deleteApplication
 );
 
 module.exports = router;

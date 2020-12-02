@@ -46,4 +46,10 @@ router.delete(
   Listing.verifyHostRole,
   Listing.deleteListing
 );
+
+router.get(
+  "/listing/applications/:id",
+  User.verifyToken,
+  Listing.getListingApplications
+);
 module.exports = router;

@@ -21,7 +21,9 @@ const TenantHistory = require("./tenantHistory")(sequelize, DataTypes);
 const TenantGroups = require("./tenantGroups")(sequelize, DataTypes);
 const GroupMembers = require("./groupMembers")(sequelize, DataTypes);
 const TenantGroupListings = require("./tenantGroupListings")(sequelize, DataTypes);
-
+const ListingApplications = require("./listingApplication")(sequelize, DataTypes);
+const GroupChatRoom = require("./groupChatRoom")(sequelize, DataTypes);
+const PersonalChatRoom = require("./personalChatRooms")(sequelize, DataTypes);
 
 // associate user and zip codes into TenantZipPreference
 User.belongsToMany(UsZipCode, {
@@ -96,8 +98,21 @@ TenantGroupListings.belongsTo(User, {foreignKey: "added_user_id"})
 TenantGroupListings.belongsTo(Listing, {foreignKey: "listing_id"})
 Listing.hasMany(TenantGroupListings, {foreignKey: "listing_id"})
 
+// chat room association
+TenantGroups.hasOne(GroupChatRoom, {foreignKey: "group_id"})
+GroupChatRoom.belongsTo(TenantGroups, {foreignKey: "group_id"})
 
-sequelize.sync({ alter: true }).then(() => {
+// listing <- ListingApplications -> TenantGroups
+Listing.belongsToMany(TenantGroups, {through: ListingApplications, foreignKey: "listing_id"});
+TenantGroups.belongsToMany(Listing, {through: ListingApplications, foreignKey: "group_id"})
+
+ListingApplications.belongsTo(Listing, {foreignKey: "listing_id"})
+Listing.hasMany(ListingApplications, {foreignKey: "listing_id"})
+
+ListingApplications.belongsTo(TenantGroups, {foreignKey: "group_id"})
+TenantGroups.hasMany(ListingApplications, {foreignKey: "group_id"})
+
+sequelize.sync({ alter: false }).then(() => {
   if (config.resetTables) {
     Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
 
@@ -120,5 +135,8 @@ module.exports = {
   TenantHistory,
   TenantGroups,
   GroupMembers,
-  TenantGroupListings
+  TenantGroupListings,
+  GroupChatRoom,
+  PersonalChatRoom,
+  ListingApplications
 };

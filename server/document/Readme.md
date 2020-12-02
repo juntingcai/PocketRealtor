@@ -17,7 +17,7 @@
 * [Delete Listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#delete-a-house-listingowner-token-needed)
 * [Search Listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#search-for-listings)
 * [Get Listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-a-listing)
-
+* [Get Owner's Listings](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-owners-listingstoken-needed)
 
 ### Tenant
 * [Indicate Living Preference](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Tenant.md#add-tenants-living-location-preference-tenant-token-needed)
@@ -62,5 +62,14 @@
 * [Withdraw a approvement](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#withdraw-an-approvement)
 * [View who has approved a listing](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/GroupListing.md#view-who-has-approved-a-listing)
 
+### Chat room
+* [Find or create a personal chat](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#find-or-create-a-personal-chat)
+* [Get all existing chat room for a user](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#get-all-existing-chat-room-for-a-user)
+* [Get a chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#get-a-chat-room)
+* [Send a message](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/ChatRoom.md#send-a-message)
 
-
+### Applications 
+* [Apply for a listing as a group](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#apply-for-a-listing-as-a-group)
+* [Update an application](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#update-an-application)
+* [Delete an application](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#delete-an-application)
+* [Get Applications for each listing (listing owner side)](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Application.md#get-applications-for-each-listing-listing-owner-side)

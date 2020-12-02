@@ -2,6 +2,8 @@ const { Listing, FavoriteListing } = require("../models/models");
 const { Op } = require("sequelize");
 const ListingStatus = require("../../common/Constans/ListingStatus");
 const HouseSearchType = require("../../common/Constans/HouseSearchType");
+const UserService = require("./UserService");
+const RoleType = require("../static/RoleType");
 
 class ListingService {
   findListings(conditions, type) {
@@ -19,7 +21,14 @@ class ListingService {
 
   getListingById(listingId) {
     return Listing.findByPk(listingId, { raw: true }).then((listing) => {
-      return listing;
+      return UserService.getUserRoles(listing.owner_id).then((role) => {
+        if (role.role_id == RoleType.AGENT.id) {
+          listing.isAgent = true;
+        } else {
+          listing.isAgent = false;
+        }
+        return listing;
+      });
     });
   }
 
@@ -83,7 +92,7 @@ class ListingService {
       where: {
         owner_id: ownerId,
       },
-      order: [["created_at"]]
+      order: [["created_at"]],
     })
       .then((listings) => {
         return listings;
