@@ -1,4 +1,4 @@
 module.exports = {
-  listenPort : '3000',
-  resetTables : true
+  listenPort : '3080',
+  resetTables : false
 }

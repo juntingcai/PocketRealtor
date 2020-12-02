@@ -5,15 +5,9 @@ const ChatRoomService = require("../services/ChatRoomService");
  * Module dependencies.
  */
 
-<<<<<<< HEAD
 var app = require('../app');
 var debug = require('debug')('server:server');
 var https = require('https');
-=======
-var app = require("../app");
-var debug = require("debug")("server:server");
-var http = require("http");
->>>>>>> d385a6f1f3c78e974c4cbfd4ad908158a51d641d
 
 /**
  * Get port from environment and store in Express.
@@ -26,11 +20,7 @@ app.set("port", port);
  * Create HTTP server.
  */
 
-<<<<<<< HEAD
 var server = https.createServer(app);
-
-=======
-var server = http.createServer(app);
 var io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -62,7 +52,6 @@ io.on("connection", (socket) => {
     });
   });
 });
->>>>>>> d385a6f1f3c78e974c4cbfd4ad908158a51d641d
 /**
  * Listen on provided port, on all network interfaces.
  */
