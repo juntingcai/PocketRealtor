@@ -15,7 +15,7 @@ var path = require('path');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || config.listenPort);
+var port = normalizePort(process.env.PORT || config.https_listenPort);
 app.set("port", port);
 
 const privateKey = fs.readFileSync(path.resolve(config.privary_key_pem), 'utf8');
