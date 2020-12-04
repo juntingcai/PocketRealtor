@@ -18,9 +18,9 @@ var path = require('path');
 var port = normalizePort(process.env.PORT || config.listenPort);
 app.set("port", port);
 
-const privateKey = fs.readFileSync(path.resolve('/etc/letsencrypt/live/pocket-realtor.chickenkiller.com/privkey.pem'), 'utf8');
-const certificate = fs.readFileSync(path.resolve('/etc/letsencrypt/live/pocket-realtor.chickenkiller.com/cert.pem'), 'utf8');
-const ca = fs.readFileSync(path.resolve('/etc/letsencrypt/live/pocket-realtor.chickenkiller.com/chain.pem'), 'utf8');
+const privateKey = fs.readFileSync(path.resolve(config.privary_key_pem), 'utf8');
+const certificate = fs.readFileSync(path.resolve(config.cert_pem), 'utf8');
+const ca = fs.readFileSync(path.resolve(config.chain_pem), 'utf8');
 
 const credentials = {
 	key: privateKey,
@@ -38,7 +38,7 @@ httpServer.listen(80, () => {
 
 const server = https.createServer(credentials, app);
 
-var io = require("socket.io")(server, {
+var io = require("socket.io")(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],

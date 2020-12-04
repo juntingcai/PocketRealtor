@@ -229,13 +229,13 @@ class UserController {
     const token = req.header("Authorization");
     jwt.verify(token, constant.jwtsecret, function (err, decoded) {
       if (err) {
-        res.json(resTemplate.TOKEN_ERR);
+        res.status(403).json(resTemplate.TOKEN_ERR);
         return;
       } else {
         // check user info
         let decodedUser = decoded.user;
         if (!decodedUser) {
-          res.json(resTemplate.TOKEN_ERR);
+          res.status(403).json(resTemplate.TOKEN_ERR);
           return;
         }
 
@@ -245,7 +245,7 @@ class UserController {
 
         if (!userId || !email || !pwdHash) {
           console.log("Token Fields Missed");
-          res.json(resTemplate.TOKEN_ERR);
+          res.status(403).json(resTemplate.TOKEN_ERR);
           return;
         }
 
