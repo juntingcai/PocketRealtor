@@ -15,15 +15,16 @@ if (!config.http.enable && !config.https.enable){
   throw "You need to enable one of http or https";
 }
 
-var server = null
+var server = null;
+var port = 0;
 if(config.http.enable){
   const http = require('http')
-  const port = config.http.port
+  port = config.http.port
   app.set("port", port);
   server = http.createServer(app);
 }else{
   const https = require('https')
-  const port = config.https.port
+  port = config.https.port
   const privateKey = fs.readFileSync(path.resolve(config.https.privary_key_pem), 'utf8');
   const certificate = fs.readFileSync(path.resolve(config.https.cert_pem), 'utf8');
   const ca = fs.readFileSync(path.resolve(config.https.chain_pem), 'utf8');
