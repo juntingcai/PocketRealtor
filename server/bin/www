@@ -20,7 +20,7 @@ if(config.http.enable){
   const http = require('http')
   const port = config.http.port
   app.set("port", port);
-  server = https.createServer(app);
+  server = http.createServer(app);
 }else{
   const https = require('https')
   const port = config.https.port
