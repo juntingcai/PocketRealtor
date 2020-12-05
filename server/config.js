@@ -1,7 +1,7 @@
 module.exports = {
-  http_port: 80,
-  https_listenPort: 443,
-  alterTables: false,
+  
+  resetTables: false, // This will clean up all tables data
+  alterTables: true,
   http: {
     enable: true,
     port: 80,

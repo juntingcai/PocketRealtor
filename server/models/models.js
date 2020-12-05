@@ -112,7 +112,7 @@ Listing.hasMany(ListingApplications, {foreignKey: "listing_id"})
 ListingApplications.belongsTo(TenantGroups, {foreignKey: "group_id"})
 TenantGroups.hasMany(ListingApplications, {foreignKey: "group_id"})
 
-sequelize.sync({ alter: false }).then(() => {
+sequelize.sync({ alter: config.alterTables, force: config.resetTables }).then(() => {
   if (config.resetTables) {
     Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
 
