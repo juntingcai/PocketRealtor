@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { toPropertyDetail, backgroundPicture, getGroup } from '../../utils/functions';
+import { toPropertyDetail, backgroundPicture, getGroup, getPropDetail} from '../../utils/functions';
 import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import Loading from '../../utils/Loading';
-import { getProperty } from '../../utils/functions';
 import { useConversations } from '../../context/ConversationsProvider';
 import { useAlert } from '../../context/AlertProvider';
 import NoData from '../../utils/NoData';
 
 
-function useDetail(curConversation) {
+function useDetail(curConversation, selectConversationIndex) {
     const [state, setState] = useState({ status: 'loading' })
 
     useEffect(() => {
@@ -22,7 +21,7 @@ function useDetail(curConversation) {
 
         if (!curConversation.detail) {
 
-            (curConversation.isGroupChat ? getGroup(curConversation.targetId) : getProperty(curConversation.listingId))
+            (curConversation.isGroupChat ? getGroup(curConversation.targetId) : getPropDetail(curConversation.listingId))
                 .then(detail => {
                     console.log(detail)
                     //setData(conversation.conversationId, 'detail', data)
@@ -33,7 +32,7 @@ function useDetail(curConversation) {
 
         return () => setState({ status: 'loading' })
 
-    }, [curConversation])
+    }, [selectConversationIndex])
 
     return state
 }
@@ -44,9 +43,9 @@ const DetailPane = ({ history }) => {
 
     //const [detail, setDetail] = useState(null);
 
-    const { curConversation } = useConversations();
+    const { curConversation, selectConversationIndex } = useConversations();
 
-    const detail = useDetail(curConversation)
+    const detail = useDetail(curConversation, selectConversationIndex)
     // useEffect(() => {
     //     setDetail(null);
     //     if(!curConversation || curConversation === null) return;

@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
-import { get, post } from './axios';
+import { get, post, axioDelete, put } from './axios';
 
 export const toPropertyDetail = (history, id) => {
 
@@ -25,30 +25,35 @@ export const backgroundPicture = (src) => {
 }
 
 export function getConversationId(hostId, listingId) {
-    //check if exist
-    return new Promise((resolve, reject) => {
-        axios.get("http://52.53.200.228:3080/conversation/find/?" +
-            "hostId=" + hostId +
-            "&listingId=" + listingId
-        ).then(res => {
-            if (res.data)
-                resolve(res.data)
-            else
-                reject(res.data.msg)
-        }).catch(err => {
-            reject(err);
-        })
-    })
+
+    const params = {
+        hostId: hostId,
+        listingId: listingId
+    }
+    return get("conversation/find/", params);
+        
+    //     axios.get("http://52.53.200.228:3080/conversation/find/?" +
+    //         "hostId=" + hostId +
+    //         "&listingId=" + listingId
+    //     ).then(res => {
+    //         if (res.data)
+    //             resolve(res.data)
+    //         else
+    //             reject(res.data.msg)
+    //     }).catch(err => {
+    //         reject(err);
+    //     })
+    // })
 }
 
 export function getUserProfile(userid) {
     return new Promise((resolve, reject) => {
-        axios.get("http://52.53.200.228:3080/user/" + userid)
+        get("user/" + userid)
             .then(res => {
-                if (res.data.data)
-                    resolve(res.data.data)
+                if (res.data)
+                    resolve(res.data)
                 else
-                    reject(res.data.msg)
+                    reject(res.msg)
             })
             .catch(err => {
                 reject(err);
@@ -56,19 +61,8 @@ export function getUserProfile(userid) {
     })
 }
 export function getGroup(groupId) {
-    return new Promise((resolve, reject) => {
-        axios.get("http://52.53.200.228:3080/tenant/group/" + groupId)
-            .then(res => {
-                if (res.data)
-                    resolve(res.data)
-                else
-                    reject(res.msg);
-
-            })
-            .catch(err => {
-                reject(err);
-            })
-    })
+    return get("tenant/group/" + groupId)
+            
 }
 
 // export function getConversations() {
@@ -88,7 +82,6 @@ export function getGroup(groupId) {
 // }
 export function getConversations() {
     return get("conversation/all")
-
 }
 
 export function getProperty(pid) {
@@ -110,19 +103,65 @@ export function getProperty(pid) {
 }
 
 export function getConversation(conversationId) {
-    return new Promise((resolve, reject) => {
-        axios.get("http://52.53.200.228:3080/conversation/get/" + conversationId)
-            .then(res => {
-                if (res.data) {
-                    resolve(res.data);
-                }
+    return get("conversation/get/" + conversationId);
+}
 
-                else
-                    reject(res.msg)
+
+
+export function loginUser(email, password) {
+
+    const body = JSON.stringify({ email, password });
+
+    return post('user/login', body);
+};
+
+export function registerUser(firstname, lastname, email, password) {
+
+    const body = JSON.stringify({ firstname, lastname, email, password });
+
+    return post('user/register', body);
+}
+
+export function searchProperties(searchProps) {
+    const param = {
+        ...searchProps,
+    }
+    if (param.maxPrice === 0) {
+        delete param.minPrice;
+        delete param.maxPrice;
+    }
+    if (param.bedrooms === 0)
+        delete param.bedrooms;
+    if (param.bathrooms === 0)
+        delete param.bathrooms;
+
+    return get('listings', param);
+}
+
+export function getPropDetail(pid) {
+    return new Promise((resolve, reject) => {
+        get("listing/" + pid)
+            .then(data => {
+                console.log(data)
+                data.image_links[0] = require('../static/noimg.jpg');
+                resolve(data);
+
             })
             .catch(err => {
+                console.log(err)
                 reject(err);
             })
     })
 }
+
+export function addFavorite(id) {
+
+    return put('tenant/favorite/' + id);
+}
+
+export function deleteFavorite(id) {
+
+    return axioDelete('tenant/favorite/' + id);
+}
+
 

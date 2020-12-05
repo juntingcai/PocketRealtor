@@ -13,11 +13,11 @@ import PhoneRoundedIcon from '@material-ui/icons/PhoneRounded';
 import EmailRoundedIcon from '@material-ui/icons/EmailRounded';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Map from './propertyMap';
+import Map from './GoogleMap';
 import { toLogin } from '../actions/dialog';
 import Axios from 'axios';
 import Avatar from '@material-ui/core/Avatar';
-import { getConversationId, getUserProfile } from '../utils/functions';
+import { getConversationId, getUserProfile, getPropDetail, addFavorite, deleteFavorite } from '../utils/functions';
 import { useSocket } from '../context/SocketProvider';
 import { useAlert } from '../context/AlertProvider';
 import { useConversations } from '../context/ConversationsProvider';
@@ -145,21 +145,18 @@ const Property = ({ match, history, user, toLogin }) => {
         if (!match.params.id)
             history.replace('/');
         const pid = match.params.id;
-        Axios.get("http://52.53.200.228:3080/listing/" + pid)
-            .then(res => {
-                console.log(res)
-                res.data.image_links[0] = require('../static/noimg.jpg');
-                setData({
-                    ...data,
-                    ...res.data,
-                    forSale: true,
-                })
-
+        const type = 1;
+        getPropDetail(pid).then(res => {
+            setData({
+                ...data,
+                ...res,
+                forSale: type === 1,
             })
-            .catch(err => {
-                console.error(err);
-                history.replace('/');
-            })
+        }).catch(err => {
+            console.error(err);
+            history.replace('/');
+        })
+        
 
         if (owner_id !== 0) {
 
@@ -192,37 +189,15 @@ const Property = ({ match, history, user, toLogin }) => {
             toLogin();
             return;
         }
-        if (isFavorite) {
-            Axios.delete("http://52.53.200.228:3080/tenant/favorite/" + id)
-                .then(res => {
 
-                    console.log(res);
-                    setData({
-                        ...data,
-                        isFavorite: false
-                    })
-                    setAlert(2, 'Successful!')
-
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-        }
-        else {
-            Axios.put("http://52.53.200.228:3080/tenant/favorite/" + id)
-                .then(res => {
-                    console.log(res);
-                    setData({
-                        ...data,
-                        isFavorite: true
-                    })
-                    setAlert(2, 'Successful!')
-
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-        }
+        (isFavorite ? deleteFavorite(id) : addFavorite(id)).then(res => {
+            console.log(res)
+            setData({
+                ...data,
+                isFavorite: !isFavorite
+            })
+            setAlert(2, 'Successful!')
+        })
 
     }
 

@@ -17,7 +17,7 @@ import { set } from 'date-fns/esm';
 import NoData from '../../utils/NoData';
 //import { useAtom } from '../../utils/useAtom';
 
-function useRecipients(conversation, user) {
+function useRecipients(conversation, selectConversationIndex, user) {
     const [state, setState] = useState({ status: 'loading' })
 
     useEffect(() => {
@@ -61,7 +61,7 @@ function useRecipients(conversation, user) {
 
         }
 
-    }, [conversation])
+    }, [selectConversationIndex])
 
     return state
 }
@@ -79,7 +79,7 @@ const ChatPane = ({ user }) => {
     }, [])
 
     const { curConversation, selectConversationIndex, addMessageToConversation } = useConversations();
-    const recipientsState = useRecipients(curConversation, user);
+    const recipientsState = useRecipients(curConversation, selectConversationIndex, user);
 
 
     const submitMessage = (e) => {
@@ -94,6 +94,9 @@ const ChatPane = ({ user }) => {
         socket.emit('send-message', { conversationId: curConversation.conversationId, recipients: recipientsState.recipients, message });
 
         addMessageToConversation({ conversationId: curConversation.conversationId, message });
+
+        setInput("");
+
     }
 
     const Message = (message, index) => {

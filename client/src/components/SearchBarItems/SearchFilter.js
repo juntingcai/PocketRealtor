@@ -2,13 +2,37 @@ import React, { Fragment, useState } from 'react';
 import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import NumberFormatCustom from '../../functions/NumberFomat'
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import '../../SearchFilter.css'
+import NumberFormat from 'react-number-format';
+
+const NumberFormatCustom = (props) => {
+
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          },
+        });
+      }}
+      thousandSeparator
+      isNumericString
+      prefix="$"
+    />
+  );
+}
+
 const SearchFilter = (props) => {
 
 
