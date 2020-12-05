@@ -1,44 +1,41 @@
 #!/usr/bin/env node
 const config = require("../config");
 const ChatRoomService = require("../services/ChatRoomService");
-/**
- * Module dependencies.
- */
-
 var app = require('../app');
 var debug = require('debug')('server:server');
-var https = require('https');
-var http = require('http')
 var fs = require('fs');
 var path = require('path');
-/**
- * Get port from environment and store in Express.
- */
 
-var port = normalizePort(process.env.PORT || config.https_listenPort);
-app.set("port", port);
 
-const privateKey = fs.readFileSync(path.resolve(config.privary_key_pem), 'utf8');
-const certificate = fs.readFileSync(path.resolve(config.cert_pem), 'utf8');
-const ca = fs.readFileSync(path.resolve(config.chain_pem), 'utf8');
+if (config.http.enable && config.https.enable){
+  throw "You cannot enable http and https at the same time";
+}
 
-const credentials = {
-	key: privateKey,
-	cert: certificate,
-	ca: ca
-};
+if (!config.http.enable && !config.https.enable){
+  throw "You need to enable one of http or https";
+}
 
-const httpServer = http.createServer(app);
-httpServer.listen(80, () => {
-	console.log('HTTP Server running on port 80');
-});
-/**
- * Create HTTP server.
- */
-
-const server = https.createServer(credentials, app);
-
-var io = require("socket.io")(httpServer, {
+var server = null
+if(config.http.enable){
+  const http = require('http')
+  const port = config.http.port
+  app.set("port", port);
+  server = https.createServer(app);
+}else{
+  const https = require('https')
+  const port = config.https.port
+  const privateKey = fs.readFileSync(path.resolve(config.https.privary_key_pem), 'utf8');
+  const certificate = fs.readFileSync(path.resolve(config.https.cert_pem), 'utf8');
+  const ca = fs.readFileSync(path.resolve(config.https.chain_pem), 'utf8');
+  app.set("port", port);
+  const credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+  };
+  server = https.createServer(credentials, app);
+}
+var io = require("socket.io")(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -49,7 +46,6 @@ io.on("connection", (socket) => {
   const id = socket.handshake.query.id;
   socket.join(id);
   console.log(id);
-
   socket.on("send-message", ({ conversationId, recipients, message }) => {
     console.log(conversationId, recipients, message);
     //add message to conversation on database
@@ -58,9 +54,7 @@ io.on("connection", (socket) => {
         console.log("sending to " + recipient.id);
         console.log(conversationId);
         console.log(message);
-
         const room = recipient.id.toString();
-
         socket.broadcast.to(room).emit("receive-message", {
           conversationId,
           message,
@@ -69,33 +63,15 @@ io.on("connection", (socket) => {
     });
   });
 });
+
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
-/**
- * Normalize a port into a number, string, or false.
- */
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
 
 /**
  * Event listener for HTTP server "error" event.
