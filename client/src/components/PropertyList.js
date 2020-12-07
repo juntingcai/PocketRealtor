@@ -1,9 +1,10 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import ListItem from './ListItem'
-import Map from './propertyMap';
+import Map from './GoogleMap';
 import SearchFilter from './SearchBarItems/SearchFilter'
 import PlaceAutoComplete from './PlaceAutoComplete'
+import { searchProperties } from '../utils/functions';
 import axios from "axios";
 import {
     geocodeByAddress,
@@ -11,74 +12,50 @@ import {
 } from 'react-places-autocomplete';
 
 import './../css/List.css';
+import ClockType from '@material-ui/pickers/constants/ClockType';
+import Loading from '../utils/Loading';
 
 const PropertyList = (props) => {
 
 
-    const [list, setList] = useState(Array);
+    const [list, setList] = useState([]);
     const [placeValue, setPlaceValue] = useState('');
-    const [inputValue, setInputValue] = useState({
-        addr: '',
+    const [searchProps, setSearchProps] = useState({
+        //const [inputValue, setInputValue] = useState({
+        addr: null,
         lat: 0,
         lng: 0,
         radius: 10,
         type: 0,
         minPrice: 0,
         maxPrice: 0,
-        numBedrm: 0,
-        numbatrm: 0,
+        bedrooms: 0,
+        bathrooms: 0,
     });
 
 
-
-    const fetchProperties = (address, type) => {
-        var lat, lng
+    const setAddrProps = (address, type) => {
+        if (!address || address === null) return;
         geocodeByAddress(address)
             .then(results => getLatLng(results[0]))
             .then(latLng => {
-                lat = latLng.lat;
-                lng = latLng.lng;
-                setInputValue({
-                    ...inputValue,
+                setSearchProps({
+                    ...searchProps,
+                    type: type,
                     addr: address,
-                    lat: lat,
-                    lng: lng,
+                    lat: latLng.lat,
+                    lng: latLng.lng,
                 })
-                console.log(inputValue.lat, inputValue.lng)
-
             })
             .catch(error => {
-
-                setInputValue({
-                    ...inputValue,
+                setSearchProps({
+                    ...searchProps,
+                    type: 0,
                     addr: "San Francisco, CA, USA",
                     lat: 37.7448,
                     lng: -122.425
                 })
-
-                console.error('Fetch Geocode Error: ' + address, error);
-            }).finally(() => {
-                //http://52.53.200.228:3080
-                var url = "http://52.53.200.228:3080/listings" +
-                    "?type=" + type +
-                    "&lat=" + lat +
-                    "&lng=" + lng +
-                    "&radius=" + inputValue.radius;
-                if (inputValue.minPrice != 0 && inputValue.maxPrice != 0) {
-                    url += "&minPrice=" + inputValue.minPrice + "&maxPrice=" + inputValue.maxPrice;
-                }
-                if (inputValue.numBedrm != 0)
-                    url += "&bedrooms=" + inputValue.numBedrm;
-                if (inputValue.numbatrm != 0)
-                    url += "&bathrooms=" + inputValue.numbatrm;
-                console.log(url)
-                axios.get(url)
-                    .then((res) => {
-                        if (res.data)
-                            setList(res.data)
-                    }).catch((err) => {
-                        console.log(err);
-                    })
+                console.error(error);
             })
     }
 
@@ -86,89 +63,85 @@ const PropertyList = (props) => {
     useEffect(() => {
         console.log("history: " + props.history.location.state.address)
         console.log("type: " + props.history.location.state.type)
-        var setType = (props.history.location.state.type) ? props.history.location.state.type : 0;
-        var setAddr = (props.history.location.state.address) ? props.history.location.state.address : 'San Francisco, CA, USA';
-        setInputValue({
-            ...inputValue,
-            addr: setAddr,
-            type: setType
-        });
-
-        setPlaceValue(setAddr);
-        console.log("setAddr: " + props.history.location.state.address)
-        fetchProperties(setAddr, setType);
-
-
-    }, [])
+        if (searchProps.addr === null) {
+            const type = props.history.location.state.type;
+            const address = props.history.location.state.address;
+            setAddrProps(address, type);
+        }
+        if (searchProps.addr !== null)
+            searchProperties(searchProps).then(list => setList(list));
+    }, [searchProps])
 
 
     const simpleAddr = () => {
         var res = "Properties in ";
-        var index = inputValue.addr.indexOf(",");
+        var index = searchProps.addr.indexOf(",");
         if (index == -1)
-            return res + inputValue.addr;
+            return res + searchProps.addr;
         else
-            return res + inputValue.addr.substring(0, index);
+            return res + searchProps.addr.substring(0, index);
 
     }
 
 
-    const onSearch = async () => {
-
-        fetchProperties(placeValue);
+    const onSearch = () => {
+        setAddrProps(placeValue, searchProps.type);
     }
     const onSelectPrice = (min, max) => {
         console.log(min, max);
-        setInputValue({
-            ...inputValue,
+        setSearchProps({
+            ...searchProps,
             minPrice: parseInt(min),
             maxPrice: parseInt(max)
         })
     }
     const onSelectRoom = (bed, bath) => {
         console.log(bed, bath);
-        setInputValue({
-            ...inputValue,
-            numBedrm: bed,
-            numbatrm: bath
+        setSearchProps({
+            ...searchProps,
+            bedrooms: bed,
+            bathrooms: bath
         })
     }
 
     return (
         <Fragment>
+
             <div id="property-list">
-                <div className="search-bar-wrap">
-                    <div className="place-input-box">
-                        <div className="place-input-box-wrap">
-                            <PlaceAutoComplete value={placeValue} setValue={setPlaceValue} />
+                {searchProps.addr === null ? <Loading /> : <>
+                    <div className="search-bar-wrap">
+                        <div className="place-input-box">
+                            <div className="place-input-box-wrap">
+                                <PlaceAutoComplete value={placeValue} setValue={setPlaceValue} />
+                            </div>
+                        </div>
+
+                        <SearchFilter onSelectPrice={onSelectPrice} onSelectRoom={onSelectRoom} />
+
+
+                        <Button variant="contained" onClick={onSearch} className="theme-color-bg" disableElevation>
+                            Search
+                    </Button>
+                    </div>
+                    <div className="content-wrap">
+                        <div className="map-wrap">
+                            <Map data={{
+                                lat: searchProps.lat,
+                                lng: searchProps.lng,
+                                list: list,
+                                zoom: 12,
+                            }} />
+                        </div>
+                        <div className="list-wrap">
+                            <div className="title">{simpleAddr()}</div>
+                            {
+                                list.map(item => (
+                                    <ListItem key={item.id} data={item} sale={true} />
+                                ))
+                            }
                         </div>
                     </div>
-
-                    <SearchFilter onSelectPrice={onSelectPrice} onSelectRoom={onSelectRoom} />
-
-
-                    <Button variant="contained" onClick={onSearch} className="theme-color-bg" disableElevation>
-                        Search
-                    </Button>
-                </div>
-                <div className="content-wrap">
-                    <div className="map-wrap">
-                        <Map data={{
-                            lat: inputValue.lat,
-                            lng: inputValue.lng,
-                            list: list,
-                            zoom: 12,
-                        }} />
-                    </div>
-                    <div className="list-wrap">
-                        <div className="title">{simpleAddr()}</div>
-                        {
-                            list.map(item => (
-                                <ListItem key={item.id} data={item} sale={true} />
-                            ))
-                        }
-                    </div>
-                </div>
+                </>}
             </div>
 
         </Fragment>

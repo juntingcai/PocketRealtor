@@ -17,7 +17,7 @@ import { set } from 'date-fns/esm';
 import NoData from '../../utils/NoData';
 //import { useAtom } from '../../utils/useAtom';
 
-function useRecipients(conversation, user) {
+function useRecipients(conversation, selectConversationIndex, user) {
     const [state, setState] = useState({ status: 'loading' })
 
     useEffect(() => {
@@ -37,7 +37,7 @@ function useRecipients(conversation, user) {
                             lastname: data.lastname,
                             avatar: data.avatar
                         }];
-                        console.log("1111", conversation.targetId, recipients)
+                        //console.log("1111", conversation.targetId, recipients)
                         setState({ status: 'ready', recipients })
 
                     }).catch(error => setState({ status: 'aborted', error }));
@@ -61,13 +61,14 @@ function useRecipients(conversation, user) {
 
         }
 
-    }, [conversation.targetId])
+    }, [selectConversationIndex])
 
     return state
 }
 
 
 const ChatPane = ({ user }) => {
+    //console.log(user)
     const socket = useSocket();
     //const [recipients, setRecipients] = useState(null);
     const [input, setInput] = useState("");
@@ -77,8 +78,8 @@ const ChatPane = ({ user }) => {
         }
     }, [])
 
-    const { curConversation, addMessageToConversation } = useConversations();
-    const recipientsState = useRecipients(curConversation, user);
+    const { curConversation, selectConversationIndex, addMessageToConversation } = useConversations();
+    const recipientsState = useRecipients(curConversation, selectConversationIndex, user);
 
 
     const submitMessage = (e) => {
@@ -93,16 +94,22 @@ const ChatPane = ({ user }) => {
         socket.emit('send-message', { conversationId: curConversation.conversationId, recipients: recipientsState.recipients, message });
 
         addMessageToConversation({ conversationId: curConversation.conversationId, message });
+
+        setInput("");
+
     }
 
     const Message = (message, index) => {
-
+        //console.log("message: ", message);
+        //console.log("recipients: ", recipientsState);
         const isLastMessage = (index === curConversation.messages.length - 1)
         const isUser = message.senderId === user.id;
         const sender = isUser ? user : recipientsState.recipients.find(recipient => {
             return recipient.id === message.senderId;
         })
-
+        //console.log("sender: ", sender);
+        if(!sender)
+            return;
         const style = {
             display: "flex",
             flexDirection: isUser ? "row-reverse" : "row",
@@ -207,6 +214,7 @@ const ChatPane = ({ user }) => {
             { recipientsState.status === 'aborted' && <NoData />}
             { recipientsState.status === 'ready' &&
                 <>
+                {console.log(recipientsState)}
                     <div className="title">
                         {curConversation.targetName}
                     </div>

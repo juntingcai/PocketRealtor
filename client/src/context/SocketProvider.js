@@ -2,7 +2,7 @@ import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { connect } from "react-redux";
 import io from 'socket.io-client';
 
-const ioServer = 'http://localhost:5000/';
+const ioServer = 'https://pocketxrealtor.ddns.net';
 
 const SocketContext = React.createContext();
 
@@ -25,7 +25,6 @@ const SocketProvider = ({ userid, children }) => {
                 }
             }
         )
-
         setSocket(newSocket);
 
         return () => newSocket.close();

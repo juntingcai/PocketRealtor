@@ -36,7 +36,6 @@ const ConversationsPane = () => {
         if (messages.length === 0 || !conversation.targetName.includes(searchChat))
             return
         const lastMessage = messages[messages.length - 1];
-        console.log(lastMessage)
         const curDate = new Date();
         const lastUpdateDate = new Date(lastMessage.date);
         const background = {

@@ -39,6 +39,7 @@ const ConversationsProvider = ({ isAuth, children }) => {
             })
             if (createConversation) {
                 getConversation(conversationId).then(res => {
+                    console.log(res)
                     newConversations.push(res);
                 })
             }
@@ -55,7 +56,7 @@ const ConversationsProvider = ({ isAuth, children }) => {
             getConversations().then(conversations => {
                 console.log(conversations)
                 setConversations(conversations);
-            })
+            }).catch(err => console.log(err));
         }
         
         if(!socket || socket === null) return;
@@ -66,9 +67,11 @@ const ConversationsProvider = ({ isAuth, children }) => {
 
     }, [isAuth, socket])
 
+
     const value = {
         conversations: conversations,
         curConversation: conversations[selectConversationIndex],
+        selectConversationIndex,
         setSelectConversationIndex,
         addMessageToConversation,
 

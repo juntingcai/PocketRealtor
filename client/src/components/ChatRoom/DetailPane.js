@@ -1,76 +1,115 @@
 import React, { useEffect, useState } from 'react';
-import { toPropertyDetail, backgroundPicture, getGroup } from '../../utils/functions';
+import { toPropertyDetail, backgroundPicture, getGroup, getPropDetail} from '../../utils/functions';
 import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import Loading from '../../utils/Loading';
-import { getProperty } from '../../utils/functions';
 import { useConversations } from '../../context/ConversationsProvider';
 import { useAlert } from '../../context/AlertProvider';
-const test_property = {
-    img: require('../../static/noimg.jpg'),
-    title: "Seashore great house",
-    city: "San Francisco",
-    state: "CA",
-    zipcode: "94116",
-    price: "312322",
-    id: 50003,
-    rooms: 3,
-    bath_rooms: 2,
-    area: 2200,
-};
+import NoData from '../../utils/NoData';
+
+
+function useDetail(curConversation, selectConversationIndex) {
+    const [state, setState] = useState({ status: 'loading' })
+
+    useEffect(() => {
+        if (state.status !== 'loading') {
+            setState({ status: 'loading' })
+        }
+
+        if (!curConversation || curConversation === null) return;
+
+        if (!curConversation.detail) {
+
+            (curConversation.isGroupChat ? getGroup(curConversation.targetId) : getPropDetail(curConversation.listingId))
+                .then(detail => {
+                    console.log(detail)
+                    //setData(conversation.conversationId, 'detail', data)
+                    setState({ status: 'ready', section: (curConversation.isGroupChat ? 1 : 2), data: detail });
+                }).catch(err => setState({ status: 'aborted', err }));
+
+        }
+
+        return () => setState({ status: 'loading' })
+
+    }, [selectConversationIndex])
+
+    return state
+}
 
 
 const DetailPane = ({ history }) => {
     const { setAlert } = useAlert();
 
-    const [detail, setDetail] = useState(null);
+    //const [detail, setDetail] = useState(null);
 
-    const { curConversation } = useConversations();
+    const { curConversation, selectConversationIndex } = useConversations();
 
-    useEffect(() => {
-        if(!curConversation || curConversation === null) return;
+    const detail = useDetail(curConversation, selectConversationIndex)
+    // useEffect(() => {
+    //     setDetail(null);
+    //     if(!curConversation || curConversation === null) return;
 
-        if (!curConversation.detail) {
+    //     if (!curConversation.detail) {
 
-            (curConversation.isGroupChat ? getGroup(curConversation.targetId) : getProperty(curConversation.targetId))
-                .then(data => {
-                    console.log(data)
-                    //setData(conversation.conversationId, 'detail', data)
-                    setDetail(data)
-                }).catch(err => setAlert(0, err));
+    //         (curConversation.isGroupChat ? getGroup(curConversation.targetId) : getProperty(curConversation.targetId))
+    //             .then(data => {
+    //                 console.log(data)
+    //                 //setData(conversation.conversationId, 'detail', data)
+    //                 setDetail(data)
+    //             }).catch(err => setAlert(0, err));
 
-        }
-        else {
-            
-            setDetail(curConversation.detail);
-        }
+    //     }
+    //     else {
 
-    }, [curConversation])
+    //         setDetail(curConversation.detail);
+    //     }
 
-    
+    // }, [curConversation])
+
+
     return (
 
         <div className="right-pane pane">
-            {detail === null ? <Loading /> : <>
-                <div className="title">
-                    Detail
-                </div>
+            <div className="title"> Detail </div>
 
-                <div className="detail">
-                    {/* {curConversation.isGroupChat ?
-                        <>
-                            <div className="member-block">
-                                <div className="group">
-                                    <div className="title">
-                                        Group Members
-                                    </div>
-                                    <div className="member-list">
-                                        {recipients.map((person, index) => (
+            <div className="detail">
+
+                {detail.status === 'loading' && <Loading />}
+                {detail.status === 'aborted' && <NoData />}
+                {detail.status === 'ready' && detail.section === 1 && <>
+
+                    <div className="member-block">
+                        <div className="group">
+                            <div className="title">
+                                {curConversation.targetName}
+                            </div>
+                            <div className="group-intro">
+                                {curConversation.targetDescription}
+                            </div>
+
+                            <div className="sub-title">
+                                Group Owner
+                            </div>
+                            <div className="owner">
+
+                                <Avatar alt="" src={detail.data.owner.avatar} />
+                                <div className="owner-info">
+                                    <div className="name">{detail.data.owner.firstname + " " + detail.data.owner.lastname}</div>
+                                    <div>Owner</div>
+                                </div>
+                            </div>
+
+
+                            <div className="sub-title">
+                                Group Members
+                            </div>
+                            <div className="member-list">
+                                        {detail.data.members.map((person, index) => (
                                             <div className="member-card" key={index}>
                                                 <Avatar alt="" src={person.avatar} />
                                                 <div className="name">
-                                                    {person.nickname}
+                                                    {person.firstname + " " + person.lastname}
                                                 </div>
                                             </div>
                                         ))}
@@ -79,58 +118,57 @@ const DetailPane = ({ history }) => {
                                         <Button variant="outlined" >Group Detail</Button>
 
                                     </div>
-                                </div>
-                            </div>
-                        </> : <>
-                            <div className="member-block">
-                                <div className="person">
+                        </div>
+                    </div>
+                </>}
+                {detail.status === 'ready' && detail.section === 2 && <>
+                    <div className="member-block">
+                        <div className="person">
 
-                                    <div className="info">
-                                        <Avatar alt="" src={recipent.avatar} />
-                                        <div className="name-role">
-                                            <div className="name">{recipent.nickname}</div>
-                                            <div className="role">{recipent.role === 1 ? "Tenant" : "Host"}</div>
-                                        </div>
-
-                                    </div>
-                                    <div className="intro-title">
-                                        {"About " + recipent.nickname}
-                                    </div>
-                                    <div className="intro">{recipent.intro}</div>
-                                </div>
-                            </div>
-                            <div className="property-block">
-                                <div className="title">
-                                    {"Relative Property"}
+                            <div className="info">
+                                <Avatar alt="" src={curConversation.img} />
+                                <div className="name-role">
+                                    <div className="name">{curConversation.targetName}</div>
+                                    <div className="role">{curConversation.targetId === detail.data.owner_id ? "Host" : "Tenant"}</div>
                                 </div>
 
-                                <div className="img">
-                                    {backgroundPicture(require('../../static/noimg.jpg'))}
-                                </div>
-                                <div className="info">
-                                    <div className="title">
-                                        {property.title}
-                                    </div>
-                                    <div className="address">
-                                        {property.city + ", " + property.state + ", " + property.zipcode}
-                                    </div>
-                                    <div className="property-rooms">
-                                        <span>{property.rooms} bedrooms</span>
-                                        <div className="divider" />
-                                        <span>{property.bath_rooms} baths</span>
-                                        <div className="divider" />
-                                        <span>{property.area} sqft</span>
-                                    </div>
-                                </div>
-                                <div className="detail-btn">
-                                    <Button variant="outlined" onClick={() => toPropertyDetail(history, property.id)}>View Detail</Button>
-                                </div>
                             </div>
-                        </>
-                    } */}
-                </div>
-            </>}
-        </div>
+                            <div className="intro-title">
+                                {"About " + curConversation.targetName}
+                            </div>
+                            <div className="intro">{curConversation.targetDescription}</div>
+                        </div>
+                    </div>
+                    <div className="property-block">
+                        <div className="title">
+                            {"Relative Property"}
+                        </div>
+
+                        <div className="img">
+                            {backgroundPicture(detail.data.image_links[0])}
+                        </div>
+                        <div className="info">
+                            <div className="title">
+                                {detail.data.title}
+                            </div>
+                            <div className="address">
+                                {detail.data.city + ", " + detail.data.state + " " + detail.data.zip_code}
+                            </div>
+                            <div className="property-rooms">
+                                <span>{detail.data.rooms} bedrooms</span>
+                                <div className="divider" />
+                                <span>{detail.data.bath_rooms} baths</span>
+                                <div className="divider" />
+                                <span>{detail.data.area} sqft</span>
+                            </div>
+                        </div>
+                        <div className="detail-btn">
+                            <Button variant="outlined" onClick={() => toPropertyDetail(history, detail.data.id)}>View Detail</Button>
+                        </div>
+                    </div>
+                </>}
+            </div>
+        </div >
 
     )
 }

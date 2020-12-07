@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { connect } from "react-redux";
-import { getCurrentProfile } from "../../actions/profile";
 import Loading from "../../utils/Loading";
 import '../../TenantTable.css';
 import {URL} from "../../utils/constants"
@@ -55,4 +54,4 @@ const mapStateToProps = (state) => ({
   profile: state.profile,
 });
 
-export default connect(mapStateToProps, { getCurrentProfile })(Tenants);
+export default connect(mapStateToProps)(Tenants);
