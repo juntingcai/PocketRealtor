@@ -2,132 +2,111 @@ const RoleType = require("../static/RoleType");
 const crypto = require("crypto");
 const constant = require("../static/Constant");
 const { User, UserRole } = require("../models/models");
-const resTemplate = require("../static/ResponseTemplate");
 const jwt = require("jsonwebtoken");
+const config = require("../config");
 class UserService {
-  register(user, res) {
-    let email = user.email;
-    var password = user.password;
-    let firstname = user.firstname;
-    let lastname = user.lastname;
-
-    User.count({ where: { email: email } })
-      .then((cnt) => {
-        if (cnt > 0) {
-          res.json(resTemplate.EMAIL_EXIST);
-          return;
-        }
-        // generate salt
-        let salt = crypto.randomBytes(16).toString("hex");
-        // hash password with salt
-        let hashedPassword = hashPassword(salt, password);
-
-        let newUser = {
-          email: email,
-          password_salt: salt,
-          password_hashed: hashedPassword,
-          first_name: firstname,
-          last_name: lastname,
-        };
-
-        User.create(newUser)
-          .then((user) => {
-            let token = generateAuthToken({
-              id: user.id,
-              email: user.email,
-              hash: hashedPassword,
-            });
-            let resSuccess = {
-              code: resTemplate.SUCCESS.code,
-              msg: resTemplate.SUCCESS.msg,
-              token: token,
-              id: user.id,
-              firstname: user.first_name,
-              lastname: user.last_name,
-              avatar: "",
-            };
-            res.json(resSuccess);
-            return;
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status.send(err);
-            return;
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send(err);
-        return;
-      });
+  isEamilExist(email) {
+    return User.count({ where: { email: email } }).then((cnt) => {
+      if (cnt > 0) {
+        return true;
+      }
+      return false;
+    });
   }
 
-  login(email, password, res) {
-    User.findOne({ where: { email: email } }).then((user) => {
-      if (!user) {
-        res.status(404).json(resTemplate.USER_NOT_EXIST);
-        return;
-      }
+  register(user) {
+    var password = user.password;
+    let salt = crypto.randomBytes(16).toString("hex");
+    let hashedPassword = hashPassword(salt, password);
 
-      let salt = user.password_salt;
-      let hashedPassword = hashPassword(salt, password);
-      if (hashedPassword === user.password_hashed) {
+    let newUser = {
+      email: user.email,
+      password_salt: salt,
+      password_hashed: hashedPassword,
+      first_name: user.firstname,
+      last_name: user.lastname,
+    };
+
+    return User.create(newUser)
+      .then((user) => {
         let token = generateAuthToken({
           id: user.id,
           email: user.email,
           hash: hashedPassword,
         });
-        let resSuccess = {
-          code: resTemplate.SUCCESS.code,
-          msg: resTemplate.SUCCESS.msg,
+        return {
           token: token,
           id: user.id,
           firstname: user.first_name,
           lastname: user.last_name,
-          avatar: user.avatar,
+          avatar: "",
         };
-        res.json(resSuccess);
-        return;
-      } else {
-        res.status(404).json(resTemplate.USER_NOT_EXIST);
-        return;
-      }
-    });
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
   }
 
-  updatePassword(userId, oldPwd, newPwd, res) {
-    User.findByPk(userId)
+  login(email, password) {
+    return User.findOne({ where: { email: email } })
       .then((user) => {
         if (!user) {
-          res.json(resTemplate.NO_DATA);
-          return;
+          return false;
+        }
+        let salt = user.password_salt;
+        let hashedPassword = hashPassword(salt, password);
+        if (hashedPassword === user.password_hashed) {
+          let token = generateAuthToken({
+            id: user.id,
+            email: user.email,
+            hash: hashedPassword,
+          });
+          return {
+            token: token,
+            id: user.id,
+            firstname: user.first_name,
+            lastname: user.last_name,
+            avatar: user.avatar,
+          };
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        return undefined;
+      });
+  }
+
+  updatePassword(userId, oldPwd, newPwd) {
+    return User.findByPk(userId)
+      .then((user) => {
+        if (!user) {
+          return false;
         }
 
         let salt = user.password_salt;
         // check old password
         if (user.password_hashed !== hashPassword(salt, oldPwd)) {
-          res.json(resTemplate.INCORRECT_PASSWORD);
-          return;
+          return false;
         }
         // check new password
         if (!isPasswordLegal(newPwd)) {
-          res.json(resTemplate.INVALID_PASSWORD);
-          return;
+          return false;
         }
         let newHashedPwd = hashPassword(salt, newPwd);
         user.password_hashed = newHashedPwd;
         user.save().then(() => {
-          res.json(resTemplate.SUCCESS);
+          return true;
         });
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).send(err);
+        return undefined;
       });
   }
 
-  updateRole(userId, roleType, res) {
-    UserRole.destroy({ where: { user_id: userId } })
+  updateRole(userId, roleType) {
+    return UserRole.destroy({ where: { user_id: userId } })
       .then(() => {
         if (roleType.isHost && roleType.isRenter) {
           UserRole.bulkCreate([
@@ -156,28 +135,29 @@ class UserService {
             role_id: RoleType.AGENT.id,
           });
         }
-        res.json(resTemplate.SUCCESS);
+        return true;
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).send(err);
+        return undefined;
       });
   }
 
-  updateProfile(userId, profile, res) {
-    User.update(profile, { where: { id: userId } })
+  updateProfile(userId, profile) {
+    return User.update(profile, { where: { id: userId } })
       .then((user) => {
-        res.json(resTemplate.SUCCESS);
+        if (user) {
+          return true;
+        } else {
+          return false;
+        }
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500);
-        return;
+        return undefined;
       });
   }
 
-  async getUserById(userId) {
-    return await User.findByPk(userId, {
+  getUserById(userId) {
+    return User.findByPk(userId, {
       attributes: [
         "id",
         "email",
@@ -192,11 +172,7 @@ class UserService {
       ],
     })
       .then((user) => {
-        if (user) {
-          return user;
-        } else {
-          return undefined;
-        }
+        return user;
       })
       .catch((err) => {
         console.log(err);
@@ -266,7 +242,7 @@ class UserService {
 
 const generateAuthToken = function (user) {
   let token = jwt.sign({ user: user }, constant.jwtsecret, {
-    expiresIn: "1d", // expire in a day
+    expiresIn: config.token_expire, // expire in a day
   });
   return token;
 };

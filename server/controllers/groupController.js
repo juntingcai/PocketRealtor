@@ -29,7 +29,9 @@ class GroupController {
 
     TenantGroupService.createGroup(user.id, groupInfo).then((result) => {
       if (result) {
-        res.json({ code: 10000, msg: "Request Success", groupId: result });
+        res.json(
+          Object.assign({}, resTemplate.SUCCESS, { data: { groupId: result } })
+        );
       } else {
         res.status(500).json(resTemplate.DATABASE_ERROR);
       }
@@ -147,7 +149,7 @@ class GroupController {
     }
 
     if (group) {
-      res.json(group);
+      res.json(Object.assign({}, resTemplate.SUCCESS, { data: group }));
     } else {
       res.status(404).json(resTemplate.NO_DATA);
     }
@@ -158,7 +160,7 @@ class GroupController {
       if (groups == undefined) {
         res.status(500).json(resTemplate.DATABASE_ERROR);
       }
-      res.json(groups);
+      res.json(Object.assign({}, resTemplate.SUCCESS, { data: groups }));
     });
   }
 
@@ -171,7 +173,7 @@ class GroupController {
     }
     TenantGroupService.getUserGroupList(user.id).then((result) => {
       if (result) {
-        res.json(result);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
       } else {
         res.status(500).json(resTemplate.DATABASE_ERROR);
       }
@@ -362,7 +364,7 @@ class GroupController {
           res.status(500).json(resTemplate.DATABASE_ERROR);
           return;
         }
-        res.json(result);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
       });
     });
   }
@@ -380,7 +382,7 @@ class GroupController {
           res.status(500).json(resTemplate.DATABASE_ERROR);
           return;
         }
-        res.json(result);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
       })
       .catch((err) => {
         console.log(err);
@@ -466,7 +468,7 @@ class GroupController {
           res.status(500).json(resTemplate.DATABASE_ERROR);
           return;
         }
-        res.json(result);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
       });
     });
   }
@@ -482,7 +484,7 @@ class GroupController {
         res.status(500).json(resTemplate.DATABASE_ERROR);
         return;
       }
-      res.json(invitations);
+      res.json(Object.assign({}, resTemplate.SUCCESS, { data: invitations }));
     });
   }
 
@@ -594,7 +596,7 @@ class GroupController {
       TenantGroupService.getApprovedMember(groupId, listingId).then(
         (result) => {
           if (result) {
-            res.json(result);
+            res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
           } else {
             res.status(500).json(resTemplate.DATABASE_ERROR);
           }
@@ -633,7 +635,7 @@ class GroupController {
               listing.isApproved = false;
             }
           }
-          res.json(listings);
+          res.json(Object.assign({}, resTemplate.SUCCESS, { data: listings }));
         } else {
           res.status(500).json(resTemplate.DATABASE_ERROR);
         }
@@ -747,11 +749,6 @@ class GroupController {
     );
   }
 
-  test(req, res) {
-    TenantGroupService.addListingToGroup(300, 9, 500).then((result) => {
-      res.json(result);
-    });
-  }
 }
 
 module.exports = new GroupController();

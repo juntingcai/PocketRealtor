@@ -2,7 +2,7 @@ module.exports = {
   db: "postgres",
   user: "postgres",
   password: "TheAdminPassword",
-  host: "pocket-realtor-db-dev.cbydt3tkf2qi.us-west-1.rds.amazonaws.com",
+  host: "pocket-realtor-dev-db.cp3pptnzl7vf.us-west-1.rds.amazonaws.com",
   port: 5432,
   dialect: "postgres",
   pool: {

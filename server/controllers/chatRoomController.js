@@ -1,4 +1,3 @@
-const groupChatRoom = require("../models/groupChatRoom");
 const resTemplate = require("../static/ResponseTemplate");
 const { isUuid } = require("uuidv4");
 const ChatRoomService = require("../services/ChatRoomService");
@@ -26,17 +25,21 @@ class ChatRoomController {
             listingId
           ).then((chatroomId) => {
             if (chatroomId) {
-              res.json({
-                conversationId: chatroomId,
-                targetId: targetId,
-                listingId: listingId,
-              });
+              res.json(
+                Object.assign({}, resTemplate.SUCCESS, {
+                  data: {
+                    conversationId: chatroomId,
+                    targetId: targetId,
+                    listingId: listingId,
+                  },
+                })
+              );
             } else {
               res.status(404).json(resTemplate.DATABASE_ERROR);
             }
           });
         } else {
-          res.status(404).send("The user does not own the listing");
+          res.status(403).send(resTemplate.PERMISSION_DENY);
         }
       }
     );
@@ -75,7 +78,7 @@ class ChatRoomController {
             return 1;
           }
         });
-        res.json(result);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
       });
     });
   }
@@ -95,7 +98,7 @@ class ChatRoomController {
 
     ChatRoomService.getChatRoom(user.id, chatroomId).then((chatroom) => {
       if (chatroom) {
-        res.json(chatroom);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: chatroom }));
       } else {
         res.status(500).json(resTemplate.DATABASE_ERROR);
       }

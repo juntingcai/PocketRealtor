@@ -3,9 +3,7 @@ const RoleType = require("../static/RoleType");
 const UserService = require("../services/UserService");
 const ListingService = require("../services/ListingService");
 const HistoryService = require("../services/HistoryService");
-const listings = require("../models/listings");
 const ApplicationService = require("../services/ApplicationService");
-const { application } = require("express");
 
 class ListingController {
   findListings(req, res, next) {
@@ -15,7 +13,7 @@ class ListingController {
       !req.query.radius ||
       !req.query.type
     ) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
     let latitude = parseFloat(req.query.lat);
@@ -51,7 +49,7 @@ class ListingController {
             listing.image_links = listing.image_links[0];
           }
         }
-        res.json(listings);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: listings }));
       } else {
         res.status(404).json(resTemplate.NO_DATA);
       }
@@ -82,14 +80,14 @@ class ListingController {
                 } else {
                   listing.isFavorite = false;
                 }
-                res.json(listing);
+                res.json(Object.assign({}, resTemplate.SUCCESS, { data: listing }));
                 return;
               }
             );
             HistoryService.viewListing(user.id, listingId);
           } else {
             listing.isFavorite = false;
-            res.json(listing);
+            res.json(Object.assign({}, resTemplate.SUCCESS, { data: listing }));
             return;
           }
         } else {
@@ -105,7 +103,7 @@ class ListingController {
       ListingService.createListing(req.body.user.id, property).then(
         (result) => {
           if (result) {
-            res.json(result);
+            res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
           } else {
             res.status(500).json(resTemplate.DATABASE_ERROR);
           }
@@ -127,7 +125,7 @@ class ListingController {
         res.status(500).json(resTemplate.DATABASE_ERROR);
         return;
       }
-      res.json(listings);
+      res.json(Object.assign({}, resTemplate.SUCCESS, { data: listings }));
     });
   }
 
@@ -137,7 +135,7 @@ class ListingController {
     if (listingId) {
       ListingService.duplicateListing(user.id, listingId).then((result) => {
         if (result) {
-          res.json(result);
+          res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
         } else if (result == false) {
           res.status(404).json(resTemplate.NO_DATA);
         } else {
@@ -222,7 +220,7 @@ class ListingController {
       }
       ApplicationService.getApplicationsByListingId(listingId).then(
         (applications) => {
-          res.json(applications);
+          res.json(Object.assign({}, resTemplate.SUCCESS, { data: applications }));
         }
       );
     });
@@ -244,7 +242,7 @@ class ListingController {
         if (result) {
           res.json(resTemplate.SUCCESS);
         } else {
-          res.json(resTemplate.FAIL);
+          res.status(500).json(resTemplate.FAIL);
         }
       });
     });
@@ -260,7 +258,7 @@ class ListingController {
       if (result) {
         next();
       } else {
-        res.json(resTemplate.PERMISSION_DENY);
+        res.status(403).json(resTemplate.PERMISSION_DENY);
       }
     });
   }

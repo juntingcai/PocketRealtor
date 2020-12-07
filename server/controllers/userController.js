@@ -15,28 +15,39 @@ class UserController {
     let firstname = req.body.firstname;
     let lastname = req.body.lastname;
     if (!email || !password || !firstname || !lastname) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
 
     if (!isEmailLegal(email)) {
-      res.json(resTemplate.INVALID_EMAIL);
+      res.status(400).json(resTemplate.INVALID_EMAIL);
       return;
     }
 
     if (!isPasswordLegal(password)) {
-      res.json(resTemplate.INVALID_PASSWORD);
+      res.status(400).json(resTemplate.INVALID_PASSWORD);
       return;
     }
 
-    let user = {
-      email: email,
-      password: password,
-      firstname: firstname,
-      lastname: lastname,
-    };
-
-    UserService.register(user, res);
+    UserService.isEamilExist(email).then((exist) => {
+      if (exist) {
+        res.status(409).json(resTemplate.EMAIL_EXIST);
+        return;
+      }
+      let user = {
+        email: email,
+        password: password,
+        firstname: firstname,
+        lastname: lastname,
+      };
+      UserService.register(user).then((result) => {
+        if (result) {
+          res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
+        } else {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+        }
+      });
+    });
   }
 
   login(req, res, next) {
@@ -44,11 +55,25 @@ class UserController {
     let password = req.body.password;
 
     if (!email || !password) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
+    UserService.isEamilExist(email).then((exist) => {
+      if (!exist) {
+        res.status(404).json(resTemplate.USER_NOT_EXIST);
+        return;
+      }
 
-    UserService.login(email, password, res);
+      UserService.login(email, password).then((result) => {
+        if (result == false) {
+          res.status(404).json(resTemplate.USER_NOT_EXIST);
+        } else if (result == undefined) {
+          res.status(500).json(resTemplate.DATABASE_ERROR);
+        } else {
+          res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
+        }
+      });
+    });
   }
 
   // just for dev
@@ -71,10 +96,16 @@ class UserController {
     };
 
     if (!roleType.isHost && !roleType.isRenter && !roleType.isAgent) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
-    UserService.updateRole(reqUser.id, roleType, res);
+    UserService.updateRole(reqUser.id, roleType).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(500).json(resTemplate.FAIL);
+      }
+    });
   }
 
   updatePassword(req, res, next) {
@@ -89,10 +120,18 @@ class UserController {
     }
 
     if (!userId || !oldPwd || !newPwd) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
-    UserService.updatePassword(userId, oldPwd, newPwd, res);
+    UserService.updatePassword(userId, oldPwd, newPwd).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else if (result == false) {
+        res.status(400).json(resTemplate.INVALID_PASSWORD);
+      } else if (result == undefined) {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+      }
+    });
   }
 
   updateProfile(req, res, next) {
@@ -140,7 +179,15 @@ class UserController {
       profile.occupation = occupation;
     }
 
-    UserService.updateProfile(reqUserId, profile, res);
+    UserService.updateProfile(reqUserId, profile).then((result) => {
+      if (result) {
+        res.json(resTemplate.SUCCESS);
+      } else if (result == false) {
+        res.status(400).json(resTemplate.FAIL);
+      } else if (result == undefined) {
+        res.status(500).json(resTemplate.DATABASE_ERROR);
+      }
+    });
   }
 
   getUserProfile(req, res, next) {
@@ -151,13 +198,13 @@ class UserController {
     }
 
     if (!userId) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
 
     UserService.getUserById(userId).then(async (user) => {
       if (!user) {
-        res.json(resTemplate.USER_NOT_EXIST);
+        res.status(404).json(resTemplate.USER_NOT_EXIST);
         return;
       }
       let responseBody = { data: user };
@@ -171,7 +218,7 @@ class UserController {
           HistoryService.viewTenant(req.body.user.id, userId);
         }
       }
-      res.json(responseBody);
+      res.json(Object.assign({}, resTemplate.SUCCESS, { data: responseBody }));
     });
   }
 
@@ -179,7 +226,7 @@ class UserController {
     let userId = req.params.userId;
 
     if (!userId) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(400).json(resTemplate.MISS_FIELD);
       return;
     }
 
@@ -202,7 +249,7 @@ class UserController {
           }
         }
 
-        res.json(userrole);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: userrole }));
       })
       .catch((err) => {
         console.log(err);
@@ -252,7 +299,7 @@ class UserController {
         UserService.isUserValid(userId, email, pwdHash)
           .then((user) => {
             if (!user) {
-              res.json(resTemplate.TOKEN_ERR);
+              res.status(401).json(resTemplate.TOKEN_ERR);
               return;
             }
             req.body.user = user;
@@ -267,9 +314,8 @@ class UserController {
   }
 
   interpretToken(req, res, next) {
-    
-    const token = req.header("Authorization");
-    if (!token) {
+    let token = req.header("Authorization");
+    if (token == undefined) {
       next();
     }
     jwt.verify(token, constant.jwtsecret, function (err, decoded) {

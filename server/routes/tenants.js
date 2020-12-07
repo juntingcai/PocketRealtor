@@ -51,6 +51,4 @@ router.get(
   Tenant.getFavoriteListings
 );
 
-router.get("/test", Tenant.test);
-
 module.exports = router;

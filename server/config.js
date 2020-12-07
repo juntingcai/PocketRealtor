@@ -1,5 +1,4 @@
 module.exports = {
-  
   resetTables: false, // This will clean up all tables data
   alterTables: true,
   http: {
@@ -13,4 +12,5 @@ module.exports = {
     cert_pem: "",
     chain_pem: "",
   },
+  token_expire : "3d",
 };

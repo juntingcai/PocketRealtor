@@ -10,7 +10,7 @@ class TenantController {
     let user = req.body.user;
     let zip = req.params.zip;
     if (!zip) {
-      res.json(res.json(resTemplate.MISS_FIELD));
+      res.status(400).json(resTemplate.MISS_FIELD);
     }
     TenantService.addZipPreference(user.id, zip.toString(), res);
   }
@@ -22,20 +22,20 @@ class TenantController {
 
     if (zipcodes !== undefined) {
       if (!Array.isArray(zipcodes)) {
-        res.json(resTemplate.INVALID_ZIP_CODE);
+        res.status(404).json(resTemplate.INVALID_ZIP_CODE);
         return;
       } else {
         TenantService.updateZipPreference(user.id, zipcodes, res);
       }
     } else if (cities !== undefined) {
       if (!Array.isArray(cities)) {
-        res.json(resTemplate.INVALID_INPUT);
+        res.status(404).json(resTemplate.INVALID_INPUT);
         return;
       } else {
         TenantService.updateCityPreference(user.id, cities, res);
       }
     } else {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(404).json(resTemplate.MISS_FIELD);
     }
   }
 
@@ -71,7 +71,7 @@ class TenantController {
     let listingId = req.params.listingId;
 
     if (!user || !listingId) {
-      res.json(resTemplate.MISS_FIELD);
+      res.status(404).json(resTemplate.MISS_FIELD);
       return;
     }
 
@@ -115,9 +115,9 @@ class TenantController {
 
     TenantService.getUserFavoriteListings(userId).then((favorites) => {
       if (favorites) {
-        res.json(favorites);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: favorites }));
       } else {
-        res.json([]);
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: [] }));
       }
     });
   }
@@ -132,17 +132,11 @@ class TenantController {
       if (result) {
         next();
       } else {
-        res.json(resTemplate.PERMISSION_DENY);
+        res.status(403).json(resTemplate.PERMISSION_DENY);
       }
     });
   }
 
-  //===========
-  test(req, res) {
-    TenantGroupService.withdrawApprove(302, 9, 500).then((ressult) => {
-      res.json(ressult);
-    });
-  }
 }
 
 module.exports = new TenantController();
