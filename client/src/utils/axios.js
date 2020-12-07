@@ -1,6 +1,4 @@
 import axios from 'axios';
-import QS from 'qs';
-import { useAlert } from '../context/AlertProvider';
 import store from '../store';
 import { setAlert } from "../actions/alert";
 
@@ -38,10 +36,12 @@ axios.interceptors.request.use(
 // response interceptor
 axios.interceptors.response.use(    
     response => {        
-        if (response.status === 200) {            
-            return Promise.resolve(response);        
-        } else {            
-            return Promise.reject(response);        
+        if (response.status === 200 && response.data.code === 10000) {
+            return Promise.resolve(response.data);
+        } else {     
+            if(response.data.msg)
+                store.dispatch(setAlert(response.data.msg, "error"));         
+            return Promise.reject(response);
         }    
     },
     // not 200  
@@ -111,14 +111,12 @@ axios.interceptors.response.use(
  */
 export function get(url, params){    
     return new Promise((resolve, reject) =>{        
-        axios.get(url, {            
-            params: params        
-        })        
+        axios.get(url, { params: params })
         .then(res => {            
             resolve(res.data);        
         })        
         .catch(err => {            
-            reject(err)        
+            reject(err);
         })    
     });
 }
@@ -134,7 +132,7 @@ export function post(url, params) {
             resolve(res.data);        
         })        
         .catch(err => {            
-            reject(err)        
+            reject(err);
         })    
     });
 }
@@ -148,7 +146,7 @@ export function axioDelete(url, params) {
             resolve(res.data);        
         })        
         .catch(err => {            
-            reject(err)        
+            reject(err);
         })    
     });
 }
@@ -160,7 +158,7 @@ export function put(url, params) {
             resolve(res.data);        
         })        
         .catch(err => {            
-            reject(err)        
+            reject(err);
         })    
     });
 }

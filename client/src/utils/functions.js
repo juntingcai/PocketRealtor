@@ -47,19 +47,10 @@ export function getConversationId(hostId, listingId) {
 }
 
 export function getUserProfile(userid) {
-    return new Promise((resolve, reject) => {
-        get("user/" + userid)
-            .then(res => {
-                if (res.data)
-                    resolve(res.data)
-                else
-                    reject(res.msg)
-            })
-            .catch(err => {
-                reject(err);
-            })
-    })
+    return get("user/" + userid)
 }
+
+
 export function getGroup(groupId) {
     return get("tenant/group/" + groupId)
             
@@ -164,4 +155,26 @@ export function deleteFavorite(id) {
     return axioDelete('tenant/favorite/' + id);
 }
 
+export function getUserPreference(userid){
+    return get('tenant/preference/' + userid);
+}
 
+export function getUserRole(userid){
+    return get('user/role/' + userid);
+}
+
+export function updateUserRole(role){
+    return put('user/updateRole', role);
+}
+export function updateAvatar(avatar){
+    return put('user/updateAvatar', {
+        "avatar": avatar,
+      });
+}
+
+export function updateUserProfile(profile){
+    return put(
+          'user/updateProfile',
+          profile,
+        );
+}

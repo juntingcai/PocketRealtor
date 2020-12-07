@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link, withRouter, Redirect } from "react-router-dom";
-import { updateProfile, getCurrentProfile } from "../../actions/profile";
+
 import axios from "axios";
 import {URL} from "../../utils/constants"
 import Container from '@material-ui/core/Container';
@@ -10,14 +10,10 @@ import Container from '@material-ui/core/Container';
 import {Input, Button, TextField, Select} from "@material-ui/core"
 
 const CreateListingPage = ({
-  // profile: { profile, loading },
-  // updateProfile,
-  // getCurrentProfile,
   history,
   userId,
 }) => {
-  // console.log("profile++");
-  // console.log(profile);
+  
   const [formData, setFormData] = useState({
     user_id: null,
     title: "",
@@ -457,18 +453,13 @@ const CreateListingPage = ({
 };
 
 CreateListingPage.propTypes = {
-  updateProfile: PropTypes.func.isRequired,
-  getCurrentProfile: PropTypes.func.isRequired,
-  profile: PropTypes.object.isRequired,
+  
   userId: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  profile: state.profile,
+  
   userId: state.auth.id,
 });
 
-export default connect(mapStateToProps, {
-  updateProfile,
-  getCurrentProfile,
-})(withRouter(CreateListingPage));
+export default connect(mapStateToProps)(withRouter(CreateListingPage));

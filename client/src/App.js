@@ -53,7 +53,7 @@ function App() {
                       <PrivateRoute exact path="/createlisting" component={CreateListingPage} />
 
                       <PrivateRoute exact path="/sell" component={CreateListing} />
-                      <PrivateRoute exact path="/findtenants" component={FindTenants} />
+                      {/* <PrivateRoute exact path="/findtenants" component={FindTenants} /> */}
                       <PrivateRoute exact path="/myprofile" component={EditProfile} />
                       <PrivateRoute exact path="/savedlist" component={SavedList} />
                       <Route exact path="/property/:id" component={Property} />
