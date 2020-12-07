@@ -11,54 +11,51 @@ const RoleType = require("../static/RoleType");
 const zipCodeUtil = require("../utils/ZipCodeUtil");
 
 class TenantService {
-  updateZipPreference(userId, zips, res) {
-    console.log(zips);
+  updateZipPreference(userId, zips) {
     for (var i = 0; i < zips.length; i++) {
       let zip = zips[i];
       if (!zipCodeUtil.isZipCodeValid(zip)) {
-        console.log(zip + " is not valid");
-        res.json(resTemplate.INVALID_ZIP_CODE);
-        return;
+        return false;
       }
     }
-
-    TenantZipPreference.destroy({ where: { user_id: userId } }).then(() => {
-      console.log(zips);
-      var data = [];
-      for (var i = 0; i < zips.length; i++) {
-        let zip = zips[i];
-        let row = { user_id: userId, zip_code: zip };
-        data.push(row);
-      }
-      TenantZipPreference.bulkCreate(data).then(() => {
-        res.json(resTemplate.SUCCESS);
+    return TenantZipPreference.destroy({ where: { user_id: userId } })
+      .then(() => {
+        var data = [];
+        for (var i = 0; i < zips.length; i++) {
+          let zip = zips[i];
+          let row = { user_id: userId, zip_code: zip };
+          data.push(row);
+        }
+        return TenantZipPreference.bulkCreate(data).then(() => {
+          return true;
+        });
+      })
+      .catch((err) => {
+        return undefined;
       });
-    });
   }
 
-  addZipPreference(userId, zip, res) {
+  addZipPreference(userId, zip) {
     if (!zipCodeUtil.isZipCodeValid(zip)) {
-      res.json(resTemplate.INVALID_ZIP_CODE);
-      return;
+      return false;
     }
-
-    TenantZipPreference.findOne({
+    return TenantZipPreference.findOne({
       where: { user_id: userId, zip_code: zip },
     }).then((row) => {
       if (row) {
-        res.json(resTemplate.SUCCESS);
+        return true;
       } else {
-        TenantZipPreference.create({
+        return TenantZipPreference.create({
           user_id: userId,
           zip_code: zip,
         }).then(() => {
-          res.json(resTemplate.SUCCESS);
+          return true;
         });
       }
     });
   }
 
-  updateCityPreference(userId, cities, res) {
+  updateCityPreference(userId, cities) {
     var preferredZips = [];
     for (var i = 0; i < cities.length; i++) {
       let city = cities[i];
@@ -69,23 +66,22 @@ class TenantService {
         preferredZips = preferredZips.concat(zipcodes);
       }
     }
-    this.updateZipPreference(userId, preferredZips, res);
+    return this.updateZipPreference(userId, preferredZips);
   }
 
-  addCityPreference(userId, city, state, res) {
+  addCityPreference(userId, city, state) {
     if (zipCodeUtil.isCityStateValid(city, state)) {
-      this.updateZipPreference(
+      return this.updateZipPreference(
         userId,
-        zipCodeUtil.getZipCodesByCityState(city, state),
-        res
+        zipCodeUtil.getZipCodesByCityState(city, state)
       );
     } else {
-      res.json(resTemplate.NO_DATA);
+      return undefined;
     }
   }
 
-  getTenantPreference(userId, res) {
-    TenantZipPreference.findAll({
+  getTenantPreference(userId) {
+    return TenantZipPreference.findAll({
       attributes: ["zip_code"],
       where: { user_id: userId },
       row: true,
@@ -101,20 +97,19 @@ class TenantService {
         }
         zips.sort((a, b) => a - b);
         let sortedCity = Array.from(citySet).sort();
-        res.json({
+        return {
           userId: userId,
           preferedZips: zips,
           preferredCities: sortedCity,
-        });
+        };
       })
       .catch((err) => {
-        console.log(err);
-        res.send(err);
+        return undefined;
       });
   }
 
-  findTenants(preferredZips, res) {
-    User.findAll(/* TODO: where .... */).then((users) => {
+  findTenants(preferredZips) {
+    return User.findAll(/* add filters here */).then((users) => {
       let userMap = new Map();
       let fitUserIds = [];
       for (var i = 0; i < users.length; i++) {
@@ -123,7 +118,7 @@ class TenantService {
         userMap.set(userId, user);
         fitUserIds.push(userId);
       }
-      TenantZipPreference.findAll({
+      return TenantZipPreference.findAll({
         attributes: ["user_id"],
         where: {
           user_id: {
@@ -138,7 +133,6 @@ class TenantService {
         let result = [];
         for (var i = 0; i < fitUsers.length; i++) {
           let fittingUser = userMap.get(fitUsers[i].get("user_id"));
-
           let resUser = {
             id: fittingUser.get("id"),
             firstname: fittingUser.get("first_name"),
@@ -150,13 +144,13 @@ class TenantService {
           };
           result.push(resUser);
         }
-        res.json(result);
+        return result;
       });
     });
   }
 
-  findAllTenants(res) {
-    UserRole.findAll({
+  findAllTenants() {
+    return UserRole.findAll({
       attributes: ["user_id"],
       where: { role_id: RoleType.RENTER.id },
     })
@@ -165,7 +159,7 @@ class TenantService {
         for (var i = 0; i < ids.length; i++) {
           userIds.push(ids[i].get("user_id"));
         }
-        User.findAll({
+        return User.findAll({
           where: {
             id: { [Op.in]: userIds },
           },
@@ -184,11 +178,11 @@ class TenantService {
             };
             result.push(resUser);
           }
-          res.json(result);
+          return result;
         });
       })
       .catch((err) => {
-        console.log(err);
+        return undefined;
       });
   }
 

@@ -2,17 +2,24 @@ const resTemplate = require("../static/ResponseTemplate");
 const RoleType = require("../static/RoleType");
 const TenantService = require("../services/TenantService");
 const UserService = require("../services/UserService");
-const TenantGroupService = require("../services/TenantGroupService");
+const zipCodeUtil = require("../utils/ZipCodeUtil");
 
 class TenantController {
   addTenantZipPreference(req, res) {
     // put a zip code
     let user = req.body.user;
     let zip = req.params.zip;
-    if (!zip) {
-      res.status(400).json(resTemplate.MISS_FIELD);
+    if (!zip || !zipCodeUtil.isZipCodeValid(zip.toString())) {
+      res.status(400).json(resTemplate.INVALID_ZIP_CODE);
+      return
     }
-    TenantService.addZipPreference(user.id, zip.toString(), res);
+    TenantService.addZipPreference(user.id, zip.toString()).then((success) => {
+      if (success) {
+        res.json(resTemplate.SUCCESS);
+      } else {
+        res.status(404).json(resTemplate.FAIL);
+      }
+    });
   }
 
   updateTenantPreference(req, res) {
@@ -20,22 +27,33 @@ class TenantController {
     let zipcodes = req.body.zipcodes; // zipcodes : [94117, 94118, ...]
     let cities = req.body.cities; // [{city: San Jose, state: CA}, {city: San Franciscoe, state: CA} ... ]
 
-    if (zipcodes !== undefined) {
+    if (zipcodes == undefined && cities == undefined) {
+      res.status(400).json(resTemplate.MISS_FIELD);
+      return;
+    } else if (zipcodes != undefined) {
       if (!Array.isArray(zipcodes)) {
         res.status(404).json(resTemplate.INVALID_ZIP_CODE);
         return;
-      } else {
-        TenantService.updateZipPreference(user.id, zipcodes, res);
       }
-    } else if (cities !== undefined) {
+      TenantService.updateZipPreference(user.id, zipcodes).then((result) => {
+        if (result) {
+          res.json(resTemplate.SUCCESS);
+        } else {
+          res.status(404).json(resTemplate.FAIL);
+        }
+      });
+    } else if (cities != undefined) {
       if (!Array.isArray(cities)) {
         res.status(404).json(resTemplate.INVALID_INPUT);
         return;
-      } else {
-        TenantService.updateCityPreference(user.id, cities, res);
       }
-    } else {
-      res.status(404).json(resTemplate.MISS_FIELD);
+      TenantService.updateCityPreference(user.id, cities).then((result) => {
+        if (result) {
+          res.json(resTemplate.SUCCESS);
+        } else {
+          res.status(404).json(resTemplate.FAIL);
+        }
+      });
     }
   }
 
@@ -44,13 +62,27 @@ class TenantController {
     let city = req.body.city;
     let state = req.body.state;
     if (city && state) {
-      TenantService.addCityPreference(user.id, city, state, res);
+      TenantService.addCityPreference(user.id, city, state).then((result) => {
+        if (result) {
+          res.json(resTemplate.SUCCESS);
+        } else if (result == undefined) {
+          res.status(404).json(resTemplate.NO_DATA);
+        } else {
+          res.status(404).json(resTemplate.FAIL);
+        }
+      });
     }
   }
 
   getTenantPreference(req, res) {
     let userId = req.params.userId;
-    TenantService.getTenantPreference(userId, res);
+    TenantService.getTenantPreference(userId).then((result) => {
+      if (result == undefined) {
+        res.status(404).json(resTemplate.NO_DATA);
+        return;
+      }
+      res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
+    });
   }
 
   searchTenants(req, res) {
@@ -59,10 +91,14 @@ class TenantController {
     // let query = req.query.zipcodes;
 
     if (city && state) {
-      let zipcodes = TenantService.cityToZipCodes(city, state);
-      TenantService.findTenants(zipcodes, res);
+      let zipcodes =  zipCodeUtil.getZipCodesByCityState(city, state)
+      TenantService.findTenants(zipcodes).then((result) => {
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
+      });
     } else {
-      TenantService.findAllTenants(res);
+      TenantService.findAllTenants().then((result) => {
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
+      });
     }
   }
 
@@ -104,11 +140,11 @@ class TenantController {
 
   getFavoriteListings(req, res) {
     console.log(req.body.user);
-    if(req.params.userId != undefined){
+    if (req.params.userId != undefined) {
       var userId = req.params.userId;
-    }else if(req.body.user){
+    } else if (req.body.user) {
       var userId = req.body.user.id;
-    }else{
+    } else {
       res.status(403).json(resTemplate.MISS_FIELD);
       return;
     }
@@ -136,7 +172,6 @@ class TenantController {
       }
     });
   }
-
 }
 
 module.exports = new TenantController();

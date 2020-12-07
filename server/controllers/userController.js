@@ -210,7 +210,7 @@ class UserController {
       let responseBody = { data: user };
       if (req.body.user) {
         if (req.body.user.id == userId) {
-          responseBody.history = {
+          responseBody.data.history = {
             tenants: await HistoryService.getViewedTenants(userId),
             listings: await HistoryService.getViewedListings(userId),
           };
@@ -218,7 +218,7 @@ class UserController {
           HistoryService.viewTenant(req.body.user.id, userId);
         }
       }
-      res.json(Object.assign({}, resTemplate.SUCCESS, { data: responseBody }));
+      res.json(Object.assign({}, resTemplate.SUCCESS, responseBody));
     });
   }
 
