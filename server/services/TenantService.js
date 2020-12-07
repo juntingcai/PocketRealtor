@@ -99,7 +99,7 @@ class TenantService {
         let sortedCity = Array.from(citySet).sort();
         return {
           userId: userId,
-          preferedZips: zips,
+          preferredZips: zips,
           preferredCities: sortedCity,
         };
       })
