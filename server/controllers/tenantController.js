@@ -115,7 +115,7 @@ class TenantController {
       if (result) {
         res.json(resTemplate.SUCCESS);
       } else {
-        res.status(500).send("Fail to add to favorite");
+        res.status(500).send(resTemplate.DATABASE_ERROR);
       }
     });
   }

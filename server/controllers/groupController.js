@@ -215,7 +215,7 @@ class GroupController {
               if (result) {
                 res.json(resTemplate.SUCCESS);
               } else {
-                res.status(400).send("You have invited the user");
+                res.status(500).json(resTemplate.FAIL);
               }
             }
           );
@@ -242,7 +242,7 @@ class GroupController {
         if (result) {
           res.json(resTemplate.SUCCESS);
         } else {
-          res.status(500).send("Fail to accept the invitation");
+          res.status(500).json(resTemplate.FAIL);
         }
       }
     );
@@ -287,9 +287,7 @@ class GroupController {
       if (result) {
         res.json(resTemplate.SUCCESS);
       } else if (result == undefined) {
-        res.status(400).send("The group does not exist");
-      } else {
-        res.status(400).send("You have appied, waiting for host's response");
+        res.status(404).json(resTemplate.NO_DATA);
       }
     });
   }
@@ -333,7 +331,7 @@ class GroupController {
           if (result) {
             res.json(resTemplate.SUCCESS);
           } else {
-            res.status(400).send("The user is not existing or not waiting");
+            res.status(404).json(resTemplate.NO_DATA);
           }
         });
       }
@@ -406,7 +404,7 @@ class GroupController {
       if (result) {
         res.json(resTemplate.SUCCESS);
       } else {
-        res.status(400).send("The application does not exist");
+        res.status(404).json(resTemplate.NO_DATA);
       }
     });
   }
@@ -748,7 +746,6 @@ class GroupController {
       }
     );
   }
-
 }
 
 module.exports = new GroupController();

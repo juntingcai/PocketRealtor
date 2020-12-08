@@ -216,18 +216,22 @@ class TenantGroupService {
         user_id: inviteeId,
         group_id: groupId,
       },
-    }).then((member) => {
-      if (member) {
-        return false;
-      }
-      return GroupMembers.create({
-        group_id: groupId,
-        user_id: inviteeId,
-        state: GroupMemberState.INVITED.id,
-      }).then(() => {
-        return true;
+    })
+      .then((member) => {
+        if (member) {
+          return true;
+        }
+        return GroupMembers.create({
+          group_id: groupId,
+          user_id: inviteeId,
+          state: GroupMemberState.INVITED.id,
+        }).then(() => {
+          return true;
+        });
+      })
+      .catch((err) => {
+        return undefined;
       });
-    });
   }
 
   // get invitation
@@ -304,7 +308,7 @@ class TenantGroupService {
         },
       }).then((application) => {
         if (application) {
-          return false;
+          return true;
         }
         return GroupMembers.create({
           user_id: userId,
