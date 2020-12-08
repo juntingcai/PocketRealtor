@@ -30,7 +30,7 @@ export function AlertProvider({children}) {
     
     const [alertState, setAlertState] = useState({
         open: false,
-        severity: "error",
+        severity: alertType[0],
         msg: "",
     })
 
@@ -56,7 +56,7 @@ export function AlertProvider({children}) {
 
         setAlertState({
             open: false,
-            severity: "",
+            severity: "error",
             msg: ""
         })
     };

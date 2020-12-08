@@ -16,6 +16,10 @@ export const loadUser = () => async (dispatch) => {
   }
 
 };
+export const reloadUser = (user) => (dispatch) => {
+  dispatch({ type: "RELOAD_USER", payload: user });
+}
+
 export const register = ({ firstname, lastname, email, password }) => async (
   dispatch
 ) => {

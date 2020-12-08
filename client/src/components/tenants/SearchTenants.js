@@ -4,16 +4,16 @@ import TenantDataTable from "./TenantDataTable";
 import '../../TenantTable.css';
 
 const SearchTenants = (props) => {
-  const [data, setData] = useState([]);
+
   const [query, setQuery] = useState("");
-  const [columns, setColumns] = useState(["firstname", "lastname", "occupation"])
+  const [columns, setColumns] = useState(["firstname", "lastname"])
   const search = (rows) => {
-    return data ? (rows.filter((row) =>
+    return props.data && rows.filter((row) =>
       columns.some(
         (column) =>
           row[column].toString().toLowerCase().indexOf(query.toLowerCase()) > -1
       )
-    )): null
+    )
   };
 
   return (

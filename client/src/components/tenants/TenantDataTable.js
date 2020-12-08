@@ -36,15 +36,10 @@ const TenantDataTable = (props) => {
     
     try {
       
-      const response = await axios.post(`${URL}/user/verifyuser`);
-      console.log(`RESPONSE TO /user/verifyuser is `)
-      console.log(response)
-      setUserid(response.data.id)
-
-      if (response.data.msg === "Invalid token") {
-        console.log("auth_error")
-      } else {
-       console.log("user_loaded")
+      if (localStorage.token) {
+        const token = JSON.parse(localStorage.getItem('token'));
+        setUserid(token.id)
+        console.log(userid)
       }
     } catch (error) {
       console.log("error")
@@ -163,7 +158,7 @@ console.log(groupData)
               </TableHead>
               <TableBody>
                 {props.data.map((element) => (
-                  <TableRow key={element.firstname + element.lastname}>
+                  <TableRow key={element.email}>
                     <TableCell><img
                   alt="avatar"
                   style={{ maxWidth: "55px" }}

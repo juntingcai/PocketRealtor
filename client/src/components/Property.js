@@ -50,6 +50,10 @@ const formatter = new Intl.NumberFormat('en-US', {
 const Property = ({ match, history, user, toLogin }) => {
     const socket = useSocket();
     const { setAlert } = useAlert();
+    const [propertyId, setPropertyId] = useState(null)
+    const [groups, setGroups] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [groupId, setGroupId] = useState(null)
     const { addMessageToConversation } = useConversations();
     const [contactForm, setContectForm] = useState({
         name: "",
@@ -145,6 +149,7 @@ const Property = ({ match, history, user, toLogin }) => {
         if (!match.params.id)
             history.replace('/');
         const pid = match.params.id;
+        setPropertyId(pid)
         const type = 1;
         getPropDetail(pid).then(res => {
             setData({
@@ -273,6 +278,58 @@ const Property = ({ match, history, user, toLogin }) => {
 
     }
 
+    const getGroups = async () => {
+        try {
+          const response = await Axios.get(`https://pocketxrealtor.ddns.net/tenant/groups`);
+          const groups = response.data;
+          console.log("Groups:");
+          console.log(groups);
+          setGroups(groups);
+          if (groups.length > 0) {
+              setGroupId(groups[0].id)
+          }
+        } catch (error) {
+          console.log(error.message);
+        }
+      };
+
+    const addToGroup = async () => {
+        try {
+          const config = {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+    
+          const payload = {};
+          payload.groupId = groupId;
+          payload.listingId = parseInt(propertyId);
+          const body = payload;
+          console.log(body)
+        //   console.log(`${URL}/tenant/group/addListing/`)
+        //   console.log(payload)
+          const response = await Axios.post(
+            `https://pocketxrealtor.ddns.net/tenant/group/addListing/`,
+            body,
+            config
+          );
+          
+          console.log("Adding to group...");
+          console.log(response)
+          
+    
+        } catch (error) {
+          console.log(error.message);
+        }
+      };
+
+
+      useEffect(() => {
+        setLoading(true)
+        getGroups()
+        setLoading(false)
+    }, [loading])
+
     return (
         <Fragment>
             <div id="property">
@@ -282,7 +339,7 @@ const Property = ({ match, history, user, toLogin }) => {
                         <div className="addr-buttons">
                             <div className="address">{address + ", " + city + ", " + state + " " + zip_code}</div>
                             <div className="buttons">
-                                <Button startIcon={<AddIcon className="theme-color" />}>
+                                <Button onClick={addToGroup} startIcon={<AddIcon className="theme-color" />}>
                                     Group
                             </Button>
                                 {isFavorite ? <Button onClick={onSaveList} startIcon={<SavedIcon style={{ color: "red" }} />}>

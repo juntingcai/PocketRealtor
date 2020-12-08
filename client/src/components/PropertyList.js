@@ -4,7 +4,7 @@ import ListItem from './ListItem'
 import Map from './GoogleMap';
 import SearchFilter from './SearchBarItems/SearchFilter'
 import PlaceAutoComplete from './PlaceAutoComplete'
-import { searchProperties } from '../utils/functions';
+import { searchProperties, getSimilarNearby } from '../utils/functions';
 import axios from "axios";
 import {
     geocodeByAddress,
@@ -19,6 +19,7 @@ const PropertyList = (props) => {
 
 
     const [list, setList] = useState([]);
+    const [subList, setSubList] = useState([]);
     const [placeValue, setPlaceValue] = useState('');
     const [searchProps, setSearchProps] = useState({
         //const [inputValue, setInputValue] = useState({
@@ -60,6 +61,7 @@ const PropertyList = (props) => {
     }
 
 
+
     useEffect(() => {
         console.log("history: " + props.history.location.state.address)
         console.log("type: " + props.history.location.state.type)
@@ -69,7 +71,18 @@ const PropertyList = (props) => {
             setAddrProps(address, type);
         }
         if (searchProps.addr !== null)
-            searchProperties(searchProps).then(list => setList(list));
+            searchProperties(searchProps)
+            .then(list => {
+                
+                setList(list)
+                if(list.length === 0){
+                    getSimilarNearby(searchProps, setSubList)
+                }
+                
+            })
+            
+        
+
     }, [searchProps])
 
 
@@ -135,9 +148,25 @@ const PropertyList = (props) => {
                         <div className="list-wrap">
                             <div className="title">{simpleAddr()}</div>
                             {
-                                list.map(item => (
-                                    <ListItem key={item.id} data={item} sale={true} />
-                                ))
+                                list.length === 0 ?
+                                    <>
+                                        <div className="empty-list">
+                                            <div className="text">
+                                                {"Sorry, we can't find any result in this area. Try other places or eliminate filters"}
+                                            </div>
+                                        </div>
+                                        {
+                                            subList && subList.map(item => (
+                                                <ListItem key={item.id} data={item} sale={true} />
+                                            ))
+                                        }
+                                        
+                                    </> :
+                                    <>
+                                        {list.map(item => (
+                                            <ListItem key={item.id} data={item} sale={true} />
+                                        ))}
+                                    </>
                             }
                         </div>
                     </div>

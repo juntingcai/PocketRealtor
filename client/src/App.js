@@ -27,6 +27,7 @@ import GroupDashboard from "./components/groups/GroupDashboard";
 import CreateGroup from "./components/groups/CreateGroup";
 import HostTimeslots from "./components/schedule/HostTimeslots";
 import NotificationDashboard from "./components/notifications/NotificationDashboard";
+import GroupListingPage from "./components/groups/GroupListingPage"
 
 if (localStorage.token) {
   const token = JSON.parse(localStorage.getItem('token'));
@@ -54,18 +55,16 @@ function App() {
 
                       <PrivateRoute exact path="/sell" component={CreateListing} />
                       {/* <PrivateRoute exact path="/findtenants" component={FindTenants} /> */}
+                      <Route exact path="/findtenants" component={FindTenants} />
                       <PrivateRoute exact path="/myprofile" component={EditProfile} />
                       <PrivateRoute exact path="/savedlist" component={SavedList} />
                       <Route exact path="/property/:id" component={Property} />
                       <PrivateRoute exact path="/messages" component={Messages} />
+                      <Route path="/grouplisting/:id" component={GroupListingPage} />
                       <PrivateRoute path="/mygroup" component={GroupDashboard} />
                       <PrivateRoute path="/creategroup" component={CreateGroup} />
                       <Route path="/timeslots" component={HostTimeslots} />
                       <PrivateRoute path="/notifications" component={NotificationDashboard} />
-
-                      {/* <Route path="/createlisting" component={Listing} />
-                <Route path="/newlisting" component={CreateListingPage} />
-                <Route path="/findtenants" component={FindTenants} /> */}
 
                     </Switch>
                   </div>

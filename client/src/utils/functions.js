@@ -2,6 +2,7 @@ import React, { Fragment, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import { get, post, axioDelete, put } from './axios';
+import ListItem from '../components/ListItem';
 
 export const toPropertyDetail = (history, id) => {
 
@@ -31,7 +32,7 @@ export function getConversationId(hostId, listingId) {
         listingId: listingId
     }
     return get("conversation/find/", params);
-        
+
     //     axios.get("http://52.53.200.228:3080/conversation/find/?" +
     //         "hostId=" + hostId +
     //         "&listingId=" + listingId
@@ -53,7 +54,7 @@ export function getUserProfile(userid) {
 
 export function getGroup(groupId) {
     return get("tenant/group/" + groupId)
-            
+
 }
 
 // export function getConversations() {
@@ -129,6 +130,19 @@ export function searchProperties(searchProps) {
     return get('listings', param);
 }
 
+export function getSimilarNearby(searchProps, setList) {
+    const param = {
+        ...searchProps,
+        radius: searchProps.radius * 1.1
+    }
+    searchProperties(param).then(res => {
+        if(res.length < 5)
+            getSimilarNearby(param, setList);
+        else
+            setList(res);
+    })
+}
+
 export function getPropDetail(pid) {
     return new Promise((resolve, reject) => {
         get("listing/" + pid)
@@ -155,26 +169,38 @@ export function deleteFavorite(id) {
     return axioDelete('tenant/favorite/' + id);
 }
 
-export function getUserPreference(userid){
+export function getUserPreference(userid) {
     return get('tenant/preference/' + userid);
 }
 
-export function getUserRole(userid){
+export function getUserRole(userid) {
     return get('user/role/' + userid);
 }
 
-export function updateUserRole(role){
+export function updateUserRole(role) {
     return put('user/updateRole', role);
 }
-export function updateAvatar(avatar){
-    return put('user/updateAvatar', {
-        "avatar": avatar,
-      });
+export function updateAvatar(avatar) {
+    return put('user/updateAvatar', { "avatar": avatar });
 }
 
-export function updateUserProfile(profile){
-    return put(
-          'user/updateProfile',
-          profile,
-        );
+export function updateUserProfile(profile) {
+    return put('user/updateProfile', profile);
 }
+
+export function addPreferredZipcode(zipcode) {
+    return put('tenant/preference/' + zipcode)
+}
+
+export function addPreferredCity(address) {
+    return put('/tenant/preference/',
+        {
+
+        });
+}
+
+
+export function getSavedList() {
+    return get('tenant/favorite');
+}
+

@@ -19,12 +19,20 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ClearRoundedIcon from '@material-ui/icons/ClearRounded';
 import { useAlert } from '../../context/AlertProvider';
 import Loading from '../../utils/Loading';
+import { reloadUser } from '../../actions/auth';
 
 import Select from '@material-ui/core/Select';
 import '../../css/ProfileForm.css'
-import Axios from "axios";
-import { getUserProfile, getUserPreference, getUserRole, updateUserProfile, updateUserRole } from "../../utils/functions";
-import Property from "../Property";
+import {
+  getUserProfile,
+  getUserPreference,
+  getUserRole,
+  updateUserProfile,
+  updateUserRole,
+  addPreferredZipcode,
+  addPreferredCity,
+  updateAvatar
+} from "../../utils/functions";
 
 // avatar: "https://res.cloudinary.com/dyegmklny/image/upload/v1606765327/pr/cpo5kmcdftk7rjiagekj.png"
 // birthday: null
@@ -38,28 +46,38 @@ import Property from "../Property";
 // occupation: null
 
 
-const EditProfile = ({ userid }) => {
+const EditProfile = ({ userid, user, reloadUser }) => {
   const [profile, setProfile] = useState(null);
   const [role, setRole] = useState(null);
   const [preference, setPreference] = useState(null);
 
+  // const {
 
-  const {
-    firstname,
-    lastname,
-    birthday,
-    nickname,
-    intro,
-    gender,
-    occupation,
-    avatar,
-  } = profile;
-  
-  const {
-    isRenter,
-    isHost,
-    isAgent
-  } = role;
+  //   firstname,
+  //   lastname,
+  //   birthday,
+  //   nickname,
+  //   intro,
+  //   gender,
+  //   occupation,
+  //   avatar
+
+  // } = profile;
+
+  // const {
+
+  //   isRenter,
+  //   isHost,
+  //   isAgent
+
+  // } = role;
+
+  // const {
+
+  //   preferredCities,
+  //   preferredZips,
+
+  // } = preference;
 
   const [file, setFile] = useState(null);
 
@@ -77,51 +95,7 @@ const EditProfile = ({ userid }) => {
     getUserProfile(userid).then(res => setProfile(res));
     getUserPreference(userid).then(res => setPreference(res));
     getUserRole(userid).then(res => setRole(res));
-    // if (props.userid) {
-    //   props.getCurrentProfile(props.userid)
-    //   //Get user preferences
-    //   Axios.get("http://52.53.200.228:3080/tenant/preference/" + props.userid)
-    //     .then(res => {
-    //       console.log(res.data.preferedZips, res.data.preferredCities)
-    //       if (res.data)
-    //         setPreference({
-    //           zips: res.data.preferedZips,
-    //           cities: res.data.preferredCities,
-    //         })
-    //     }).catch(err => {
-    //       console.log(err)
-    //     })
-    //   //Get user roles
-    //   Axios.get("http://52.53.200.228:3080/user/role/" + props.userid)
-    //     .then(res => {
-    //       if (res.data) {
-    //         setRole({
-    //           ...res.data,
-    //         })
-    //       }
 
-    //     }).catch(err => {
-    //       console.log(err)
-    //     })
-    // }
-
-    // // const data = props.profile.profile.data;
-    // if (!props.profile.loading) {
-    //   console.log(props.profile)
-    //   var data = props.profile.profile.data;
-    //   setFormData({
-    //     firstname: data.firstname,
-    //     lastname: data.lastname,
-    //     role: data.role,
-    //     birthday: (data.birthday === null) ? "" : data.birthday,
-    //     nickname: (data.nickname === null) ? "user" + props.userid : data.nickname,
-    //     intro: data.intro === null ? "" : data.intro,
-    //     gender: (data.gender === null) ? 0 : data.gender,
-    //     occupation: data.occupation === null ? "" : data.occupation,
-    //     avatar: data.avatar === null ? faker.image.avatar() : data.avatar,
-    //     preferredCity: data.preferredCity,
-    //   });
-    // }
   }, [userid]);
 
 
@@ -129,14 +103,8 @@ const EditProfile = ({ userid }) => {
     setRole({ ...role, [event.target.name]: event.target.checked });
   };
 
-
-
-  const roleError = isAgent && (isRenter || isHost)
-
   const onChange = (e) => {
-
     setProfile({ ...profile, [e.target.id]: e.target.value });
-
   };
 
   const nameTag = (name, index) => {
@@ -160,13 +128,46 @@ const EditProfile = ({ userid }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    
+
     updateUserProfile(profile)
-    .then(() => updateUserRole(role))
-    .then(() => setAlert("Profile Saved", 2))
+      .then(() => updateUserRole(role))
+      .then(() => setAlert(2, "Profile Saved"))
     console.log("successly submitted");
-    
+
   };
+
+  const [loadingImage, setLoadingImage] = useState(false);
+
+  const uploadImage = async (e) => {
+    const files = e.target.files
+    const data = new FormData()
+    data.append('file', files[0])
+    data.append('upload_preset', 'pocketrealtor')
+    setLoadingImage(true)
+
+    const response = await fetch('https://api.cloudinary.com/v1_1/dyegmklny/image/upload', {
+      method: 'POST',
+      body: data
+    })
+    const file = await response.json()
+    const avatarUrl = file.secure_url;
+    console.log(avatarUrl)
+    updateAvatar(avatarUrl).then(() => {
+      setAlert(2, "Upload Successfully!");
+      setProfile({
+        ...profile,
+        avatar: avatarUrl
+      })
+      const newUser = {
+        ...user,
+        avatar: avatarUrl
+      }
+      reloadUser(newUser);
+
+    })
+      .finally(() => setLoadingImage(false));
+
+  }
 
   const onFileChange = (e) => {
     setFile({ file: e.target.files[0] });
@@ -174,61 +175,74 @@ const EditProfile = ({ userid }) => {
     console.log(e.target.files[0]);
   };
 
-
-  const addZipcode = () => {
-    if (zipcode.length != 5)
-      alert("invalid zipcode");
-    else {
-      Axios.put("http://52.53.200.228:3080/tenant/preference/" + zipcode)
-        .then(res => {
-          if (res.data.code === 10000) {
-            setPreference({
-              ...preference,
-              zips: [...preference.zips, zipcode]
-            })
-            setAlert(2, "Preferred Zipcode added");
-          }
-          else {
-            setAlert(0, res.data.msg);
-          }
-        }).catch(err => {
-          console.log(err);
-        })
-    }
-  }
-
   const handleSelectOcp = e => {
     setProfile({
       ...profile,
       occupation: e.target.value
     })
   }
+  const addZipcode = () => {
+    if (zipcode.length != 5) {
+      setAlert(1, "Invalid zipcode");
+      return;
+    }
+    addPreferredZipcode(zipcode)
+      .then(() => {
+        setPreference(prevPreference => {
+          const newZips = [...prevPreference.preferredZips, zipcode];
+          return {
+            ...prevPreference,
+            preferredZips: newZips
+          }
+        })
+        setAlert(2, "Preferred Zipcode added");
+      })
+  }
 
   const addCity = () => {
-    const addr = placeValue.split(",");
-    if (placeValue.length === "")
-      alert("invalid city");
-    else {
-      Axios.put("http://52.53.200.228:3080/tenant/preference/",
-        {
-          city: addr[0],
-          state: addr[1],
-        }).then(res => {
-          console.log(res)
-        }).catch(err => {
-          console.log(err);
-        })
+    if (placeValue.length === "") {
+      setAlert(1, "Invalid address");
+      return;
     }
+    addPreferredCity(placeValue)
+      .then(() => {
+        setPreference(prevPreference => {
+          const newCities = [...prevPreference.preferredCities, placeValue];
+          return {
+            ...prevPreference,
+            preferredCities: newCities
+          }
+        })
+        setAlert(2, "Preferred City added");
+      })
+
   }
+
+
 
   return (
     <Fragment>
       <div className="profile-form-wrap">
-        {profile === null ? <Loading /> :
+        {(profile === null || role === null || preference === null) ? <Loading /> :
           <>
             <div className="avatar-uploader">
-              <Avatar alt={firstname} src={avatar} />
+              <Avatar alt={profile.firstname} src={profile.avatar} />
               <input
+                  accept="image/*"
+                  onChange={e => uploadImage(e)}
+                  id="contained-button-file"
+                  multiple
+                  type="file"
+                  style={{display: "none"}}
+                />
+                <label htmlFor="contained-button-file" style={{marginTop: "1rem"}}>
+                  <Button variant="contained" color="primary" component="span" style={{width: "9rem"}} startIcon={<CloudUploadIcon />}>
+                    Upload
+                  </Button>
+                </label>
+
+            
+              {/* <input
                 accept="image/*"
                 style={{ display: "none" }}
                 id="contained-button-file"
@@ -244,7 +258,9 @@ const EditProfile = ({ userid }) => {
                 >
                   Upload
             </Button>
-              </label>
+                
+              </label> */}
+              
 
             </div>
 
@@ -260,7 +276,7 @@ const EditProfile = ({ userid }) => {
                 id="firstname"
                 label="First name"
                 fullWidth
-                value={firstname}
+                value={profile.firstname}
                 InputProps={{
                   readOnly: !editing,
                 }}
@@ -271,39 +287,18 @@ const EditProfile = ({ userid }) => {
                 id="lastname"
                 label="Last name"
                 fullWidth
-                value={lastname}
+                value={profile.lastname}
                 InputProps={{
                   readOnly: !editing,
                 }}
                 onChange={(e) => onChange(e)}
                 variant="outlined"
               />
-
-              {/* <div className="form-group">
-          <p>First Name:</p>
-          <input
-            type="text"
-            placeholder="First name"
-            name="firstname"
-            value={firstname}
-            readOnly
-          />
-        </div>
-        <div className="form-group">
-          <p>Last Name:</p>
-          <input
-            type="text"
-            placeholder="Last name"
-            name="lastname"
-            value={lastname}
-            readOnly
-          />
-        </div> */}
               <TextField
                 id="nickname"
                 label="nickname"
                 fullWidth
-                value={nickname}
+                value={role.nickname}
                 InputProps={{
                   readOnly: !editing,
                 }}
@@ -315,7 +310,7 @@ const EditProfile = ({ userid }) => {
                 <Select
                   labelId="gender"
                   id="gender"
-                  value={gender}
+                  value={profile.gender}
                   onChange={(e) => onChange(e)}
                   label="Gender"
 
@@ -332,8 +327,8 @@ const EditProfile = ({ userid }) => {
                 className="bd-selector"
                 id="birthday"
                 label="Birthday"
-                type="datetime-local"
-                value={birthday}
+                type="date"
+                value={profile.birthday}
                 onChange={(e) => onChange(e)}
                 variant="outlined"
                 InputLabelProps={{
@@ -347,9 +342,12 @@ const EditProfile = ({ userid }) => {
                 fullWidth
                 multiline
                 rows={5}
-                value={intro}
+                value={profile.intro}
                 onChange={(e) => onChange(e)}
                 variant="outlined"
+                InputProps={{
+                  readOnly: !editing,
+                }}
                 placeholder="Introduce yourself :)"
               />
 
@@ -359,14 +357,12 @@ const EditProfile = ({ userid }) => {
                 <Select
                   labelId="occupation"
                   id="occupation"
-                  value={occupation}
+                  value={profile.occupation}
                   onChange={handleSelectOcp}
                   label="Occupation"
 
                 >
-                  <MenuItem value="" disabled>
-                    <em>Occupation</em>
-                  </MenuItem>
+                  <MenuItem value="" disabled><em>Occupation</em></MenuItem>
                   <MenuItem value={"Software Developer"}>Software Developer</MenuItem>
                   <MenuItem value={"Student"}>Student</MenuItem>
                   <MenuItem value={"Realtor"}>Realtor</MenuItem>
@@ -390,23 +386,23 @@ const EditProfile = ({ userid }) => {
 
 
 
-              <FormControl required error={roleError} component="fieldset" className="role-selector">
+              <FormControl required error={role.isAgent && role.isRenter} component="fieldset" className="role-selector">
                 <FormLabel component="legend">Select User Roles</FormLabel>
                 <FormGroup>
                   <FormControlLabel
-                    control={<Checkbox checked={isRenter} onChange={handleCheckRole} name="isRenter" />}
+                    control={<Checkbox checked={role.isRenter} onChange={handleCheckRole} name="isRenter" />}
                     label="Tenant"
                   />
                   <FormControlLabel
-                    control={<Checkbox checked={isHost} onChange={handleCheckRole} name="isHost" />}
+                    control={<Checkbox checked={role.isHost} onChange={handleCheckRole} name="isHost" />}
                     label="Host"
                   />
                   <FormControlLabel
-                    control={<Checkbox checked={isAgent} onChange={handleCheckRole} name="isAgent" />}
+                    control={<Checkbox checked={role.isAgent} onChange={handleCheckRole} name="isAgent" />}
                     label="Agent"
                   />
                 </FormGroup>
-                {roleError && <FormHelperText>Can not select agent while host or tenant is selected</FormHelperText>}
+                {role.isAgent && role.isRenter && <FormHelperText>Can not select agent while host or tenant is selected</FormHelperText>}
               </FormControl>
               <div className="submit-button">
 
@@ -414,14 +410,13 @@ const EditProfile = ({ userid }) => {
                   Submit
               </Button>}
               </div>
-              {isRenter && <div className="preference">
+              {role.isRenter && <div className="preference">
                 <div className="prefer-head">
                   <div className="name-tag-title">
                     {"Preferred Cities: "}
                   </div>
 
-                  {preference.cities.map((item, index) => (
-
+                  {preference.preferredCities.map((item, index) => (
                     nameTag(item, index)
                   ))}
 
@@ -435,7 +430,7 @@ const EditProfile = ({ userid }) => {
                     {"Preferred ZIP Code: "}
                   </div>
 
-                  {preference.zips.map((item, index) => (
+                  {preference.preferredZips.map((item, index) => (
                     nameTag(item, index)
                   ))}
 
@@ -485,11 +480,14 @@ const EditProfile = ({ userid }) => {
 };
 
 EditProfile.propTypes = {
+  user: PropTypes.object.isRequired,
   userid: PropTypes.number.isRequired,
+  reloadUser: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
   userid: state.auth.id,
+  user: state.auth,
 });
 
-export default withRouter(connect(mapStateToProps)(EditProfile));
+export default withRouter(connect(mapStateToProps, { reloadUser })(EditProfile));

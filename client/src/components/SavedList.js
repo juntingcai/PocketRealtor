@@ -2,47 +2,32 @@ import React, { Fragment, useEffect, useState } from 'react';
 import '../css/SavedList.css';
 import { withRouter } from 'react-router-dom';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { toPropertyDetail } from '../utils/functions';
-import Axios from 'axios';
+import { toPropertyDetail, getSavedList, deleteFavorite } from '../utils/functions';
+import Loading from '../utils/Loading';
 
-const SavedList = ({history}) => {
-    const [data, setData] = useState({
-        list: [],
-    });
+
+const SavedList = ({ history }) => {
+    const [list, setList] = useState(null);
 
     const deleteSaved = (index) => {
         console.log(index)
-        const itemid = data.list[index].id;
-        Axios.delete("http://52.53.200.228:3080/tenant/favorite/" + itemid)
-            .then(res => {
-                if (res.data.code === 10000) {
-                    var updateList = data.list
-                    updateList.splice(index, 1);
-                    setData({
-                        list: updateList
+        const pid = list[index].id;
+        deleteFavorite(pid)
+            .then(() => {
+                setList(prevList => {
+                    return prevList.filter(item => {
+                        return item.id !== pid;
                     })
-                }
-
-            })
-            .catch(err => {
-                console.error(err);
+                })
             })
     }
 
     useEffect(() => {
-        Axios.get("http://52.53.200.228:3080/tenant/favorite/")
+        getSavedList()
             .then(res => {
                 console.log(res)
-                if (res.data)
-                    setData({
-                        list: res.data
-                    })
+                setList(res)
             })
-            .catch(err => {
-                console.log(err)
-
-            })
-
     }, [])
     return (
         <Fragment>
@@ -50,9 +35,9 @@ const SavedList = ({history}) => {
                 <div className="saved-list-wrap">
                     <div className="saved-list-title">
                         Saved List
-                </div>
+                    </div>
                     <div className="saved-list-body">
-                        {data.list.map((item, index) => (<div key={index} className="saved-property-card" >
+                        {list === null ? <Loading /> : list.map((item, index) => (<div key={index} className="saved-property-card" >
                             <div className="img" onClick={() => toPropertyDetail(history, item.id)}>
                                 <img src={require('../static/noimg.jpg')} alt="none" />
                             </div>
