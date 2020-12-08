@@ -73,6 +73,17 @@
     width: 18rem;
     
 }
+#property-list .empty-list{
+    margin: 1rem;
+    font-size: 1.1rem;
+    color: rgba(54, 52, 52, 0.774);
+    font-weight: 300;
+    border-radius: 0.5rem;
+    flex: 1;
+    padding: 1rem;
+    background-color: #0001;
+    border: solid 2px #0002
+}
 
 @keyframes oninput{
     from {width: 12rem;}

@@ -11,6 +11,7 @@ export default function (state = initialState, action) {
   switch (action.type) {
     case "REGISTER_SUCCESS":
     case "LOGIN_SUCCESS":
+    case "RELOAD_USER":
       localStorage.setItem("token", JSON.stringify(action.payload));
       return {
         ...state,

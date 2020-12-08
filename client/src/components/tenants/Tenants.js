@@ -12,13 +12,13 @@ const Tenants = (
   {
   }
 ) => {
-  const [tenantsData, setTenantsData] = useState([]);
+  const [tenantsData, setTenantsData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const getTenants = async () => {
     try {
-        console.log(URL)
-      const response = await Axios.get("http://52.53.200.228:3080/tenants");
+      console.log(URL)
+      const response = await Axios.get("https://pocketxrealtor.ddns.net/tenants");
       const tenants = response;
       console.log("**** 888")
       console.log(tenants);
@@ -36,14 +36,14 @@ const Tenants = (
     setLoading(true);
     getTenants();
     setLoading(false);
-  }, []);
+  }, [loading]);
 
   return loading ? (
     <Loading />
   ) : (
     <Fragment>
       {/* <h3 className="table-head">Tenant Portal</h3> */}
-      {tenantsData.length > 0 ? <SearchTenants className="table-head" data={tenantsData} /> : null}
+      {tenantsData && tenantsData.length > 0 ? <SearchTenants className="table-head" data={tenantsData} /> : null}
       
     </Fragment>
   );

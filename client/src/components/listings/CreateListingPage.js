@@ -1,19 +1,24 @@
+
 import React, { useState, useEffect, Fragment } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link, withRouter, Redirect } from "react-router-dom";
-
+// import { updateProfile, getCurrentProfile } from "../../actions/profile";
 import axios from "axios";
 import {URL} from "../../utils/constants"
+import setAuthToken from "../../utils/setAuthToken"
 import Container from '@material-ui/core/Container';
 
 import {Input, Button, TextField, Select} from "@material-ui/core"
 
 const CreateListingPage = ({
+  // profile: { profile, loading },
+  // updateProfile,
+  // getCurrentProfile,
   history,
-  userId,
 }) => {
-  
+  // console.log("profile++");
+  // console.log(profile);
   const [formData, setFormData] = useState({
     user_id: null,
     title: "",
@@ -33,11 +38,12 @@ const CreateListingPage = ({
     bath_rooms: null,
     status: 1,
     furnitured: "No",
-    garage: "No",
-    backyard: "No",
-    cooling: "No",
-    heating: "No", 
-    fireplace: "No"
+    garage: "Yes",
+    backyard: "Yes",
+    cooling: "Yes",
+    heating: "Yes", 
+    fireplace: "Yes",
+    image_links: []
   });
 
   const [file, setFile] = useState(null);
@@ -64,14 +70,31 @@ const CreateListingPage = ({
     backyard,
     cooling,
     heating, 
-    fireplace
+    fireplace,
+    image_links
   } = formData;
 
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false)
+  const [loadingImage, setLoadingImage] = useState("")
+  const [image, setImage] = useState(null)
+  const [images, setImages] = useState([])
   
+  const [userId, setUserId] = useState(null)
 
-    
+    const verifyUser = async () => {
+      if (localStorage.token) {
+        const token = JSON.parse(localStorage.getItem('token'));
+        setUserId(token.id)
+        
+      }
+    }
+
+    useEffect(() => {
+      setLoading(true)
+      verifyUser()
+      setLoading(false)
+  }, [loading])
   console.log("verifyuser = ")
   console.log(userId)
 
@@ -103,6 +126,9 @@ const CreateListingPage = ({
     payload.rooms = parseInt(rooms);
     payload.bath_rooms = parseInt(bath_rooms);
     payload.status = parseInt(status);
+    var imgs = []
+    imgs.push(image)
+    payload.image_links = imgs
     // payload.furnitured = furnitured;
     // payload.garage = garage;
     // payload.backyard = backyard;
@@ -153,6 +179,7 @@ const CreateListingPage = ({
         rooms,
         bath_rooms,
         status,
+        image_links
         // furnitured,
         // garage,
         // backyard,
@@ -190,6 +217,7 @@ const CreateListingPage = ({
         rooms,
         bath_rooms,
         status,
+        image_links,
         // furnitured,
         // garage,
         // backyard,
@@ -203,14 +231,43 @@ const CreateListingPage = ({
     }
   };
 
-  const onFileChange = (e) => {
-    setFile({ file: e.target.files[0] });
-    console.log(e.target.files[0]);
-  };
+
+
+
+
+
+  // const onFileChange = (e) => {
+  //   setFile({ file: e.target.files[0] });
+  //   console.log(e.target.files[0]);
+  // };
+
+
+
+  const uploadImage = async (e) => {
+    const files = e.target.files
+    const data = new FormData()
+    data.append('file', files[0])
+    data.append('upload_preset', 'pocketrealtor')
+    setLoadingImage(true)
+
+    const response = await fetch('https://api.cloudinary.com/v1_1/dyegmklny/image/upload', {
+      method: 'POST',
+      body: data
+    })
+    const file = await response.json()
+    setImage(file.secure_url)
+    setImages([...images, image])
+    console.log(`images: ${images}`)
+    setLoadingImage(false)
+  }
+
+
+
 
   return (
     <Fragment>
       <Container>
+      {" "}
       <h1 className="medium text-primary">Create Listing</h1>
       <form className="form" onSubmit={(e) => onSubmit(e)}>
         <div className="form-group">
@@ -436,7 +493,9 @@ const CreateListingPage = ({
         </div>
 <br/>
         <h5>Add An Image</h5>
-        <Input onChange={onFileChange} type="file" accept="image/*" />
+        <Input onChange={uploadImage} type="file" name="file" accept="image/*" placeholder="Upload an image"/>
+        <br/>
+        {image === null ? null: (<><h3>Image Preview</h3><img style={{width: '300px'}}src={image} alt="image"/></>)}
         <br />
         <br />
         <Input type="submit" variant="contained" color="primary" />
@@ -447,19 +506,23 @@ const CreateListingPage = ({
         </a> */}
         <Button  href="/sell">Back</Button>
       </form>
+
       </Container>
     </Fragment>
   );
 };
 
 CreateListingPage.propTypes = {
-  
-  userId: PropTypes.number.isRequired,
+  updateProfile: PropTypes.func.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  
-  userId: state.auth.id,
+  // profile: state.profile,
 });
 
-export default connect(mapStateToProps)(withRouter(CreateListingPage));
+export default connect(mapStateToProps, {
+  // updateProfile,
+  // getCurrentProfile,
+})(withRouter(CreateListingPage));

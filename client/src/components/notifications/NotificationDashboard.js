@@ -129,6 +129,19 @@ const NotificationDashboard = () => {
        
         setLoading(false)
     }, [groups])
+  //   useEffect(() => {
+  //     setLoading(true)
+  //     if (groups) {
+  //         if (groups[0] && groups[0].id) {
+  //             console.log("groups[0].id")
+  //         console.log(groups[0].id)
+  //         getIncomingApplications(groups[0].id)
+  //         }
+  //     }
+     
+  //     setLoading(false)
+  // }, [])
+
 
     console.log("incoming applications")
     console.log(incomingApplications)
@@ -155,6 +168,81 @@ const NotificationDashboard = () => {
 
     console.log("Invitations: ")
     console.log(invitations)
+
+
+  const [listingsData, setListingsData] = useState([]);
+
+  const getListings = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`${URL}/listing/owner/listings`);
+      const listings = response.data;
+      console.log("Response:")
+      console.log(response)
+      console.log("Listings:");
+      console.log(listings);
+      setListingsData(listings);
+      setLoading(false)
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true)
+    console.log("starting getlistings")
+    getListings();
+    console.log("finished getlistings")
+    setLoading(false)
+  }, []);
+
+  console.log("listings")
+  console.log(listingsData)
+
+  const [listingApplications, setListingApplications] = useState([])
+
+  const prepareListingApplicationsData = async () => {
+      for (var i = 0; i < listingsData.length; i++) {
+        try {
+          console.log(`listing===`)
+          console.log(listingsData[i])
+          var l = listingsData[i].id
+          const url = `${URL}/listing/applications/${l}`
+          const response = await axios.get(url);
+          const data = response.data
+          console.log("data = ")
+          console.log(data)
+          var body = {address: listingsData[i].address, data}
+          console.log(body)
+          setListingApplications([...listingApplications, body])
+          // for (var j = 0; j < data.length; j++) {
+          //   var d = data[j]
+          //   var body = {address: listingsData[i].address, d}
+          //   console.log("going")
+          //   setListingApplications([...listingApplications, body]);
+          // }
+
+          // console.log("prepareListingApplicationsData response:");
+          // //
+          // setListingApplications([...listingApplications, response]);
+          console.log("Success!")
+        } catch (error) {
+          console.log(error)
+        }
+      } 
+    }
+
+    useEffect(() => {
+      setLoading(true)
+      console.log("starting prepareListingApplicationsData")
+      prepareListingApplicationsData()
+      console.log("finished prepareListingApplicationsData")
+      setLoading(false)
+    }, [listingsData]);
+    
+    console.log("listingApplications")
+    console.log(listingApplications)
+    console.log(`Size = ${listingApplications.length}`)
 
     const onButtonClickAcceptIncomingApplication = async (groupId, userApplicationId) => {
         try {
@@ -185,7 +273,7 @@ const NotificationDashboard = () => {
             console.log(error)
           }
     }
-    const onButtonClickRejectIncomingApplication = async (groupId, userApplicationId) => {
+    const onButtonClickDeclineIncomingApplication = async (groupId, userApplicationId) => {
         try {
             const config = {
               headers: {
@@ -239,7 +327,7 @@ const NotificationDashboard = () => {
             }
     }
 
-    const onButtonClickRejectInvitation = async (groupId) => {
+    const onButtonClickDeclineInvitation = async (groupId) => {
         try {
             const config = {
               headers: {
@@ -251,7 +339,7 @@ const NotificationDashboard = () => {
               config
             );
         
-            console.log("rejecting invitation = ")
+            console.log("Declineing invitation = ")
             console.log(res)
                 
             setInvitations(invitations.filter(invitation => invitation.groupId !== groupId))
@@ -262,96 +350,147 @@ const NotificationDashboard = () => {
           }
     }
 
-    const onButtonClickReject = async (e) => {}
+    const onButtonClickDecline = async (e) => {}
 
 return <Container>
     <h1>Notifications Dashboard</h1>
+    {listingsData.length > 0 && listingApplications.length > 0? (<Fragment>
+      <h3>Group Applications for Your Listings</h3><TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+              <TableRow>
+              <TableCell><Button color="secondary">Decline</Button></TableCell>
+                  <TableCell>Address</TableCell>
+                  <TableCell>Group</TableCell>
+                  <TableCell>Message</TableCell>
+                  {/* <TableCell><Button color="primary">Accept</Button></TableCell> */}
+                  
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {listingApplications.map((element) => 
+                  {
+                    return (
+                    element.data.map((d) => (
+                  <TableRow key={d.groupId}>
+                    <TableCell><Button onClick={() => onButtonClickDecline(element.email)} variant="contained" color="secondary">Decline</Button></TableCell>
+                    <TableCell>{element.address}</TableCell>
+                    <TableCell>{d.name}</TableCell>
+                    <TableCell>{d.description}</TableCell>
+                    
+                  </TableRow>
+                  )))
+                  
+                  // : 
+                  //   (<TableRow key={element.data[0].groupId}>
+                  //   <TableCell>{element.address}</TableCell>
+                  //   <TableCell>{element.data[0].name}</TableCell>
+                  //   <TableCell>{element.data[0].description}</TableCell>
+                  //   {/* <TableCell>{element.lastname}</TableCell> */}
+                  //   {/* <TableCell><Button onClick={() => onButtonClickAccept(element.email)} variant="contained" color="primary">Accept</Button></TableCell> */}
+                  //   <TableCell><Button onClick={() => onButtonClickDecline(element.email)} variant="contained" color="secondary">Decline</Button></TableCell>
+                  // </TableRow>)
+              }
+                  
+              )
+              }
+              </TableBody>
+            </Table>
+            </TableContainer></Fragment>): null}
     {invitees ? (<Fragment>
         <h3>Your Pending Invites</h3>
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
               <TableRow>
+              <TableCell><Button color="secondary">Decline</Button></TableCell>
               <TableCell>Photo</TableCell>
                   <TableCell>First Name</TableCell>
                   <TableCell>Last Name</TableCell>
                   {/* <TableCell><Button color="primary">Accept</Button></TableCell> */}
-                  <TableCell><Button color="secondary">Cancel</Button></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {invitees.map((element) => (
                   <TableRow key={element.firstname + element.lastname}>
+                    <TableCell><Button onClick={() => onButtonClickDecline(element.email)} variant="contained" color="secondary">Decline</Button></TableCell>
                     <TableCell><img
                   alt="avatar"
                   style={{ maxWidth: "55px" }}
-                  src={faker.image.avatar()}
+                  src={`https://i.imgur.com/0avxl7q.jpg`}
+                  // src={faker.image.avatar()}
                 /></TableCell>
                     <TableCell>{element.firstname}</TableCell>
                     <TableCell>{element.lastname}</TableCell>
                     {/* <TableCell><Button onClick={() => onButtonClickAccept(element.email)} variant="contained" color="primary">Accept</Button></TableCell> */}
-                    <TableCell><Button onClick={() => onButtonClickReject(element.email)} variant="contained" color="secondary">Cancel</Button></TableCell>
+                    
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
             </TableContainer></Fragment>): null}
-            {incomingApplications ? (<Fragment>
+            {incomingApplications !== null ? (<Fragment>
         <h3>Your Incoming Applications</h3>
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
               <TableRow>
+              <TableCell><Button color="secondary">Decline</Button></TableCell>
+              <TableCell><Button color="primary">Accept</Button></TableCell>
+                  
               <TableCell>Photo</TableCell>
                   <TableCell>First Name</TableCell>
                   <TableCell>Last Name</TableCell>
-                  <TableCell><Button color="primary">Accept</Button></TableCell>
-                  <TableCell><Button color="secondary">Reject</Button></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {incomingApplications && incomingApplications.map((element) => (
                   <TableRow key={element.firstname + element.lastname}>
+                    <TableCell><Button onClick={() => onButtonClickDeclineIncomingApplication(groups[0].id, element.id)} variant="contained" color="secondary">Decline</Button></TableCell>
+                     <TableCell><Button onClick={() => onButtonClickAcceptIncomingApplication(groups[0].id, element.id)} variant="contained" color="primary">Accept</Button></TableCell>
+                    
                     <TableCell><img
                   alt="avatar"
                   style={{ maxWidth: "55px" }}
-                  src={faker.image.avatar()}
+                  src={`https://i.imgur.com/0avxl7q.jpg`}
                 /></TableCell>
                     <TableCell>{element.firstname}</TableCell>
                     <TableCell>{element.lsstname}</TableCell>
                     {/* <TableCell><Button onClick={() => onButtonClickAccept(element.email)} variant="contained" color="primary">Accept</Button></TableCell> */}
-                    <TableCell><Button onClick={() => onButtonClickAcceptIncomingApplication(groups[0].id, element.id)} variant="contained" color="primary">Accept</Button></TableCell>
-                    <TableCell><Button onClick={() => onButtonClickRejectIncomingApplication(groups[0].id, element.id)} variant="contained" color="secondary">Reject</Button></TableCell>
+                   
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
             </TableContainer></Fragment>): null}
-            {applications.length > 0 ? (<Fragment>
-        <h3>Your Pending Applications</h3>
+            
+            {applications.length > 0 ? (<Fragment><h3>Your Pending Applications</h3>
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
               <TableRow>
+              <TableCell><Button color="secondary">Decline</Button></TableCell>
               <TableCell>Photo</TableCell>
                   <TableCell>Group Name</TableCell>
                   <TableCell>Description</TableCell>
                   {/* <TableCell><Button color="primary">Accept</Button></TableCell> */}
-                  <TableCell><Button color="secondary">Cancel</Button></TableCell>
+                  
                 </TableRow>
               </TableHead>
               <TableBody>
                 {applications.map((element) => (
                   <TableRow key={element.id}>
+                    <TableCell><Button onClick={() => onButtonClickDecline(element.email)} variant="contained" color="secondary">Decline</Button></TableCell>
                     <TableCell><img
                   alt="avatar"
                   style={{ maxWidth: "55px" }}
-                  src={faker.image.avatar()}
+                  src={`https://i.imgur.com/0avxl7q.jpg`}
+                  // src={faker.image.avatar()}
                 /></TableCell>
                     <TableCell>{element.name}</TableCell>
                     <TableCell>{element.description}</TableCell>
                     {/* <TableCell><Button onClick={() => onButtonClickAccept(element.email)} variant="contained" color="primary">Accept</Button></TableCell> */}
-                    <TableCell><Button onClick={() => onButtonClickReject(element.email)} variant="contained" color="secondary">Cancel</Button></TableCell>
+                    
                   </TableRow>
                 ))}
               </TableBody>
@@ -364,25 +503,29 @@ return <Container>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
               <TableRow>
+              <TableCell><Button color="secondary">Decline</Button></TableCell>
+              <TableCell><Button color="primary">Accept</Button></TableCell>
+              
               <TableCell>Photo</TableCell>
                   <TableCell>Group Name</TableCell>
                   <TableCell>Description</TableCell>
-                  <TableCell><Button color="primary">Accept</Button></TableCell>
-                  <TableCell><Button color="secondary">Reject</Button></TableCell>
+                  
                 </TableRow>
               </TableHead>
               <TableBody>
                 {invitations.map((element) => (
                   <TableRow key={element.groupId}>
+                    <TableCell><Button onClick={() => onButtonClickDeclineInvitation(element.groupId)} variant="contained" color="secondary">Decline</Button></TableCell>
+                    <TableCell><Button onClick={() => onButtonClickAcceptInvitation(element.groupId)} variant="contained" color="primary">Accept</Button></TableCell>
+                    
                     <TableCell><img
                   alt="avatar"
                   style={{ maxWidth: "55px" }}
-                  src={faker.image.abstract()}
+                  src={`https://i.imgur.com/0avxl7q.jpg`}
                 /></TableCell>
                     <TableCell>{element.name}</TableCell>
                     <TableCell>{element.description}</TableCell>
-                    <TableCell><Button onClick={() => onButtonClickAcceptInvitation(element.groupId)} variant="contained" color="primary">Accept</Button></TableCell>
-                    <TableCell><Button onClick={() => onButtonClickRejectInvitation(element.groupId)} variant="contained" color="secondary">Reject</Button></TableCell>
+                    
                   </TableRow>
                 ))}
               </TableBody>
