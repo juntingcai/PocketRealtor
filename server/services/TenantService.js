@@ -1,106 +1,87 @@
 const resTemplate = require("../static/ResponseTemplate");
 const {
   TenantZipPreference,
-  UsZipCode,
   User,
   UserRole,
+  FavoriteListing,
+  Listing,
 } = require("../models/models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const RoleType = require("../static/RoleType");
+const zipCodeUtil = require("../utils/ZipCodeUtil");
 
-let zipCodeMap = new Map();
-let cityZipMap = new Map();
 class TenantService {
-  constructor() {
-    UsZipCode.findAll({
-      row: true,
-      attributes: ["zip", "state", "city"],
-    }).then((zips) => {
-      for (var i = 0; i < zips.length; i++) {
-        let area = zips[i];
-        let city = area.city + "," + area.state;
-        zipCodeMap.set(area.zip, { state: area.state, city: area.city });
-
-        if (cityZipMap.has(city)) {
-          cityZipMap.get(city).push(area.zip);
-        } else {
-          cityZipMap.set(city, [area.zip]);
-        }
-      }
-    });
-  }
-
-  updateZipPreference(userId, zips, res) {
-    console.log(zips);
+  updateZipPreference(userId, zips) {
     for (var i = 0; i < zips.length; i++) {
       let zip = zips[i];
-      if (!zipCodeMap.has(zip)) {
-        console.log(zip + " is not valid");
-        res.json(resTemplate.INVALID_ZIP_CODE);
-        return;
+      if (!zipCodeUtil.isZipCodeValid(zip)) {
+        return false;
       }
     }
-
-    TenantZipPreference.destroy({ where: { user_id: userId } }).then(() => {
-      console.log(zips);
-      var data = [];
-      for (var i = 0; i < zips.length; i++) {
-        let zip = zips[i];
-        let row = { user_id: userId, zip_code: zip };
-        data.push(row);
-      }
-      TenantZipPreference.bulkCreate(data).then(() => {
-        res.json(resTemplate.SUCCESS);
+    return TenantZipPreference.destroy({ where: { user_id: userId } })
+      .then(() => {
+        var data = [];
+        for (var i = 0; i < zips.length; i++) {
+          let zip = zips[i];
+          let row = { user_id: userId, zip_code: zip };
+          data.push(row);
+        }
+        return TenantZipPreference.bulkCreate(data).then(() => {
+          return true;
+        });
+      })
+      .catch((err) => {
+        return undefined;
       });
-    });
   }
 
-  addZipPreference(userId, zip, res) {
-    if (!zipCodeMap.has(zip)) {
-      res.json(resTemplate.INVALID_ZIP_CODE);
-      return;
+  addZipPreference(userId, zip) {
+    if (!zipCodeUtil.isZipCodeValid(zip)) {
+      return false;
     }
-
-    TenantZipPreference.findOne({
+    return TenantZipPreference.findOne({
       where: { user_id: userId, zip_code: zip },
     }).then((row) => {
       if (row) {
-        res.json(resTemplate.SUCCESS);
+        return true;
       } else {
-        TenantZipPreference.create({
+        return TenantZipPreference.create({
           user_id: userId,
           zip_code: zip,
         }).then(() => {
-          res.json(resTemplate.SUCCESS);
+          return true;
         });
       }
     });
   }
 
-  updateCityPreference(userId, cities, res) {
+  updateCityPreference(userId, cities) {
     var preferredZips = [];
     for (var i = 0; i < cities.length; i++) {
       let city = cities[i];
-      let citystate = city.city + "," + city.state;
-      if (cityZipMap.has(citystate)) {
-        let c = Array.from(cityZipMap.get(citystate));
-        preferredZips = preferredZips.concat(c);
+      if (zipCodeUtil.isCityStateValid(city.city, city.state)) {
+        let zipcodes = Array.from(
+          zipCodeUtil.getZipCodesByCityState(city.city, city.state)
+        );
+        preferredZips = preferredZips.concat(zipcodes);
       }
     }
-    this.updateZipPreference(userId, preferredZips, res);
+    return this.updateZipPreference(userId, preferredZips);
   }
 
-  addCityPreference(userId, city, state, res) {
-    let citystate = city + "," + state;
-    if (cityZipMap.has(citystate)) {
-      this.updateZipPreference(userId, cityZipMap.get(citystate), res);
+  addCityPreference(userId, city, state) {
+    if (zipCodeUtil.isCityStateValid(city, state)) {
+      return this.updateZipPreference(
+        userId,
+        zipCodeUtil.getZipCodesByCityState(city, state)
+      );
     } else {
-      res.json(resTemplate.NO_DATA);
+      return undefined;
     }
   }
 
-  getTenantPreference(userId, res) {
-    TenantZipPreference.findAll({
+  getTenantPreference(userId) {
+    return TenantZipPreference.findAll({
       attributes: ["zip_code"],
       where: { user_id: userId },
       row: true,
@@ -111,25 +92,24 @@ class TenantService {
         for (var i = 0; i < preferredZips.length; i++) {
           let zip = preferredZips[i].get("zip_code");
           zips.push(zip);
-          let city = zipCodeMap.get(zip);
+          let city = zipCodeUtil.getCityStateByZipCode(zip);
           citySet.add(city.city + ", " + city.state);
         }
         zips.sort((a, b) => a - b);
         let sortedCity = Array.from(citySet).sort();
-        res.json({
+        return {
           userId: userId,
-          preferedZips: zips,
+          preferredZips: zips,
           preferredCities: sortedCity,
-        });
+        };
       })
       .catch((err) => {
-        console.log(err);
-        res.send(err);
+        return undefined;
       });
   }
 
-  findTenants(preferredZips, res) {
-    User.findAll(/* TODO: where .... */).then((users) => {
+  findTenants(preferredZips) {
+    return User.findAll(/* add filters here */).then((users) => {
       let userMap = new Map();
       let fitUserIds = [];
       for (var i = 0; i < users.length; i++) {
@@ -138,7 +118,7 @@ class TenantService {
         userMap.set(userId, user);
         fitUserIds.push(userId);
       }
-      TenantZipPreference.findAll({
+      return TenantZipPreference.findAll({
         attributes: ["user_id"],
         where: {
           user_id: {
@@ -160,16 +140,17 @@ class TenantService {
             email: fittingUser.get("email"),
             gender: fittingUser.get("gender"),
             occupation: fittingUser.get("occupation"),
+            avatar: fittingUser.get("avatar"),
           };
           result.push(resUser);
         }
-        res.json(result);
+        return result;
       });
     });
   }
 
-  findAllTenants(res) {
-    UserRole.findAll({
+  findAllTenants() {
+    return UserRole.findAll({
       attributes: ["user_id"],
       where: { role_id: RoleType.RENTER.id },
     })
@@ -178,7 +159,7 @@ class TenantService {
         for (var i = 0; i < ids.length; i++) {
           userIds.push(ids[i].get("user_id"));
         }
-        User.findAll({
+        return User.findAll({
           where: {
             id: { [Op.in]: userIds },
           },
@@ -193,32 +174,117 @@ class TenantService {
               email: user.get("email"),
               gender: user.get("gender"),
               occupation: user.get("occupation"),
+              avatar: user.get("avatar"),
             };
             result.push(resUser);
           }
-          res.json(result);
+          return result;
         });
       })
       .catch((err) => {
-        console.log(err);
+        return undefined;
       });
   }
 
-  //==============util================
-  cityToZipCodes(city, state) {
-    let citystate = city + "," + state;
-    return cityZipMap.get(citystate);
+  async addToFavorite(userId, listingId) {
+    return await FavoriteListing.findOne({
+      where: {
+        user_id: userId,
+        listing_id: listingId,
+      },
+    }).then((row) => {
+      if (row) {
+        return true;
+      }
+      return FavoriteListing.create({
+        user_id: userId,
+        listing_id: listingId,
+        create_time: Sequelize.fn("NOW"),
+      })
+        .then(() => {
+          return true;
+        })
+        .catch((err) => {
+          console.log(err);
+          return false;
+        });
+    });
   }
 
-  getCityByZipCode(zip) {
-    return zipCodeMap.get(zip);
+  deleteFavorite(userId, listingId) {
+    return FavoriteListing.findOne({
+      where: {
+        user_id: userId,
+        listing_id: listingId,
+      },
+    })
+      .then((row) => {
+        if (!row) {
+          return true;
+        }
+        return row
+          .destroy()
+          .then(() => {
+            return true;
+          })
+          .catch((err) => {
+            console.log(err);
+            return false;
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
   }
 
-  //==============================
-  testZip(req, res) {
-    let zips = cityZipMap.get("San Francisco,CA");
-    console.log(zips);
-    res.json({ zips: zips });
+  getUserFavoriteListings(userId) {
+    return FavoriteListing.findAll({
+      attributes: [
+        ["listing_id", "id"],
+        [Sequelize.col("listing.title"), "title"],
+        [Sequelize.col("listing.sale_price"), "salePrice"],
+        [Sequelize.col("listing.rent_price"), "rentPrice"],
+        [Sequelize.col("listing.address"), "address"],
+        [Sequelize.col("listing.city"), "city"],
+        [Sequelize.col("listing.state"), "state"],
+        [Sequelize.col("listing.zip_code"), "zipcode"],
+        [Sequelize.col("create_time"), "addAt"],
+      ],
+      raw: true,
+      where: { user_id: userId },
+      order: [["create_time", "DESC"]],
+      include: {
+        model: Listing,
+        attributes: [],
+      },
+    })
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
+
+  test(userId) {
+    return FavoriteListing.findAll({
+      attributes: [
+        ["listing_id", "id"],
+        [Sequelize.col("listing.title"), "title"],
+        [Sequelize.col("create_time"), "addAt"],
+      ],
+      raw: true,
+      where: { user_id: userId },
+      order: [["create_time", "DESC"]],
+      include: {
+        model: Listing,
+        attributes: [],
+      },
+    }).then((result) => {
+      return result;
+    });
   }
 }
 

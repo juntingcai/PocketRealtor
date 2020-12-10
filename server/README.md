@@ -17,6 +17,74 @@
 ### 10/18
 1. Change conditions in searching listings
 
+### 10/22
+1. Users are able to see their history of exploring tenants and listings
+2. Tenants are able to like a listing, and delete it
+3. Modify some structures
+
+### 10/27
+1. Implemented grouping functionalities. [See Here](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document#tenant-group)
+
+### 10/28
+1. Add a filed "status" in listing table.(About status, see [ListingStatus.js](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/common/Constans/ListingStatus.js))
+2. Listing owner can update liting's status now.
+
+### 10/29
+1. Add "isFavorite" field into [GET-LISTING](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-a-listing)
+
+### 10/30
+1. Change output from [getUserRole](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/User.md#update-users-role-token-needed)
+2. When calling getListing, now the image_links will return a array containing at least 5 elements(could be empty strings if images are not enough). 
+3. When searching listings, the image_links will only be the first image_link in the database. If no images, it will be a empty string 
+4. Remove the restriction of being a tenant while putting/deleting/getting favorite listings 
+
+### 10/31
+1. Now the [GetFavorite](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Tenant.md#view-favorite-list-token-needed) returns listing's address and price
+2. [Get User's Invitaions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-invitations)
+3. [View all groups](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#view-all-groups)
+
+### 11/9
+1. Create a few [group-listing functions](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#listings-in-groups)
+
+### 11/10
+1. Add type=0 (both rent and sale) into listing search filter.
+
+### 11/15
+1. Return "approvers" when viewing listings in a group
+
+### 11/21 
+1. Add createdAt and updatedAt on Listing
+2. Create a new route: [Get Owner's Listings](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Listing.md#get-owners-listingstoken-needed)
+
+### 11/22
+1. Add user's id in getUserProfile
+2. Add "isAgent" in getting a listing
+
+### 11/23
+1. Add [chat room](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#chat-room) routes 
+
+### 11/26
+1. Fix typos
+2. Add listingId to personal chat room
+3. Order the chatrooms by the last message
+
+### 11/27
+1. Returns user basic info while login/register
+2. Add more features about [applications](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#applications)
+
+### Configuration
+Before starting the server, there some configurations need to be settup   
+1. **[Basic config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/config.js)**   
+  * Table reset/alter: If you need to change table schemas, enable alter. If you need to clean all data in database, enable reset.
+  * You need to enable ethier http or https. If it's https, you also need to provide the ssl certification files path
+  * You can setup how long is valid after user has logged in.   
+2. **[Database config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/database/config.js)**   
+  * You can settup the database connection here, like hostname and password   
+3. **[JWT SECRET](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/static/Constant.js)**   
+  * This is the key for jwt encryption, you may want to change when this project is in production   
+   
+
+
 ## Set up
 
 - Input your database's setting in database/config.js
@@ -26,401 +94,15 @@
 ```
 npm install
 ```
-
 ### Start Server
 
 ```
-DEBUG=express-locallibrary-tutorial:* npm run devstart
+npm run start
 ```
 
 ## Server Response
-
 - No matter requests success or fail, the server will return a json in {code: code, msg: message} (sometimes with token) where code and message are in static/ResponseTemplate.js
-- Note: Currently response code and message are not stable, so please do not rely on it.
 
-## User Register
+## API
+See [documant/Readme.md](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document).
 
-```
-Post: localhost:3000/user/register
-{
-    "email": "youremail@gmail.com",
-    "password": "EE123456ee",
-    "firstname": "Jerry",
-    "lastname": "Chen"
-}
-```
-
-- Password has to be between 6 to 20 characters and contain at least one numeric digit, one uppercase and one lowercase letter
-- If registered successfully, the server will return the token (see "User Login" response).
-
-## User Login
-
-```
-Post: localhost:3000/user/login
-{
-    "email": "bnb1083@gmail.com",
-    "password": "EE123456ee"
-}
-```
-
-If user's login inputed correctly, it will return the json with "token".
-
-```
-{
-    "code": 10000,
-    "msg": "Request Success",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJlbWFpbCI6ImJuYjEwODNAZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6IkplcnJ5IiwibGFzdF9uYW1lIjoiQ2hlbiIsInBhc3N3b3JkX3NhbHQiOiJjYzMyN2QwMDBmNWIxN2JmYWNmMTFlYjRhN2RhMTQ0NCIsInBhc3N3b3JkX2hhc2hlZCI6ImY2OTYzYzFmZTQxNmFkZWY0YTI0MDY1NzEyYmYzYWY4YjU2M2Y5Zjk0MTQ4ODQ4NjJmNDI5ZWRlMWJlZWNiODAiLCJ0b2tlbnMiOm51bGx9LCJpYXQiOjE2MDEwODM1MDUsImV4cCI6MTYwMTY4ODMwNX0.hdKH5wdAnJTTyrd7nzgQX7G0IMr3o8n2Uk94GyGXqm8"
-}
-```
-
-Otherwise, the fail code and reason will show as in static/ResponseTemplate.js
-
-## Token
-
-- To test if your token is valid, make a post request with HEADER key-value -> "Authorization":"YOUR TOKEN"
-- If the token is valid, it will return the user's info in Json.
-- If you'd like to see the token's value(user's id), check out https://jwt.io, and enter the token you got.
-
-```
-Post: localhost:3000/verifyuser
-```
-
-## Change password (Token needed)
-
-To update user's passoword, please include the user's token in Header
-"Authorization":"USER'S TOKEN", and make a post request:
-
-```
-Post: localhost:3000/user/updatePassword
-{
-    "oldPassword": "Ee123456789",
-    "newPassword": "Ee123456100"
-}
-```
-
-## Update profile (Token needed)
-
-To update user's profole, please include the user's token in Header
-"Authorization":"USER'S TOKEN", and make a put request:
-
-```
-Put: localhost:3000/user/updateProfile
-{
-    "firstname": "Jerry",
-    "lastname": "Chen",
-    "birthday" "2001-01-01",
-    "nickname": "JC",
-    "intro" : "Hi I am Jerry"
-    "gender": "JC",
-    "occupation" : "Hi I am Jerry"
-}
-```
-
-## Update user's role (Token needed)
-
-```
-PUT: localhost:3000/user/updateRole
-{
-    "isAgent" : false,
-    "isRenter" : true,
-    "isHost" : false
-}
-```
-
-You do not need to give every role field. It's still working if you input:
-
-```
-{
-    "isRenter" : true,
-}
-```
-
-Also, renter and host and be true simultaneously.
-
-```
-{
-    "isRenter" : true,
-    "isHost" : true
-}
-```
-
-However, if 3 roles are all true, the server will ignore the agent.  
-And if all roles are false or undefined, no data will be updated, but the server is still going to return SUCCESS.
-
-## Update user's avatar (Token needed)
-Update user's avatar by giving a image link
-```
-PUT: localhost:3000/user/updateAvatar
-{
-    "avatar" : "https://i.imgur.com/0avxl7q.jpg"
-}
-```
-
-where AVATAR will be stored in database as Blob.  
-See example response in "Get someone's profile"
-
-## Get someone's profile
-
-To get someone's profile, please make a GET request and provide the user's id
-
-```
-GET: localhost:3000/user/:userId
-```
-
-If the user exists, a json will be returned like:
-
-```
-{
-    "success": true,
-    "data": {
-        "email": "member2@gmail.com",
-        "firstname": "Jerry",
-        "lastname": "Chen",
-        "nickname": "JC",
-        "birthday": 2001-01-01,
-        "intro": "Hi I am Jerry",
-        "avatar": "https://i.imgur.com/0avxl7q.jpg"
-    }
-}
-```
-
-If the user does not exist, a json will be returned like:
-
-```
-{
-    "success": false,
-    "message": "Cannot find the user"
-}
-```
-
-## GET User's role
-
-To get a user's role, please make a GET request and provide the user's id
-
-```
-GET: localhost:3000/user/role/:userId
-```
-
-Response will be a json array  
-One role
-
-```
-[
-    {
-        "user_id": 1,
-        "role_id": 1,
-        "role_name": "Renter"
-    }
-]
-```
-
-Two roles
-
-```
-[
-    {
-        "user_id": 1,
-        "role_id": 2,
-        "role_name": "Host"
-    },
-    {
-        "user_id": 1,
-        "role_id": 1,
-        "role_name": "Renter"
-    }
-]
-```
-
-## Create a house listing(Host user token needed)
-
-Before a user creating a listing, the user must be a Host.
-(See [Update user's role](https://github.com/sfdevshop/PocketRealtorApp/tree/master/server#update-users-role-token-needed))
-
-```
-POST: localhost:3000/listing/create
-{
-    "property": {
-        "title": "My house",
-        "description": "This is a good house",
-        "address": "2312 Cool Stree.",
-        "city": "San Jose",
-        "state": "CA",
-        "latitude": 37.776339,
-        "longitude": -122.450672,
-        "rooms": 5,
-        "zip_code" : 94117,
-        "type" : "Apartment",
-        "rent_price": 2500,
-        "sale_price" : 999999,
-        "bath_rooms" : 2,
-        "area" : 55000.12,
-        "age" : 30
-    }
-}
-```
-
-## Duplicate a house listing(Owner token needed)
-
-**The duplicated owner will be the one who calls this api(by given token)**
-
-```
-PUT: localhost:3000/listing/duplicate/:listingId
-```
-
-## Update a house listing(Owner token needed)
-```
-PUT: localhost:3000/listing/update
-{   "id": 3004,
-    "property": {
-        "title": "My house",
-        "description": "This is a good house",
-        "address": "2312 Cool Stree.",
-        "city": "San Jose",
-        "state": "CA",
-        "latitude": 37.776339,
-        "longitude": -122.450672,
-        "rooms": 5,
-        "zip_code" : 94117,
-        "type" : "Apartment",
-        "rent_price": 2500,
-        "sale_price" : 999999,
-        "bath_rooms" : 2,
-        "area" : 55000.12,
-        "age" : 30
-    }
-}
-```
-
-## Delete a house listing(Owner token needed)
-
-**Note: The user calling this api must be the owner of the house.**
-
-```
-DELETE localhost:3000/listing/delete/:listingid
-```
-
-## Search for listings (10/18 changed)
-
-Given a center from coordinate and radius(mile), this api will provides the house listings in the range.  
-
-Required parameters
-- lat // latitude
-- lng // longitude
-- radius // in miles
-- type // 1 = rent, 2 = sale
-
-Optional parameters
-- minPrice // rent/sale price >= minPrice
-- maxPrice // rent/sale price <= maxPrice
-- bedrooms // least bedroom number
-- bathrooms // least bathrooms number
-
-Here are some examples:
-```
-localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=3&type=1
-localhost:3000/listings?lat=45.015900&lng=-93.471900&radius=100&type=1&minPrice=202&maxPrice=5000&bedrooms=1&bathrooms=1
-```
-
-## GET A LISTING
-
-```
-GET localhost:3000/listing/:id
-```
-
-## Add Tenant's living location preference (Tenant token needed)
-
-A tenant has two ways to add an area where s/he would like to live.
-
-1. Provide a zip code
-
-```
-PUT: localhost:3000/tenant/preference/:zip
-```
-
-2. Provde city & state
-
-```
-PUT: localhost:3000/tenant/preference/
-{
-    "city" : "San Francisco",
-    "state" : "CA"
-}
-```
-
-## Update Tenant's living location preference (Tenant token needed)
-
-A tenant could also update locations where s/he would like to live.  
-**You can give cities or zipcodes, but you cannot give both.**
-**Important: this will remove previous preference and get it updated by what you input**
-
-```
-POST: localhost:3000/tenant/preference/update
-{
-    "cities" : [
-        {"city" : "San Francisco", "state": "CA"},
-        {"city" : "San Jose", "state": "CA"},
-        {"city" : "New York", "state": "NY"}
-    ]
-}
-```
-
-**OR**
-
-```
-{
-    "zipcodes" : [
-        "94117",
-        "30005",
-        "60002",
-        "70001",
-        "90087"
-    ]
-}
-```
-
-## Search tenants
-
-Users can find other tenants who are interested in certain city,
-A request could be :
-**(NOTE: Must give both city and state)**
-
-```
-GET: localhost:3000/tenants?city=San Francisco&state=CA
-```
-
-If one of city or state is missing, it will find all tanants.  
-Also you can find all users(with tenant's role) by:
-
-```
-GET: localhost:3000/tenants
-```
-
-## Get a tenant's preference
-
-You can find a tenant preference on both city and zips
-
-```
-GET: localhost:3000/tenant/preference/:userId
-```
-
-A json would be return like(sorted):
-
-```
-{
-    "userId": "2",
-    "preferedZips": [
-        "30005",
-        "60002",
-        "70001",
-        "90087",
-        "94117"
-    ],
-    "preferredCities": [
-        "Alpharetta, GA",
-        "Antioch, IL",
-        "Los Angeles, CA",
-        "Metairie, LA",
-        "San Francisco, CA"
-    ]
-}
-```

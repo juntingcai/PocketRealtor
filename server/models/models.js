@@ -4,158 +4,42 @@ const config = require("../config");
 const permissionType = require("../static/PermissionType");
 const roleType = require("../static/RoleType");
 
-let tableDefaultSetting = {
-  underscored: true,
-  timestamps: false,
-  freezeTableName: true,
-};
-
-let tableSettingWithTimestamps = {
-  underscored: true,
-  timestamps: true,
-  freezeTableName: true,
-};
-
-const User = sequelize.define(
-  "users",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-    password_salt: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password_hashed: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    // ---bio below
-    first_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    last_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    nickname: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    birthday: {
-      type: DataTypes.DATEONLY,
-      allowNull: true,
-    },
-    avatar: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    intro: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    gender: {
-      type: DataTypes.INTEGER, // 1 = Male, 2 = Female
-      allowNull: true,
-    },
-    occupation: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  tableDefaultSetting
+// Models Import
+const User = require("./users")(sequelize, DataTypes);
+const UsZipCode = require("./usZipCodes")(sequelize, DataTypes);
+const TenantZipPreference = require("./tenantZipPreferences")(
+  sequelize,
+  DataTypes
 );
+const Role = require("./roles")(sequelize, DataTypes);
+const UserRole = require("./userRoles")(sequelize, DataTypes);
+const Permission = require("./permissions")(sequelize, DataTypes);
+const RolePermission = require("./rolePermissions")(sequelize, DataTypes);
+const Listing = require("./listings")(sequelize, DataTypes);
+const FavoriteListing = require("./favariteListings")(sequelize, DataTypes);
+const TenantHistory = require("./tenantHistory")(sequelize, DataTypes);
+const TenantGroups = require("./tenantGroups")(sequelize, DataTypes);
+const GroupMembers = require("./groupMembers")(sequelize, DataTypes);
+const TenantGroupListings = require("./tenantGroupListings")(sequelize, DataTypes);
+const ListingApplications = require("./listingApplication")(sequelize, DataTypes);
+const GroupChatRoom = require("./groupChatRoom")(sequelize, DataTypes);
+const PersonalChatRoom = require("./personalChatRooms")(sequelize, DataTypes);
 
-const UsZipCode = sequelize.define(
-  "us_zip_codes",
-  {
-    zip: {
-      type: DataTypes.STRING(5),
-      primaryKey: true,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    state: {
-      type: DataTypes.STRING(2),
-      allowNull: false,
-    },
-    county: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    latitude: {
-      type: DataTypes.DECIMAL(10, 6),
-      allowNull: true,
-    },
-    longitude: {
-      type: DataTypes.DECIMAL(10, 6),
-      allowNull: true,
-    },
-  },
-  tableDefaultSetting
-);
+// associate user and zip codes into TenantZipPreference
+User.belongsToMany(UsZipCode, {
+  through: TenantZipPreference,
+  foreignKey: "user_id",
+});
+UsZipCode.belongsToMany(User, {
+  through: TenantZipPreference,
+  foreignKey: "zip_code",
+});
 
-const TenantZipPreference = sequelize.define(
-  "tenant_preferences",
-  {},
-  tableDefaultSetting
-);
-
-User.belongsToMany(UsZipCode, { through: TenantZipPreference, foreignKey: "user_id" });
-UsZipCode.belongsToMany(User, { through: TenantZipPreference, foreignKey: "zip_code" });
-
-
-const Role = sequelize.define(
-  "roles",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  tableDefaultSetting
-);
-
-const UserRole = sequelize.define("user_roles", {}, tableDefaultSetting);
-
+// associate user and role into UserRole
 User.belongsToMany(Role, { through: UserRole, foreignKey: "user_id" });
 Role.belongsToMany(User, { through: UserRole, foreignKey: "role_id" });
 
-const Permission = sequelize.define(
-  "permissions",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  tableDefaultSetting
-);
-
-const RolePermission = sequelize.define(
-  "role_permissions",
-  {},
-  tableDefaultSetting
-);
-
+// assciate role and its permission into RolePermission
 Permission.belongsToMany(Role, {
   through: RolePermission,
   foreignKey: "permission_id",
@@ -165,86 +49,70 @@ Role.belongsToMany(Permission, {
   foreignKey: "role_id",
 });
 
-const Listing = sequelize.define(
-  "listings",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    age: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    state: {
-      type: DataTypes.STRING(2),
-      allowNull: true,
-    },
-    zip_code: {
-      type: DataTypes.INTEGER(5),
-      allowNull: true,
-    },
-    latitude: {
-      type: DataTypes.DECIMAL(10, 6),
-      allowNull: true,
-    },
-    longitude: {
-      type: DataTypes.DECIMAL(10, 6),
-      allowNull: true,
-    },
-    sale_price: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    rent_price: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    area: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    rooms: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    bath_rooms: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    image_links: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: true,
-    },
-  },
-  tableDefaultSetting
-);
-
+// associate user and listings
 User.hasMany(Listing, { foreignKey: "owner_id" });
 Listing.belongsTo(User, { foreignKey: "owner_id" });
 
-sequelize.sync({ force: config.resetTables }).then(() => {
+// associate user and listings to FavoriteListing
+User.belongsToMany(Listing, {
+  through: FavoriteListing,
+  foreignKey: "user_id",
+});
+Listing.belongsToMany(User, {
+  through: FavoriteListing,
+  foreignKey: "listing_id",
+});
+
+FavoriteListing.belongsTo(User, {foreignKey: "user_id"})
+FavoriteListing.belongsTo(Listing, {foreignKey: "listing_id"})
+User.hasMany(FavoriteListing, {foreignKey: "user_id"})
+Listing.hasMany(FavoriteListing, {foreignKey: "listing_id"});
+
+// user has one TenantGroups
+User.hasMany(TenantGroups, { foreignKey: "owner_id" });
+TenantGroups.belongsTo(User, { foreignKey: "owner_id" });
+
+// set up TenantGroups
+TenantGroups.belongsToMany(User, {
+  through: GroupMembers,
+  foreignKey: "group_id",
+});
+User.belongsToMany(TenantGroups, {
+  through: GroupMembers,
+  foreignKey: "user_id",  
+});
+
+GroupMembers.belongsTo(User, {foreignKey: "user_id"})
+GroupMembers.belongsTo(TenantGroups, {foreignKey: "group_id"})
+
+User.hasMany(GroupMembers, {foreignKey: "user_id"})
+TenantGroups.hasMany(GroupMembers, {foreignKey: "group_id"});
+
+// tenant group and listings
+Listing.belongsToMany(TenantGroups, {through: TenantGroupListings, foreignKey: "listing_id"});
+TenantGroups.belongsToMany(Listing, {through: TenantGroupListings, foreignKey: "group_id"})
+
+User.hasMany(TenantGroupListings, {foreignKey: "added_user_id"});
+TenantGroupListings.belongsTo(User, {foreignKey: "added_user_id"})
+
+TenantGroupListings.belongsTo(Listing, {foreignKey: "listing_id"})
+Listing.hasMany(TenantGroupListings, {foreignKey: "listing_id"})
+
+// chat room association
+TenantGroups.hasOne(GroupChatRoom, {foreignKey: "group_id"})
+GroupChatRoom.belongsTo(TenantGroups, {foreignKey: "group_id"})
+
+// listing <- ListingApplications -> TenantGroups
+Listing.belongsToMany(TenantGroups, {through: ListingApplications, foreignKey: "listing_id"});
+TenantGroups.belongsToMany(Listing, {through: ListingApplications, foreignKey: "group_id"})
+
+ListingApplications.belongsTo(Listing, {foreignKey: "listing_id"})
+Listing.hasMany(ListingApplications, {foreignKey: "listing_id"})
+
+ListingApplications.belongsTo(TenantGroups, {foreignKey: "group_id"})
+TenantGroups.hasMany(ListingApplications, {foreignKey: "group_id"})
+
+sequelize.sync({ alter: config.alterTables, force: config.resetTables }).then(() => {
   if (config.resetTables) {
     Role.bulkCreate([roleType.RENTER, roleType.HOST, roleType.AGENT]);
 
@@ -256,4 +124,19 @@ sequelize.sync({ force: config.resetTables }).then(() => {
   }
 });
 
-module.exports = { User, UserRole, Role, Listing, TenantZipPreference, UsZipCode};
+module.exports = {
+  User,
+  UserRole,
+  Role,
+  Listing,
+  TenantZipPreference,
+  UsZipCode,
+  FavoriteListing,
+  TenantHistory,
+  TenantGroups,
+  GroupMembers,
+  TenantGroupListings,
+  GroupChatRoom,
+  PersonalChatRoom,
+  ListingApplications
+};
