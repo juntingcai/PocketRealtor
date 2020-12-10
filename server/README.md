@@ -72,6 +72,19 @@
 1. Returns user basic info while login/register
 2. Add more features about [applications](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#applications)
 
+### Configuration
+Before starting the server, there some configurations need to be settup
+**[Basic config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/config.js)**
+1. Table reset/alter: If you need to change table schemas, enable alter. If you need to clean all data in database, enable reset.
+2. You need to enable ethier http or https. If it's https, you also need to provide the ssl certification files path
+3. You can setup how long is valid after user has logged in. 
+**[Database config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/database/config.js)**
+1. You can settup the database connection here, like hostname and password
+**[JWT SECRET](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/static/Constant.js)**
+1. This is the key for jwt encryption, you may want to change when this project is in production
+
+
+
 ## Set up
 
 - Input your database's setting in database/config.js
@@ -81,16 +94,14 @@
 ```
 npm install
 ```
-
 ### Start Server
 
 ```
-DEBUG=express-locallibrary-tutorial:* npm run devstart
+npm run start
 ```
 
 ## Server Response
 - No matter requests success or fail, the server will return a json in {code: code, msg: message} (sometimes with token) where code and message are in static/ResponseTemplate.js
-- Note: Currently response code and message are not stable, so please do not rely on it.
 
 ## API
 See [documant/Readme.md](https://github.com/sfdevshop/PocketRealtorApp/tree/serverBuilding/server/document).
