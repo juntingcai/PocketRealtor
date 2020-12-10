@@ -73,16 +73,16 @@
 2. Add more features about [applications](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Readme.md#applications)
 
 ### Configuration
-Before starting the server, there some configurations need to be settup
-**[Basic config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/config.js)**
-1. Table reset/alter: If you need to change table schemas, enable alter. If you need to clean all data in database, enable reset.
-2. You need to enable ethier http or https. If it's https, you also need to provide the ssl certification files path
-3. You can setup how long is valid after user has logged in. 
-**[Database config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/database/config.js)**
-1. You can settup the database connection here, like hostname and password
-**[JWT SECRET](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/static/Constant.js)**
-1. This is the key for jwt encryption, you may want to change when this project is in production
-
+Before starting the server, there some configurations need to be settup   
+1. **[Basic config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/config.js)**   
+  * Table reset/alter: If you need to change table schemas, enable alter. If you need to clean all data in database, enable reset.
+  * You need to enable ethier http or https. If it's https, you also need to provide the ssl certification files path
+  * You can setup how long is valid after user has logged in.   
+2. **[Database config](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/database/config.js)**   
+  * You can settup the database connection here, like hostname and password   
+3. **[JWT SECRET](https://github.com/sfdevshop/PocketRealtorApp/blob/master/server/static/Constant.js)**   
+  * This is the key for jwt encryption, you may want to change when this project is in production   
+   
 
 
 ## Set up
