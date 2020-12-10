@@ -807,6 +807,32 @@ class TenantGroupService {
       return member.state;
     });
   }
+
+  getOwnerGroup(userId) {
+    return GroupMembers.findAll({
+      raw: true,
+      attributes: [
+        ["group_id", "id"],
+        [Sequelize.col("tenant_group.name"), "name"],
+        [Sequelize.col("tenant_group.description"), "description"],
+      ],
+      where: {
+        user_id: userId,
+        state: GroupMemberState.OWNER.id,
+      },
+      include: {
+        model: TenantGroups,
+        attributes: [],
+      },
+    })
+      .then((groups) => {
+        return groups;
+      })
+      .catch((err) => {
+        console.log(err);
+        return undefined;
+      });
+  }
 }
 
 module.exports = new TenantGroupService();

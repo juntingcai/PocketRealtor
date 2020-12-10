@@ -163,4 +163,9 @@ router.delete(
   TenantGroup.deleteApplication
 );
 
+router.get(
+  "/tenant/group/owner/:id",
+  TenantGroup.getOwnerGroup
+)
+
 module.exports = router;

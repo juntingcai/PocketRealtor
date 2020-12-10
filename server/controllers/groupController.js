@@ -746,6 +746,15 @@ class GroupController {
       }
     );
   }
+
+  getOwnerGroup(req, res) {
+    let ownerId = req.params.id;
+    TenantGroupService.getOwnerGroup(ownerId).then((result) => {
+      if (result != undefined) {
+        res.json(Object.assign({}, resTemplate.SUCCESS, { data: result }));
+      } else res.status(404).json(resTemplate.NO_DATA);
+    });
+  }
 }
 
 module.exports = new GroupController();
