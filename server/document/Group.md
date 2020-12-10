@@ -381,3 +381,29 @@ PUT localhost:3000/tenant/group/notes/put/:groupId
 * Messages only can be seen by group the owner and members.  
 * Messages will be displayed in [GET-GROUP](https://github.com/sfdevshop/PocketRealtorApp/blob/serverBuilding/server/document/Group.md#get-group-owner-and-member-side)
 
+## GET Owner's group
+This routes returns an users groups where the user is the owner
+
+```
+GET /tenant/group/owner/:userId
+```
+If the user does own a group, it returns
+```
+{
+    "code": 10000,
+    "msg": "Request Success",
+    "data": [
+        {
+            "id": 54,
+            "name": "SF Renters1",
+            "description": "Good renters"
+        }
+    ]
+}
+```
+Otherwise, it's a empty array
+{
+    "code": 10000,
+    "msg": "Request Success",
+    "data": []
+}
